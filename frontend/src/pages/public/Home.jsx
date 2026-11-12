@@ -115,7 +115,20 @@ export default function Home() {
             </ul>
           </div>
           <div className="hero-visual">
-            <img src="/famsecur-logo.jpg" alt="FamSecur logosu: evi koruyan kalkan" />
+            <img
+              className="hero-photo"
+              src="/images/aile-kanepe.webp"
+              alt="Evde kanepede birlikte gülümseyen dört kişilik aile"
+              width="1200"
+              height="800"
+            />
+            <div className="hero-badge">
+              <img src="/famsecur-logo.jpg" alt="" width="44" height="44" />
+              <div>
+                <b>Ev ağınız korunuyor</b>
+                <span>Yalnızca zararlı istekler engellenir</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -162,6 +175,14 @@ export default function Home() {
       <section className="section alt" id="gizlilik">
         <div className="container privacy">
           <div>
+            <img
+              className="section-photo"
+              src="/images/ebeveyn-cocuk-bilgisayar.webp"
+              alt="Mutfak masasında dizüstü bilgisayara birlikte bakan baba ve oğul"
+              width="1100"
+              height="743"
+              loading="lazy"
+            />
             <span className="eyebrow">Gizlilik ilkemiz</span>
             <h2>Neyi görmediğimiz, neyi gördüğümüz kadar önemli</h2>
             <p className="muted">
@@ -198,9 +219,19 @@ export default function Home() {
 
       <section className="section cta">
         <div className="container cta-box">
-          <h2>Ailenizi bugün koruma altına alın</h2>
-          <p>Hesabınızı oluşturun, cihazlarınızı ekleyin ve politikanızı birkaç dakikada belirleyin.</p>
-          <Link to="/kayit" className="btn btn-dark">Hemen başla</Link>
+          <img
+            className="cta-photo"
+            src="/images/aile-disarida.webp"
+            alt="Dışarıda kol kola poz veren mutlu dört kişilik aile"
+            width="1100"
+            height="733"
+            loading="lazy"
+          />
+          <div className="cta-text">
+            <h2>Ailenizi bugün koruma altına alın</h2>
+            <p>Hesabınızı oluşturun, cihazlarınızı ekleyin ve politikanızı birkaç dakikada belirleyin.</p>
+            <Link to="/kayit" className="btn btn-dark">Hemen başla</Link>
+          </div>
         </div>
       </section>
     </>
