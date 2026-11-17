@@ -51,7 +51,7 @@ export default function TestDomain() {
           <p className="muted small">Sonuç beklediğiniz gibi değil mi? <Link to="/panel/politika">Politikanızı</Link> veya <Link to="/panel/beyaz-liste">beyaz listenizi</Link> düzenleyin.</p>
         </form>
         <div>
-          {result ? <DecisionResult decision={result.decision} message={result.message} /> : <div className="decision decision-empty">Sonuç burada görünecek.</div>}
+          {result ? <DecisionResult decision={result.decision} message={result.message} ai={result.ai} /> : <div className="decision decision-empty">Sonuç burada görünecek.</div>}
         </div>
       </div>
     </>

@@ -208,3 +208,32 @@ class PublicAndAdminTests(BaseAPITest):
         self.assertEqual(response.data["action"], "block")
         self.assertEqual(response.data["category"], "phishing")
         self.assertEqual(ThreatSource.objects.count(), 1)
+
+
+class AiRiskTests(BaseAPITest):
+    """Eğitilmiş yapay zeka modeli: yalnızca listede olmayan alan adlarına uyarı verir."""
+
+    def setUp(self):
+        super().setUp()
+        self.register()
+        self.login_as()
+
+    def test_unknown_risky_domain_gets_ai_warning_but_is_not_blocked(self):
+        response = self.client.post("/api/check/", {"domain": "hotgirlsvideo.com"}, format="json")
+        self.assertEqual(response.data["decision"]["action"], "allow")  # model engellemez
+        self.assertGreaterEqual(response.data["ai"]["risk"], 60)
+        self.assertTrue(response.data["ai"]["warning"])
+        self.assertEqual(response.data["ai"]["category"], "adult")
+
+    def test_clean_domain_gets_low_ai_risk(self):
+        response = self.client.post("/api/check/", {"domain": "https://www.google.com/search"}, format="json")
+        self.assertLess(response.data["ai"]["risk"], 30)
+        self.assertFalse(response.data["ai"]["warning"])
+
+    def test_listed_or_whitelisted_domains_skip_ai(self):
+        response = self.client.post("/api/check/", {"domain": "0-romancasino.com"}, format="json")
+        self.assertEqual(response.data["decision"]["action"], "block")
+        self.assertIsNone(response.data["ai"])
+        self.client.post("/api/whitelist/", {"domain": "hotgirlsvideo.com"}, format="json")
+        response = self.client.post("/api/check/", {"domain": "hotgirlsvideo.com"}, format="json")
+        self.assertIsNone(response.data["ai"])
