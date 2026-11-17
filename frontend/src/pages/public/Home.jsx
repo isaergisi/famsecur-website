@@ -15,6 +15,13 @@ const FEATURES = [
   { icon: "🔕", title: "Sessiz veya uyarılı engel", text: "Site sessizce açılmasın ya da çocuğunuz nedenini anlatan bir uyarı sayfası görsün." },
 ];
 
+const WHY = [
+  { icon: "👁️‍🗨️", title: "Gözetlemeden korur", text: "Birçok ebeveyn kontrol uygulaması çocuğun mesajlarını, ekranını ve gezinme geçmişini izler; bu da aile içinde güveni zedeler. FamSecur yalnızca zararlı siteyi durdurur. Mesajlara, ekrana ya da geçmişe hiç bakmaz." },
+  { icon: "🎯", title: "Türkiye'deki yasa dışı bahse odaklı", text: "Bahis siteleri her gün adres değiştiriyor (ör. yenibahis123.net) ve listeler buna yetişemiyor. FamSecur'un yapay zeka modeli, hiçbir listede olmayan yeni bir adresi adından tanır ve sizi uyarır. Model, Türkiye'de popüler sitelerle eğitildi." },
+  { icon: "📶", title: "Tek kurulum, tüm cihazlar", text: "FamSecur ev ağında çalışır. Telefon, tablet ve oyun konsoluna ayrı ayrı uygulama kurmanız gerekmez. Cihazda uygulama olmadığı için çocuk onu silerek korumayı kapatamaz." },
+  { icon: "🤫", title: "Çocuk merak etmeden güvende kalır", text: "Sessiz engel modunda zararlı site yalnızca açılmaz; çocuk \"kumar\" ya da \"yetişkin içerik\" yazan bir uyarıyla karşılaşmaz. Bu yaş grubunda böyle içeriklerin varlığını öğrenmek bile merak uyandırabilir. FamSecur bu kapıyı hiç aralamaz." },
+];
+
 const STEPS = [
   ["Router'a bağlayın", "Ev router'ınızın DNS ayarını FamSecur'a yönlendirin. Çocuğun cihazına uygulama gerekmez."],
   ["Politikanızı seçin", "Hangi kategorilerin hangi eşikte engelleneceğine ebeveyn panelinden karar verin."],
@@ -145,6 +152,22 @@ export default function Home() {
                 <span className="feature-icon" aria-hidden>{f.icon}</span>
                 <h3>{f.title}</h3>
                 <p className="muted">{f.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section" id="neden-famsecur">
+        <div className="container">
+          <span className="eyebrow">Neden FamSecur?</span>
+          <h2>Korur, ama gözetlemez.</h2>
+          <div className="card-grid">
+            {WHY.map((w) => (
+              <article className="card feature" key={w.title}>
+                <span className="feature-icon" aria-hidden>{w.icon}</span>
+                <h3>{w.title}</h3>
+                <p className="muted">{w.text}</p>
               </article>
             ))}
           </div>
