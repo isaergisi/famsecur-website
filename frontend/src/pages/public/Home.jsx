@@ -7,6 +7,7 @@ import useFetch from "../../components/useFetch";
 
 const FEATURES = [
   { icon: "🛡️", title: "Ağ seviyesinde koruma", text: "Router'daki DNS katmanında çalışır. Gizli mod, tarayıcı değişikliği veya uygulama silme korumayı kapatmaz." },
+  { icon: "🤖", title: "Yapay zeka destekli analiz", text: "Kendi eğittiğimiz model, hiçbir listede olmayan yeni kumar ve yetişkin içerik sitelerini adından tanır ve sizi uyarır. Hiçbir veri dışarı gönderilmez." },
   { icon: "🔍", title: "Açıklanabilir kararlar", text: "Her engelin kategorisi, risk puanı ve gerekçesi panelde görünür. Kara kutu yok." },
   { icon: "🇹🇷", title: "Resmî kaynaklar", text: "Oltalama ve zararlı yazılım için USOM verisi, yasa dışı bahis için resmî alan adı havuzu kullanılır." },
   { icon: "✅", title: "Beyaz liste", text: "Yanlış engellenen bir siteyi tek tıkla izinli hâle getirin; alt alan adları da otomatik açılır." },
@@ -92,13 +93,14 @@ export default function Home() {
       <section className="hero">
         <div className="container hero-grid">
           <div>
-            <span className="eyebrow">Gizlilik odaklı aile internet kalkanı</span>
+            <span className="eyebrow">Yapay zeka destekli, gizlilik odaklı aile internet kalkanı</span>
             <h1>
               Müdahale etmeden, <span className="lime">Aileni koru.</span>
             </h1>
             <p className="lead">
               FamSecur ev ağınızda çalışır ve yalnızca kumar, yetişkin içerik, oltalama ve zararlı yazılım sitelerini
-              engeller. Mesajlar, ekran ya da gezinme geçmişi asla toplanmaz.
+              engeller. Mesajlar, ekran ya da gezinme geçmişi asla toplanmaz. Yapay zeka destekli risk analizi, listelerde
+              henüz olmayan yeni siteleri de adından tanır ve sizi uyarır.
             </p>
             <div className="hero-actions">
               <Link to="/kayit" className="btn btn-primary">
@@ -110,7 +112,7 @@ export default function Home() {
             </div>
             <ul className="hero-stats">
               <li><b>36.000+</b><span>resmî bahis alan adı</span></li>
-              <li><b>5</b><span>risk kategorisi</span></li>
+              <li><b>%92</b><span>yapay zeka doğruluğu</span></li>
               <li><b>0</b><span>kaydedilen izinli istek</span></li>
             </ul>
           </div>
