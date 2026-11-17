@@ -1,4 +1,4 @@
-export default function DecisionResult({ decision, message }) {
+export default function DecisionResult({ decision, message, ai }) {
   if (!decision) return null;
   const blocked = decision.action === "block";
   return (
@@ -27,6 +27,30 @@ export default function DecisionResult({ decision, message }) {
         ))}
       </ul>
       {message && <p className="small">{message}</p>}
+      {ai && <AiRisk ai={ai} />}
+    </div>
+  );
+}
+
+// Eğitilmiş yapay zeka modelinin tahmini. Yalnızca hiçbir listede olmayan alan
+// adları için gelir; engel kararını değiştirmez, ebeveyne ek bir uyarıdır.
+function AiRisk({ ai }) {
+  return (
+    <div className={`ai-risk ${ai.warning ? "ai-risk-warn" : ""}`}>
+      <div className="score">
+        <span>
+          Yapay zeka risk tahmini: <b>%{ai.risk}</b>
+        </span>
+        <div className="score-bar">
+          <span style={{ width: `${ai.risk}%` }} />
+        </div>
+      </div>
+      <p className="small">
+        {ai.warning
+          ? `Dikkat: bu alan adı hiçbir listede yok ama adı ${ai.category_label ? ai.category_label.toLowerCase() + " sitelerine" : "riskli sitelere"} benziyor. Engellenmedi; isterseniz kontrol edin.`
+          : "Bu alan adı hiçbir listede yok; yapay zeka modeli de adında belirgin bir risk görmedi."}
+      </p>
+      <p className="muted small">Model yalnızca alan adının harflerine bakar, sitenin içeriğini görmez. Tahmin yanılabilir.</p>
     </div>
   );
 }

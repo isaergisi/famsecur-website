@@ -4,7 +4,8 @@ from datetime import timedelta
 
 from django.utils import timezone
 
-from .classifier import Decision, analyze_domain
+from .classifier import Decision, analyze_domain, domain_suffixes, matches_any, official_gambling_domains
+from .ml_risk import predict_risk
 from .models import BlockEvent, Device, Family, ThreatSource
 
 BLOCK_MESSAGES = {
@@ -24,6 +25,26 @@ def decide_for_family(family: Family, domain: str) -> Decision:
     )
 
 
+def is_in_known_list(family: Family, domain: str) -> bool:
+    """Alan adı beyaz listede, tehdit kaynaklarında veya resmî havuzda mı?"""
+    if matches_any(domain, family.whitelist.values_list("domain", flat=True)):
+        return True
+    if any(suffix in ThreatSource.active_domain_map() for suffix in domain_suffixes(domain)):
+        return True
+    return matches_any(domain, official_gambling_domains())
+
+
+def ai_prediction(family: Family, decision: Decision) -> dict | None:
+    """Hiçbir listede olmayan alan adları için yapay zeka risk tahmini.
+
+    Listede olan alan adının sonucu zaten kesindir; model yalnızca bilinmeyen
+    alan adları için ek bir uyarı üretir ve kararı değiştirmez.
+    """
+    if not decision.domain or "." not in decision.domain or is_in_known_list(family, decision.domain):
+        return None
+    return predict_risk(decision.domain)
+
+
 def check_domain(family: Family, domain: str, device: Device | None = None) -> dict:
     """Bir DNS sorgusunu aile politikasına göre değerlendirir.
 
@@ -32,7 +53,7 @@ def check_domain(family: Family, domain: str, device: Device | None = None) -> d
     """
     if device is not None and not device.is_protected:
         decision = Decision(domain.strip().lower(), "allow", None, None, 0, ["Bu cihazda koruma kapalı"])
-        return {"decision": decision.to_dict(), "event": None, "message": "Cihaz korumada olmadığı için istek iletildi."}
+        return {"decision": decision.to_dict(), "event": None, "ai": None, "message": "Cihaz korumada olmadığı için istek iletildi."}
 
     decision = decide_for_family(family, domain)
     event = None
@@ -50,7 +71,7 @@ def check_domain(family: Family, domain: str, device: Device | None = None) -> d
         )
         message = BLOCK_MESSAGES[mode]
         prune_events(family)
-    return {"decision": decision.to_dict(), "event": event, "message": message}
+    return {"decision": decision.to_dict(), "event": event, "ai": ai_prediction(family, decision), "message": message}
 
 
 def prune_events(family: Family) -> int:

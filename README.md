@@ -48,8 +48,8 @@ tüm ailelerde geçerli tehdit istihbaratı kaynaklarını yönetir.
 | Hata ve başarı durumlarını gösterme | Alan bazlı form hataları, uyarı kutuları, bildirim (toast) mesajları |
 | Oturum yönetimi | Anahtarlar `localStorage`'da; süresi dolan erişim anahtarı otomatik yenilenir, yenilenemezse oturum kapatılır (`src/api.js`) |
 | En az 5 veri modeli | 9 model (aşağıda) |
-| Basit CRUD'dan öte | Açıklanabilir risk puanlamalı alan adı karar motoru, 36.000+ resmî kumar alan adı havuzu |
-| Testler | 17 API testi (`backend/tests/test_api.py`) |
+| Basit CRUD'dan öte | Açıklanabilir risk puanlamalı alan adı karar motoru, 36.000+ resmî kumar alan adı havuzu, kendi eğittiğimiz yapay zeka risk modeli (%92 test doğruluğu) |
+| Testler | 20 API testi (`backend/tests/test_api.py`) |
 
 ## Veri modelleri
 
@@ -80,7 +80,7 @@ erDiagram
 - Her ebeveyn yalnızca kendi ailesinin verisini görebilir; başka ailenin kaydı `404` döner.
 - Kayıt olan her kullanıcıya otomatik olarak bir aile ve varsayılan politika (eşik 70, sessiz engel, tüm kategoriler) oluşturulur.
 - Risk eşiği 30-100 arasında olmalıdır; oltalama ve zararlı yazılım kategorileri kapatılamaz.
-- `POST /api/check/` alan adını şu sırayla değerlendirir: cihaz koruması → beyaz liste → aktif tehdit kaynakları → resmî kumar havuzu → açıklanabilir sinyal puanlaması.
+- `POST /api/check/` alan adını şu sırayla değerlendirir: cihaz koruması → beyaz liste → aktif tehdit kaynakları → resmî kumar havuzu → açıklanabilir sinyal puanlaması. Alan adı hiçbir listede yoksa yanıta ayrıca yapay zeka risk tahmini (`ai`) eklenir; bu tahmin kararı değiştirmez.
 - İzin verilen istekler **hiçbir yerde kaydedilmez**; engellenenler `BlockEvent` olarak yazılır, saklama süresi dolanlar silinir.
 - Olaylar elle oluşturulamaz (`POST /api/events/` → `405`); yalnızca karar motoru üretir.
 - Aynı ailede aynı adlı iki cihaz veya aynı alan adı iki kez beyaz listede olamaz.
@@ -110,6 +110,87 @@ erDiagram
 | GET / POST, PUT, PATCH, DELETE | `/api/threat-sources/` | Herkes / Yönetici | Tehdit kaynakları |
 | GET, POST, PUT, PATCH, DELETE | `/api/admin/users/` | Yönetici | Kullanıcı yönetimi |
 | GET | `/api/admin/stats/` | Yönetici | Platform istatistikleri |
+
+## Yapay zeka risk modeli
+
+Listeler ne kadar büyük olursa olsun her gün yeni kumar ve yetişkin içerik
+siteleri açılıyor. Bu yüzden FamSecur'a, **hiçbir listede olmayan** bir alan
+adının adına bakarak ne kadar riskli göründüğünü tahmin eden küçük bir makine
+öğrenmesi modeli eklendi. Model ücretsizdir, tamamen yerelde (kendi
+bilgisayarımızda) eğitilir ve çalışır; dışarıya hiçbir veri gönderilmez.
+
+Ebeveyn panelindeki **Alan adı test et** sayfasında sonuç kartının altında
+"Yapay zeka risk tahmini: %NN" olarak görünür. Tahmin %60 ve üzerindeyse
+ebeveyne uyarı gösterilir. Model **engellemez**, yalnızca uyarır: kesin engel
+kararını açıklanabilir karar motoru ve listeler verir. Böylece modelin olası
+yanlışları çocuğun masum bir siteye girmesini engellemez.
+
+### Nasıl çalışıyor?
+
+1. **Veri.** Riskli örnekler: resmî kumar alan adı havuzu (Polonya Maliye
+   Bakanlığı) ve The Block List Project yetişkin içerik listesi. Temiz örnekler:
+   Cisco Umbrella'nın en çok ziyaret edilen 1 milyon alan adı listesi.
+2. **Temizleme.** Her alan adı kayıtlı alan adına indirilir
+   (`www.m.ornek.com` → `ornek.com`). Riskli listelerde geçen hiçbir alan adı
+   "temiz" sayılmaz. `tumblr.com` gibi binlerce kullanıcı sayfası barındıran
+   platformlar iki taraftan da çıkarılır.
+3. **Örneklem.** 100.000 riskli (≈26.000 kumar + ≈74.000 yetişkin) ve
+   ≈238.000 temiz alan adı. Sınıflar eşit sayıda değil; bunu
+   `class_weight="balanced"` ile dengeliyoruz (az örnekli sınıfın hatası daha
+   "pahalı" sayılır).
+4. **Ayrım.** Verinin %80'i eğitime, %20'si teste ayrılır. Test kümesini model
+   eğitim sırasında hiç görmez (hold-out), bu yüzden ölçülen doğruluk modelin
+   yeni alan adlarındaki başarısını gösterir.
+5. **Özellikler.** Alan adı 2-5 harflik parçalara (karakter n-gram) bölünür:
+   `bahis` → `ba`, `ah`, `bah`, `ahi`, … Bu parçalar *hashing* ile sabit
+   boyutlu bir vektöre yerleştirilir ve **TF-IDF** ile ağırlıklandırılır
+   (bir alan adında geçen ama genelde nadir olan parçalar daha önemli sayılır).
+6. **Sınıflandırıcı.** Çok sınıflı **Lojistik Regresyon**: her alan adı için
+   `clean` (temiz), `gambling` (kumar), `adult` (yetişkin) olasılıkları
+   hesaplanır. Risk puanı = 1 − P(temiz).
+7. **Kayıt.** Model `joblib` ile sıkıştırılarak
+   `backend/ml/model/domain_risk.joblib` dosyasına (≈3 MB) kaydedilir;
+   ölçümler `backend/ml/model/metrics.json` dosyasına yazılır.
+
+### Sonuçlar (67.558 alan adlık test kümesi)
+
+| Ölçüm | Değer |
+| --- | --- |
+| Doğruluk (temiz / kumar / yetişkin) | **%92,1** |
+| Doğruluk (riskli / temiz) | **%92,0** |
+| Riskli alan adlarını yakalama oranı | %87,1 |
+| Temiz alan adlarını doğru bırakma oranı | %94,1 |
+| ROC AUC (riskli / temiz) | 0,965 |
+
+| Sınıf | Kesinlik (precision) | Duyarlılık (recall) |
+| --- | --- | --- |
+| Kumar | %93,0 | %96,0 |
+| Yetişkin | %84,0 | %83,0 |
+| Temiz | %94,5 | %94,5 |
+
+Model yalnızca alan adının harflerine bakar, sitenin içeriğini görmez. Bu
+yüzden `better.com` gibi "bet" içeren masum adlarda veya temiz listede az
+bulunan Türkçe adlarda yanılabilir. Modeli engel yerine uyarı olarak
+kullanmamızın nedeni budur.
+
+### Modeli yeniden eğitmek
+
+```bash
+cd backend
+pip install -r requirements.txt
+python -m ml.train_risk_model --download   # verileri indirir (~40 MB) ve eğitir, ~1 dk
+python manage.py test tests                # model testleri dahil
+```
+
+Ham veriler `backend/ml/data/` klasörüne iner ve git'e eklenmez. Eğitim
+betiği sabit rastgelelik tohumu (`SEED = 42`) kullanır; aynı verilerle
+çalıştırıldığında aynı sonucu verir. Model dosyası farklı bir scikit-learn
+sürümüyle açılamazsa yukarıdaki komutla yeniden eğitmek yeterlidir; model
+yüklenemezse site çalışmaya devam eder, yalnızca yapay zeka tahmini görünmez.
+
+Dosyalar: `backend/ml/train_risk_model.py` (eğitim),
+`backend/ml/features.py` (eğitim ve tahminde ortak ön işleme),
+`backend/shield/ml_risk.py` (Django'da modeli yükleyip tahmin yapan yardımcı).
 
 ## Kurulum
 
@@ -165,6 +246,7 @@ backend/
   accounts/    kullanıcı modeli, kayıt/giriş, rol izinleri, kullanıcı yönetimi
   shield/      aile, politika, cihaz, beyaz liste, olay, tehdit kaynağı, karar motoru
   content/     SSS, iletişim talepleri, seed_demo komutu
+  ml/          yapay zeka risk modeli: eğitim betiği ve kayıtlı model
   tests/       API testleri
 frontend/
   src/api.js            REST istemcisi (JWT, otomatik yenileme, hata yönetimi)

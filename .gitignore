@@ -15,3 +15,6 @@ frontend/dist/
 .vscode/
 .idea/
 .DS_Store
+
+# Yapay zeka modeli eğitim verileri (büyük; train_risk_model.py --download ile indirilir)
+backend/ml/data/

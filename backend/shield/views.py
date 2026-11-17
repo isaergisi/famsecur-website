@@ -152,6 +152,7 @@ class CheckDomainView(APIView):
             {
                 "decision": result["decision"],
                 "message": result["message"],
+                "ai": result["ai"],
                 "event": BlockEventSerializer(event).data if event else None,
             },
             status=status.HTTP_201_CREATED if event else status.HTTP_200_OK,

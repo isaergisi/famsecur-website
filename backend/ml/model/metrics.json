@@ -1,0 +1,116 @@
+{
+  "trained_at": "2026-11-17T20:32:24+00:00",
+  "sklearn_version": "1.9.1",
+  "train_size": 270228,
+  "test_size": 67558,
+  "train_seconds": 50.0,
+  "accuracy_3class": 0.9206,
+  "accuracy_risky_vs_clean": 0.9202,
+  "risky_recall": 0.8711,
+  "clean_recall": 0.9408,
+  "roc_auc_risky_vs_clean": 0.9651,
+  "per_class": {
+    "adult": {
+      "precision": 0.8396,
+      "recall": 0.8299,
+      "f1-score": 0.8348,
+      "support": 14795.0
+    },
+    "clean": {
+      "precision": 0.9445,
+      "recall": 0.9445,
+      "f1-score": 0.9445,
+      "support": 47558.0
+    },
+    "gambling": {
+      "precision": 0.93,
+      "recall": 0.96,
+      "f1-score": 0.9448,
+      "support": 5205.0
+    }
+  },
+  "confusion_matrix": {
+    "labels": [
+      "adult",
+      "clean",
+      "gambling"
+    ],
+    "rows_true_cols_pred": [
+      [
+        12279,
+        2459,
+        57
+      ],
+      [
+        2320,
+        44919,
+        319
+      ],
+      [
+        25,
+        183,
+        4997
+      ]
+    ]
+  },
+  "data": {
+    "gambling_available": 26027,
+    "adult_available": 739857,
+    "adult_platforms_removed": [
+      "135.it",
+      "150m.com",
+      "1accesshost.com",
+      "20m.com",
+      "50megs.com",
+      "8m.com",
+      "ahacdn.me",
+      "alibaba.com",
+      "allmanpages.com",
+      "allmyblog.com",
+      "angelfire.com",
+      "at.tt",
+      "atspace.com",
+      "atw.hu",
+      "axxs.de",
+      "b-cdn.net",
+      "bds0d.com",
+      "be.tc",
+      "beeplog.de",
+      "bestelinks.nl",
+      "bizland.com",
+      "blog.com",
+      "blog4ever.com",
+      "blogdrive.com",
+      "blogg.de",
+      "blogg.org",
+      "blogger.com.br",
+      "blogs.fr",
+      "blogse.nl",
+      "blogsome.com",
+      "blogsource.com",
+      "blogspirit.com",
+      "blogtrafic.com",
+      "bol.com.br",
+      "boogolinks.nl",
+      "book.fr",
+      "bookspace.fr",
+      "bpa.nu",
+      "bravehost.com",
+      "bravepages.com",
+      "bzs.es",
+      "c.la",
+      "ca.cx",
+      "ca.tc",
+      "canalblog.com",
+      "centerblog.net",
+      "chat.ru",
+      "chez-alice.fr",
+      "chez.com",
+      "cjb.net"
+    ],
+    "clean_available": 237786,
+    "gambling_used": 26027,
+    "adult_used": 73973,
+    "clean_used": 237786
+  }
+}
