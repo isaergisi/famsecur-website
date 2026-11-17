@@ -48,7 +48,7 @@ tüm ailelerde geçerli tehdit istihbaratı kaynaklarını yönetir.
 | Hata ve başarı durumlarını gösterme | Alan bazlı form hataları, uyarı kutuları, bildirim (toast) mesajları |
 | Oturum yönetimi | Anahtarlar `localStorage`'da; süresi dolan erişim anahtarı otomatik yenilenir, yenilenemezse oturum kapatılır (`src/api.js`) |
 | En az 5 veri modeli | 9 model (aşağıda) |
-| Basit CRUD'dan öte | Açıklanabilir risk puanlamalı alan adı karar motoru, 36.000+ resmî kumar alan adı havuzu, kendi eğittiğimiz yapay zeka risk modeli (%92 test doğruluğu) |
+| Basit CRUD'dan öte | Açıklanabilir risk puanlamalı alan adı karar motoru, 36.000+ resmî kumar alan adı havuzu, kendi eğittiğimiz yapay zeka risk modeli (%93 test doğruluğu) |
 | Testler | 20 API testi (`backend/tests/test_api.py`) |
 
 ## Veri modelleri
@@ -128,49 +128,80 @@ yanlışları çocuğun masum bir siteye girmesini engellemez.
 ### Nasıl çalışıyor?
 
 1. **Veri.** Riskli örnekler: resmî kumar alan adı havuzu (Polonya Maliye
-   Bakanlığı) ve The Block List Project yetişkin içerik listesi. Temiz örnekler:
-   Cisco Umbrella'nın en çok ziyaret edilen 1 milyon alan adı listesi.
+   Bakanlığı), The Block List Project kumar ve yetişkin içerik listeleri. Temiz
+   örnekler: Cisco Umbrella'nın dünyada en çok sorgulanan 1 milyon alan adı ve
+   Google Chrome'un (CrUX) **Türkiye'de en çok ziyaret edilen ≈470.000 sitesi**.
 2. **Temizleme.** Her alan adı kayıtlı alan adına indirilir
    (`www.m.ornek.com` → `ornek.com`). Riskli listelerde geçen hiçbir alan adı
    "temiz" sayılmaz. `tumblr.com` gibi binlerce kullanıcı sayfası barındıran
    platformlar iki taraftan da çıkarılır.
-3. **Örneklem.** 100.000 riskli (≈26.000 kumar + ≈74.000 yetişkin) ve
-   ≈238.000 temiz alan adı. Sınıflar eşit sayıda değil; bunu
+3. **Türkçe riskli örnekler (zayıf etiketleme).** Kara listeler çoğunlukla
+   yabancı sitelerden oluşur. Türkiye'de popüler siteler arasında ise henüz
+   hiçbir listeye girmemiş yasa dışı bahis ve yetişkin siteleri var. Kural
+   tabanlı karar motorumuzun adından açıkça engellediği bu ≈24.000 site temiz
+   kümeden çıkarılır ve riskli örnek olarak eklenir. Model böylece
+   `canlibahis`, `yenibahisadresi` gibi Türkçe adları öğrenir, ama kurala
+   birebir bağlı kalmaz: kuralın bilmediği benzer adları da tanıyabilir.
+4. **Örneklem.** 100.000 kumar, 100.000 yetişkin ve ≈520.000 temiz alan adı
+   (toplam ≈720.000). Sınıflar eşit sayıda değil; bunu
    `class_weight="balanced"` ile dengeliyoruz (az örnekli sınıfın hatası daha
    "pahalı" sayılır).
-4. **Ayrım.** Verinin %80'i eğitime, %20'si teste ayrılır. Test kümesini model
+5. **Ayrım.** Verinin %80'i eğitime, %20'si teste ayrılır. Test kümesini model
    eğitim sırasında hiç görmez (hold-out), bu yüzden ölçülen doğruluk modelin
    yeni alan adlarındaki başarısını gösterir.
-5. **Özellikler.** Alan adı 2-5 harflik parçalara (karakter n-gram) bölünür:
+6. **Özellikler.** Alan adı 2-5 harflik parçalara (karakter n-gram) bölünür:
    `bahis` → `ba`, `ah`, `bah`, `ahi`, … Bu parçalar *hashing* ile sabit
    boyutlu bir vektöre yerleştirilir ve **TF-IDF** ile ağırlıklandırılır
    (bir alan adında geçen ama genelde nadir olan parçalar daha önemli sayılır).
-6. **Sınıflandırıcı.** Çok sınıflı **Lojistik Regresyon**: her alan adı için
+7. **Sınıflandırıcı.** Çok sınıflı **Lojistik Regresyon**: her alan adı için
    `clean` (temiz), `gambling` (kumar), `adult` (yetişkin) olasılıkları
    hesaplanır. Risk puanı = 1 − P(temiz).
-7. **Kayıt.** Model `joblib` ile sıkıştırılarak
+8. **Kayıt.** Model `joblib` ile sıkıştırılarak
    `backend/ml/model/domain_risk.joblib` dosyasına (≈3 MB) kaydedilir;
    ölçümler `backend/ml/model/metrics.json` dosyasına yazılır.
 
-### Sonuçlar (67.558 alan adlık test kümesi)
+### Sonuçlar (143.999 alan adlık test kümesi)
 
 | Ölçüm | Değer |
 | --- | --- |
-| Doğruluk (temiz / kumar / yetişkin) | **%92,1** |
-| Doğruluk (riskli / temiz) | **%92,0** |
-| Riskli alan adlarını yakalama oranı | %87,1 |
-| Temiz alan adlarını doğru bırakma oranı | %94,1 |
-| ROC AUC (riskli / temiz) | 0,965 |
+| Doğruluk (temiz / kumar / yetişkin) | **%92,8** |
+| Doğruluk (riskli / temiz) | **%93,0** |
+| Riskli alan adlarını yakalama oranı | %90,5 |
+| Temiz alan adlarını doğru bırakma oranı | %93,9 |
+| Türkiye'de popüler temiz siteleri doğru bırakma oranı | %94,9 |
+| ROC AUC (riskli / temiz) | 0,974 |
 
 | Sınıf | Kesinlik (precision) | Duyarlılık (recall) |
 | --- | --- | --- |
-| Kumar | %93,0 | %96,0 |
-| Yetişkin | %84,0 | %83,0 |
-| Temiz | %94,5 | %94,5 |
+| Kumar | %92,7 | %94,0 |
+| Yetişkin | %77,6 | %83,1 |
+| Temiz | %96,1 | %94,5 |
+
+### İlk model ile karşılaştırma
+
+İlk model yalnızca Polonya kumar listesi, yetişkin listesi ve Umbrella ile
+eğitilmişti. İki modeli **aynı test kümesinde** ölçtük:
+
+| Ölçüm | İlk model | Yeni model |
+| --- | --- | --- |
+| Doğruluk (riskli / temiz) | %87,3 | **%93,0** |
+| Riskli alan adlarını yakalama | %79,6 | **%90,5** |
+| Temiz alan adlarını doğru bırakma | %90,2 | **%93,9** |
+| Türkiye'de popüler temiz siteleri doğru bırakma | %86,2 | **%94,9** |
+| 40 bilinen Türk sitesinde ortalama risk | %11,8 | **%4,0** |
+
+Örnekler (risk tahmini, ilk → yeni): `sahibinden.com` %36 → %6,
+`yemeksepeti.com` %55 → %2, `cumhuriyet.com.tr` %45 → %0,
+`yenibahisadresi.net` %56 → %95, `canlimacizle-bahis.com` %81 → %92.
+
+Not: İlk modelin daha önce ölçülen %92'lik doğruluğu kendi (daha kolay,
+Türkçe örnek içermeyen) test kümesindeydi; burada iki model aynı ve daha zor
+kümede yarışıyor. Test kümesindeki Türkçe riskli örneklerin etiketi kural
+motorundan geldiği için bu dilimde ölçülen başarı biraz iyimser olabilir.
 
 Model yalnızca alan adının harflerine bakar, sitenin içeriğini görmez. Bu
-yüzden `better.com` gibi "bet" içeren masum adlarda veya temiz listede az
-bulunan Türkçe adlarda yanılabilir. Modeli engel yerine uyarı olarak
+yüzden `better.com` gibi "bet" içeren masum adlarda veya `n11.com` gibi çok
+kısa adlarda yanılabilir. Modeli engel yerine uyarı olarak
 kullanmamızın nedeni budur.
 
 ### Modeli yeniden eğitmek
@@ -178,7 +209,7 @@ kullanmamızın nedeni budur.
 ```bash
 cd backend
 pip install -r requirements.txt
-python -m ml.train_risk_model --download   # verileri indirir (~40 MB) ve eğitir, ~1 dk
+python -m ml.train_risk_model --download   # verileri indirir (~85 MB) ve eğitir, ~2 dk
 python manage.py test tests                # model testleri dahil
 ```
 
