@@ -1,32 +1,32 @@
 {
-  "trained_at": "2026-11-17T20:32:24+00:00",
+  "trained_at": "2026-11-17T21:32:08+00:00",
   "sklearn_version": "1.9.1",
-  "train_size": 270228,
-  "test_size": 67558,
-  "train_seconds": 50.0,
-  "accuracy_3class": 0.9206,
-  "accuracy_risky_vs_clean": 0.9202,
-  "risky_recall": 0.8711,
-  "clean_recall": 0.9408,
-  "roc_auc_risky_vs_clean": 0.9651,
+  "train_size": 575994,
+  "test_size": 143999,
+  "train_seconds": 149.0,
+  "accuracy_3class": 0.9284,
+  "accuracy_risky_vs_clean": 0.9295,
+  "risky_recall": 0.9051,
+  "clean_recall": 0.9389,
+  "roc_auc_risky_vs_clean": 0.9736,
   "per_class": {
     "adult": {
-      "precision": 0.8396,
-      "recall": 0.8299,
-      "f1-score": 0.8348,
-      "support": 14795.0
+      "precision": 0.7762,
+      "recall": 0.8305,
+      "f1-score": 0.8024,
+      "support": 20000.0
     },
     "clean": {
-      "precision": 0.9445,
-      "recall": 0.9445,
-      "f1-score": 0.9445,
-      "support": 47558.0
+      "precision": 0.9605,
+      "recall": 0.945,
+      "f1-score": 0.9527,
+      "support": 103999.0
     },
     "gambling": {
-      "precision": 0.93,
-      "recall": 0.96,
-      "f1-score": 0.9448,
-      "support": 5205.0
+      "precision": 0.927,
+      "recall": 0.9404,
+      "f1-score": 0.9337,
+      "support": 20000.0
     }
   },
   "confusion_matrix": {
@@ -37,80 +37,61 @@
     ],
     "rows_true_cols_pred": [
       [
-        12279,
-        2459,
-        57
+        16609,
+        3076,
+        315
       ],
       [
-        2320,
-        44919,
-        319
+        4559,
+        98275,
+        1165
       ],
       [
-        25,
-        183,
-        4997
+        230,
+        963,
+        18807
       ]
     ]
   },
   "data": {
-    "gambling_available": 26027,
-    "adult_available": 739857,
-    "adult_platforms_removed": [
-      "135.it",
-      "150m.com",
-      "1accesshost.com",
-      "20m.com",
-      "50megs.com",
-      "8m.com",
-      "ahacdn.me",
-      "alibaba.com",
-      "allmanpages.com",
-      "allmyblog.com",
-      "angelfire.com",
-      "at.tt",
-      "atspace.com",
-      "atw.hu",
-      "axxs.de",
-      "b-cdn.net",
-      "bds0d.com",
-      "be.tc",
-      "beeplog.de",
-      "bestelinks.nl",
-      "bizland.com",
-      "blog.com",
-      "blog4ever.com",
-      "blogdrive.com",
-      "blogg.de",
-      "blogg.org",
-      "blogger.com.br",
-      "blogs.fr",
-      "blogse.nl",
-      "blogsome.com",
-      "blogsource.com",
-      "blogspirit.com",
-      "blogtrafic.com",
-      "bol.com.br",
-      "boogolinks.nl",
-      "book.fr",
-      "bookspace.fr",
-      "bpa.nu",
-      "bravehost.com",
-      "bravepages.com",
-      "bzs.es",
-      "c.la",
-      "ca.cx",
-      "ca.tc",
-      "canalblog.com",
-      "centerblog.net",
-      "chat.ru",
-      "chez-alice.fr",
-      "chez.com",
-      "cjb.net"
-    ],
-    "clean_available": 237786,
-    "gambling_used": 26027,
-    "adult_used": 73973,
-    "clean_used": 237786
+    "gambling_available": 360657,
+    "adult_available": 739563,
+    "platforms_removed": 286,
+    "clean_available": 519993,
+    "clean_by_source": {
+      "crux_tr": 323809,
+      "umbrella": 196184
+    },
+    "rule_labeled_risky_by_source": {
+      "crux_tr": 20179,
+      "umbrella": 4086
+    },
+    "rule_labeled_gambling": 21679,
+    "rule_labeled_adult": 2586,
+    "gambling_used": 100000,
+    "adult_used": 100000,
+    "clean_used": 519993
+  },
+  "evaluation": {
+    "new_model": {
+      "accuracy_3class": 0.9284,
+      "accuracy_risky_vs_clean": 0.9295,
+      "risky_recall": 0.9051,
+      "clean_recall": 0.9389,
+      "clean_recall_turkey_popular": 0.9492,
+      "turkish_probes_false_alarms": 1,
+      "turkish_probes_warnings": 1,
+      "turkish_probes_mean_risk": 4.0
+    },
+    "old_model": {
+      "accuracy_3class": 0.8633,
+      "accuracy_risky_vs_clean": 0.8725,
+      "risky_recall": 0.796,
+      "clean_recall": 0.902,
+      "clean_recall_turkey_popular": 0.8615,
+      "turkish_probes_false_alarms": 1,
+      "turkish_probes_warnings": 0,
+      "turkish_probes_mean_risk": 11.8
+    }
   }
 }

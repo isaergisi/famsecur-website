@@ -115,7 +115,8 @@ def domain_suffixes(domain: str) -> list[str]:
 
 def matches_any(domain: str, entries) -> bool:
     """Tam alan adı veya alt alan adı eşleşmesi (benzer adları yanlışlıkla eşleştirmez)."""
-    entries = set(entries)
+    if not isinstance(entries, (set, frozenset)):
+        entries = set(entries)
     return any(suffix in entries for suffix in domain_suffixes(domain))
 
 

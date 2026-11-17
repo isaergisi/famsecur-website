@@ -112,7 +112,7 @@ export default function Home() {
             </div>
             <ul className="hero-stats">
               <li><b>36.000+</b><span>resmî bahis alan adı</span></li>
-              <li><b>%92</b><span>yapay zeka doğruluğu</span></li>
+              <li><b>%93</b><span>yapay zeka doğruluğu</span></li>
               <li><b>0</b><span>kaydedilen izinli istek</span></li>
             </ul>
           </div>
