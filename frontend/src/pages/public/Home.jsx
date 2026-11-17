@@ -142,22 +142,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section" id="ozellikler">
-        <div className="container">
-          <span className="eyebrow">Özellikler</span>
-          <h2>Ebeveyn kontrolü, gözetim olmadan</h2>
-          <div className="card-grid">
-            {FEATURES.map((f) => (
-              <article className="card feature" key={f.title}>
-                <span className="feature-icon" aria-hidden>{f.icon}</span>
-                <h3>{f.title}</h3>
-                <p className="muted">{f.text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="section" id="neden-famsecur">
         <div className="container">
           <span className="eyebrow">Neden FamSecur?</span>
@@ -168,6 +152,22 @@ export default function Home() {
                 <span className="feature-icon" aria-hidden>{w.icon}</span>
                 <h3>{w.title}</h3>
                 <p className="muted">{w.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section" id="ozellikler">
+        <div className="container">
+          <span className="eyebrow">Özellikler</span>
+          <h2>Ebeveyn kontrolü, gözetim olmadan</h2>
+          <div className="card-grid">
+            {FEATURES.map((f) => (
+              <article className="card feature" key={f.title}>
+                <span className="feature-icon" aria-hidden>{f.icon}</span>
+                <h3>{f.title}</h3>
+                <p className="muted">{f.text}</p>
               </article>
             ))}
           </div>

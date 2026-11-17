@@ -15,7 +15,7 @@ export default function PublicLayout() {
             ☰
           </button>
           <nav className={open ? "nav-links open" : "nav-links"} onClick={() => setOpen(false)}>
-            <a href="/#ozellikler">Özellikler</a>
+            <a href="/#neden-famsecur">Neden FamSecur?</a>
             <a href="/#nasil-calisir">Nasıl çalışır</a>
             <a href="/#demo">Canlı demo</a>
             <NavLink to="/sss">SSS</NavLink>
@@ -46,6 +46,7 @@ export default function PublicLayout() {
           </div>
           <div>
             <h4>Ürün</h4>
+            <a href="/#neden-famsecur">Neden FamSecur?</a>
             <a href="/#ozellikler">Özellikler</a>
             <a href="/#gizlilik">Gizlilik</a>
             <a href="/#demo">Canlı demo</a>
