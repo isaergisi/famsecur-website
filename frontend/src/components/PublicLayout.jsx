@@ -18,6 +18,7 @@ export default function PublicLayout() {
             <a href="/#neden-famsecur">Neden FamSecur?</a>
             <a href="/#nasil-calisir">Nasıl çalışır</a>
             <a href="/#demo">Canlı demo</a>
+            <a href="/#fiyatlar">Fiyatlar</a>
             <NavLink to="/sss">SSS</NavLink>
             <NavLink to="/iletisim">İletişim</NavLink>
             {user ? (
@@ -50,6 +51,7 @@ export default function PublicLayout() {
             <a href="/#ozellikler">Özellikler</a>
             <a href="/#gizlilik">Gizlilik</a>
             <a href="/#demo">Canlı demo</a>
+            <a href="/#fiyatlar">Fiyatlar</a>
           </div>
           <div>
             <h4>Destek</h4>
