@@ -22,16 +22,31 @@ const WHY = [
   { icon: "🤫", title: "Çocuk merak etmeden güvende kalır", text: "Sessiz engel modunda zararlı site yalnızca açılmaz; çocuk \"kumar\" ya da \"yetişkin içerik\" yazan bir uyarıyla karşılaşmaz. Bu yaş grubunda böyle içeriklerin varlığını öğrenmek bile merak uyandırabilir. FamSecur bu kapıyı hiç aralamaz." },
 ];
 
-const COMPARE_COLUMNS = ["FamSecur", "İnternet sağlayıcı filtresi", "Ebeveyn kontrol uygulamaları"];
 const COMPARE_ROWS = [
-  ["Mesaj, ekran, geçmiş gözetleme", "Yok, yalnızca engellenen site kaydedilir", "Yok", "Birçoğunda var"],
-  ["Listede olmayan yeni bahis sitesini tanıma", "Yapay zeka adından tanır ve sizi uyarır", "Yok, liste güncellenmesini bekler", "Çoğunlukla liste tabanlı"],
-  ["Tek kurulum, tüm cihazlar", "Evet, router ayarıyla", "Evet, hat üzerinden", "Hayır, her cihaza ayrı kurulum"],
-  ["Çocuğun silerek kapatması", "Cihazda silinecek uygulama yok", "Mümkün değil", "Uygulama silinebilir ya da kapatılabilir"],
-  ["Engelin nedenini görme", "Kategori, risk puanı ve gerekçe panelde", "Genelde görünmez", "Ürüne göre değişir"],
-  ["Ev dışında (mobil veri) koruma", "Hayır, yalnızca ev ağında", "Yalnızca o hatta", "Evet, cihazla birlikte gider"],
-  ["Fiyat", "149 TL/ay veya 1.490 TL/yıl, 7 gün ücretsiz", "Genelde ücretsiz", "Genelde aylık abonelik"],
+  ["Mesajları, ekranı ve geçmişi gözetlemez", true, [false, 1]],
+  ["Listede olmayan yeni bahis sitesini tanır", true, [false, 2]],
+  ["Tek kurulumla evdeki tüm cihazları korur", true, false],
+  ["Çocuk uygulamayı silerek korumayı kapatamaz", true, false],
+  ["Engelin nedenini gösterir (kategori, risk puanı, gerekçe)", true, [false, 3]],
+  ["Ev dışında (mobil veride) korur", [false, 4], true],
 ];
+const COMPARE_NOTES = [
+  "Birçok uygulama mesajları, ekranı veya gezinme geçmişini izler.",
+  "Çoğu uygulama hazır site listelerine dayanır.",
+  "Bazı uygulamalarda kısmen bulunur.",
+  "FamSecur ev ağında çalışır; ev dışında koruma sağlamaz.",
+];
+
+function Mark({ value }) {
+  const [ok, note] = Array.isArray(value) ? value : [value, null];
+  return (
+    <>
+      <span className={ok ? "mark-yes" : "mark-no"} aria-hidden>{ok ? "✓" : "✗"}</span>
+      <span className="sr-only">{ok ? "Evet" : "Hayır"}</span>
+      {note && <sup className="compare-ref">{note}</sup>}
+    </>
+  );
+}
 
 const PLAN_FEATURES = [
   "Resmi kumar ve yetişkin içerik listelerine karşı koruma",
@@ -180,32 +195,34 @@ export default function Home() {
       <section className="section alt" id="karsilastirma">
         <div className="container">
           <span className="eyebrow">Karşılaştırma</span>
-          <h2>FamSecur'u diğer yöntemlerle karşılaştırın</h2>
+          <h2>FamSecur'u ebeveyn kontrol uygulamalarıyla karşılaştırın</h2>
           <div className="card table-wrap compare-wrap">
             <table className="compare">
               <thead>
                 <tr>
                   <th scope="col"><span className="sr-only">Özellik</span></th>
-                  {COMPARE_COLUMNS.map((c, i) => (
-                    <th scope="col" key={c} className={i === 0 ? "compare-us" : undefined}>{c}</th>
-                  ))}
+                  <th scope="col" className="compare-us">FamSecur</th>
+                  <th scope="col">Ebeveyn kontrol uygulamaları</th>
                 </tr>
               </thead>
               <tbody>
-                {COMPARE_ROWS.map(([label, ...cells]) => (
+                {COMPARE_ROWS.map(([label, us, apps]) => (
                   <tr key={label}>
                     <th scope="row">{label}</th>
-                    {cells.map((cell, i) => (
-                      <td key={i} className={i === 0 ? "compare-us" : undefined}>{cell}</td>
-                    ))}
+                    <td className="compare-us"><Mark value={us} /></td>
+                    <td><Mark value={apps} /></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="muted small compare-note">
-            Genel bir karşılaştırmadır; tek tek ürünlerin özellikleri farklılık gösterebilir.
+          <p className="compare-price">
+            <b>FamSecur:</b> 149 TL/ay veya 1.490 TL/yıl, 7 gün ücretsiz deneme.
           </p>
+          <ol className="muted small compare-notes">
+            {COMPARE_NOTES.map((n) => <li key={n}>{n}</li>)}
+          </ol>
+          <p className="muted small">Genel bir karşılaştırmadır; tek tek ürünlerin özellikleri farklılık gösterebilir.</p>
         </div>
       </section>
 
