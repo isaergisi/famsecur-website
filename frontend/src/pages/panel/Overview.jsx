@@ -6,6 +6,7 @@ import PageHead from "../../components/PageHead";
 import Spinner from "../../components/Spinner";
 import { useToast } from "../../components/Toast";
 import useFetch from "../../components/useFetch";
+import WeeklySummary from "../../components/WeeklySummary";
 import { CATEGORY_COLORS, formatDate } from "../../utils";
 
 export default function Overview() {
@@ -51,6 +52,8 @@ export default function Overview() {
           <button className="btn btn-ghost btn-sm" onClick={() => setEditing(true)}>Aile adını düzenle</button>
         )}
       </PageHead>
+
+      {s.weekly && <WeeklySummary weekly={s.weekly} categoryLabels={f.policy.category_labels} />}
 
       <div className="stat-grid">
         <div className="card stat"><span>Korunan cihaz</span><b>{f.device_count}</b></div>
