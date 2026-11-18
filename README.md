@@ -227,12 +227,62 @@ Dosyalar: `backend/ml/train_risk_model.py` (eğitim),
 
 Gereksinimler: Python 3.11+, Node.js 20+.
 
-### Backend
+Proje iki ayrı parçadan oluşur ve **iki ayrı terminal** gerekir: biri backend
+(Python/Django), diğeri frontend (Node/React) için. `python` ve `pip`
+komutları yalnızca `backend` klasöründe, `npm` komutları yalnızca `frontend`
+klasöründe çalıştırılır. `backend` klasöründe `npm` çalıştırmayın; orada
+`package.json` yoktur ve hata alırsınız.
+
+### Windows'ta adım adım
+
+Aşağıdaki komutlar PowerShell içindir (VS Code terminali de varsayılan olarak
+PowerShell'dir). Önce proje klasörüne girin, ör. `cd C:\Users\Ad\famsecur-website`.
+
+**1. terminal: backend**
+
+```powershell
+cd backend
+py -m venv .venv                     # "py" yoksa: python -m venv .venv
+.venv\Scripts\Activate.ps1           # satır başında (.venv) görünmeli
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py seed_demo           # demo hesapları ve örnek veri
+python manage.py runserver           # http://127.0.0.1:8000 — bu terminali açık bırakın
+```
+
+`Activate.ps1` için "betik çalıştırma bu sistemde devre dışı" hatası alırsanız
+bir kez şunu çalıştırıp tekrar deneyin:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+Komut İstemi (cmd) kullanıyorsanız etkinleştirme komutu `.venv\Scripts\activate.bat` olur.
+
+**2. terminal: frontend** (yeni bir terminal açın, proje klasörüne girin)
+
+```powershell
+cd frontend
+npm install                          # yalnızca ilk seferde
+npm run dev                          # http://localhost:5173
+```
+
+Tarayıcıda `http://localhost:5173` adresini açın ve aşağıdaki demo hesaplarından
+biriyle giriş yapın.
+
+**Sonraki açılışlarda** yalnızca şunlar yeterlidir:
+
+- 1. terminal: `cd backend`, `.venv\Scripts\Activate.ps1`, `python manage.py runserver`
+- 2. terminal: `cd frontend`, `npm run dev`
+
+### macOS / Linux
+
+Backend (1. terminal):
 
 ```bash
 cd backend
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py seed_demo       # demo hesapları ve örnek veri
@@ -245,7 +295,7 @@ Testler:
 python manage.py test tests
 ```
 
-### Frontend
+Frontend (2. terminal):
 
 ```bash
 cd frontend
