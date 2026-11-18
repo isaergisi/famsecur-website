@@ -23,18 +23,18 @@ const WHY = [
 ];
 
 const COMPARE_ROWS = [
+  ["Kumar ve yetişkin içerik sitelerini engeller", true, true],
+  ["Engellenen siteleri ebeveyn panelinde raporlar", true, true],
   ["Mesajları, ekranı ve geçmişi gözetlemez", true, [false, 1]],
   ["Listede olmayan yeni bahis sitesini tanır", true, [false, 2]],
   ["Tek kurulumla evdeki tüm cihazları korur", true, false],
   ["Çocuk uygulamayı silerek korumayı kapatamaz", true, false],
   ["Engelin nedenini gösterir (kategori, risk puanı, gerekçe)", true, [false, 3]],
-  ["Ev dışında (mobil veride) korur", [false, 4], true],
 ];
 const COMPARE_NOTES = [
   "Birçok uygulama mesajları, ekranı veya gezinme geçmişini izler.",
   "Çoğu uygulama hazır site listelerine dayanır.",
   "Bazı uygulamalarda kısmen bulunur.",
-  "FamSecur ev ağında çalışır; ev dışında koruma sağlamaz.",
 ];
 
 function Mark({ value }) {
