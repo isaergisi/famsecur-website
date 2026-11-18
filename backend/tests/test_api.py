@@ -137,7 +137,14 @@ class FamilyResourceTests(BaseAPITest):
         events = self.client.get("/api/events/").data["results"]
         self.assertEqual(len(events), 3)
         self.assertEqual(self.client.get("/api/events/?category=gambling").data["count"], 2)
-        self.assertEqual(self.client.get("/api/events/stats/").data["total"], 3)
+        stats = self.client.get("/api/events/stats/").data
+        self.assertEqual(stats["total"], 3)
+        weekly = stats["weekly"]
+        self.assertEqual(weekly["total"], 3)
+        self.assertEqual(weekly["previous_total"], 0)
+        self.assertEqual(len(weekly["days"]), 7)
+        self.assertEqual(weekly["days"][-1]["count"], 3)
+        self.assertEqual(weekly["top_category"], {"category": "gambling", "count": 2})
         self.assertEqual(self.client.delete(f"/api/events/{events[0]['id']}/").status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(self.client.delete("/api/events/clear/").data["deleted"], 2)
         # Olaylar elle oluşturulamaz

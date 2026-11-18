@@ -136,7 +136,36 @@ class BlockEventViewSet(
             ),
             "by_day": [{"day": row["day"].isoformat(), "count": row["count"]} for row in by_day],
             "top_domains": list(events.values("domain").annotate(count=Count("id")).order_by("-count")[:5]),
+            "weekly": self._weekly_summary(events),
         })
+
+    @staticmethod
+    def _weekly_summary(events):
+        """Son 7 günün özeti: gün gün engel sayısı (boş günler 0), önceki haftayla kıyas, öne çıkan kategori/cihaz."""
+        today = timezone.localdate()
+        start = today - timedelta(days=6)
+        week = events.filter(created_at__date__gte=start)
+        previous = events.filter(created_at__date__gte=start - timedelta(days=7), created_at__date__lt=start)
+        counts = {
+            row["day"]: row["count"]
+            for row in week.annotate(day=TruncDate("created_at")).values("day").annotate(count=Count("id"))
+        }
+        top_category = week.values("category").annotate(count=Count("id")).order_by("-count").first()
+        top_device = (
+            week.exclude(device=None).values("device__name").annotate(count=Count("id")).order_by("-count").first()
+        )
+        return {
+            "start": start.isoformat(),
+            "end": today.isoformat(),
+            "total": week.count(),
+            "previous_total": previous.count(),
+            "days": [
+                {"day": (start + timedelta(days=i)).isoformat(), "count": counts.get(start + timedelta(days=i), 0)}
+                for i in range(7)
+            ],
+            "top_category": top_category,
+            "top_device": {"name": top_device["device__name"], "count": top_device["count"]} if top_device else None,
+        }
 
 
 class CheckDomainView(APIView):
