@@ -342,6 +342,30 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="section" id="gelistirici">
+        <div className="container maker">
+          <span className="eyebrow">Yerli ve milli</span>
+          <h2>Türkiye'de, Türk aileler için geliştirildi</h2>
+          <p className="lead">
+            FamSecur, Ankara'dan genç bir Türk mühendis olan <b>İsa Ergişi</b> tarafından geliştirildi.
+          </p>
+          <p className="muted">
+            Yabancı bir ürünün Türkçeye çevrilmiş hâli değil. Yapay zeka modeli Türkiye'de popüler sitelerle eğitildi.
+            Oltalama verisi T.C. Siber Güvenlik Başkanlığı'nın USOM listesinden, bahis listesi resmî kaynaklardan geliyor.
+            Türkiye'de her gün adres değiştiren yasa dışı bahis sitelerine karşı burada, bu sorunu bilen biri tarafından
+            yazıldı.
+          </p>
+          <blockquote className="maker-quote">Amacım basit: çocuğunuzu gözetlemeden korumak.</blockquote>
+          <p className="maker-sign">
+            <b>İsa Ergişi</b>, FamSecur'un geliştiricisi
+          </p>
+          <p className="muted small">
+            Özgeçmiş ve daha fazla bilgi için:{" "}
+            <a href="mailto:iergisi23@posta.pau.edu.tr">iergisi23@posta.pau.edu.tr</a>
+          </p>
+        </div>
+      </section>
+
       <section className="section cta">
         <div className="container cta-box">
           <img

@@ -353,3 +353,9 @@ button.pill { cursor: pointer; }
   .compare th, .compare td { padding-left: 10px; padding-right: 10px; }
   .compare thead th { font-size: 0.8rem; }
 }
+
+/* Ana sayfa: geliştirici (yerli ve milli) bölümü */
+.maker { max-width: 760px; }
+.maker .lead { margin-bottom: 12px; }
+.maker-quote { margin: 20px 0 8px; padding: 4px 0 4px 18px; border-left: 3px solid var(--lime); font-size: 1.25rem; font-weight: 700; color: var(--text); }
+.maker-sign { margin-bottom: 6px; }
