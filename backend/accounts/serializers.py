@@ -86,7 +86,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "date_joined", "last_login"]
 
-    def get_device_count(self, obj):
+    def get_device_count(self, obj) -> int:
         family = getattr(obj, "family", None)
         return family.devices.count() if family else 0
 

@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     "accounts",
     "shield",
     "content",
@@ -98,6 +100,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
     "EXCEPTION_HANDLER": "config.exceptions.api_exception_handler",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.ScopedRateThrottle"],
     "DEFAULT_THROTTLE_RATES": {
         "public_analyze": "30/minute",
@@ -111,6 +114,38 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "UPDATE_LAST_LOGIN": True,
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "FamSecur API",
+    "DESCRIPTION": (
+        "FamSecur ebeveyn koruma sisteminin REST API belgesi.\n\n"
+        "**Nasıl denenir?**\n"
+        "1. `POST /api/auth/login/` uç noktasını açın, *Try it out* ile demo hesabıyla giriş yapın "
+        "(ebeveyn: `ebeveyn@famsecur.com` / `Ebeveyn.12345`, yönetici: `admin@famsecur.com` / `Admin.12345`).\n"
+        "2. Yanıttaki `access` değerini kopyalayın.\n"
+        "3. Sağ üstteki **Authorize** düğmesine basıp yapıştırın. Artık kilitli uç noktaları deneyebilirsiniz.\n\n"
+        "Tüm hatalar `{\"detail\": \"...\", \"errors\": {alan: [mesaj]}}` biçiminde Türkçe döner."
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+    "SWAGGER_UI_SETTINGS": {"persistAuthorization": True, "displayRequestDuration": True, "filter": True},
+    "TAGS": [
+        {"name": "Kimlik doğrulama", "description": "Kayıt, giriş, oturum yenileme ve profil."},
+        {"name": "Aile ve politika", "description": "Ebeveynin ailesi ve koruma politikası."},
+        {"name": "Cihazlar", "description": "Ailenin cihazları (CRUD)."},
+        {"name": "Beyaz liste", "description": "Ailenin her zaman izin verdiği alan adları (CRUD)."},
+        {"name": "Engel olayları", "description": "Karar motorunun engellediği istekler: okuma, silme, istatistik."},
+        {"name": "Karar motoru", "description": "Alan adını değerlendirme (ebeveyn) ve sitedeki canlı demo (herkese açık)."},
+        {"name": "Tehdit kaynakları", "description": "Tüm ailelerde geçerli engel listeleri; yönetimi yöneticidedir."},
+        {"name": "SSS", "description": "Sıkça sorulan sorular; yönetimi yöneticidedir."},
+        {"name": "İletişim talepleri", "description": "Ziyaretçi talep gönderir, yönetici yönetir."},
+        {"name": "Yönetim", "description": "Yalnızca yönetici: kullanıcı yönetimi ve platform istatistikleri."},
+    ],
 }
 
 CORS_ALLOWED_ORIGINS = os.environ.get(

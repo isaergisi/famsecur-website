@@ -1,9 +1,17 @@
 from django.contrib import admin
 from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenRefreshView
 
-from accounts.views import AdminUserViewSet, ChangePasswordView, LoginView, LogoutView, MeView, RegisterView
+from accounts.views import (
+    AdminUserViewSet,
+    ChangePasswordView,
+    LoginView,
+    LogoutView,
+    MeView,
+    RefreshView,
+    RegisterView,
+)
 from content.views import ContactRequestViewSet, FAQViewSet
 from shield.views import (
     AdminStatsView,
@@ -29,7 +37,7 @@ router.register("admin/users", AdminUserViewSet, basename="admin-user")
 auth_urls = [
     path("register/", RegisterView.as_view(), name="register"),
     path("login/", LoginView.as_view(), name="login"),
-    path("refresh/", TokenRefreshView.as_view(), name="token-refresh"),
+    path("refresh/", RefreshView.as_view(), name="token-refresh"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("me/", MeView.as_view(), name="me"),
     path("change-password/", ChangePasswordView.as_view(), name="change-password"),
@@ -44,4 +52,8 @@ urlpatterns = [
     path("api/analyze/", PublicAnalyzeView.as_view(), name="analyze"),
     path("api/admin/stats/", AdminStatsView.as_view(), name="admin-stats"),
     path("api/", include(router.urls)),
+    # API belgesi: koddan otomatik üretilen OpenAPI şeması ve arayüzleri
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]
