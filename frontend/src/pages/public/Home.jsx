@@ -22,6 +22,14 @@ const WHY = [
   { icon: "🤫", title: "Çocuk merak etmeden güvende kalır", text: "Sessiz engel modunda zararlı site yalnızca açılmaz; çocuk \"kumar\" ya da \"yetişkin içerik\" yazan bir uyarıyla karşılaşmaz. Bu yaş grubunda böyle içeriklerin varlığını öğrenmek bile merak uyandırabilir. FamSecur bu kapıyı hiç aralamaz." },
 ];
 
+const PLAN_FEATURES = [
+  "Resmi kumar ve yetişkin içerik listelerine karşı koruma",
+  "Yapay zeka ile risk tahmini: listede olmayan yeni riskli sitelerde sizi uyarır",
+  "Sessiz engelleme modu",
+  "Haftalık özet raporu",
+  "Evdeki tüm cihazlar (sınırsız)",
+];
+
 const STEPS = [
   ["Router'a bağlayın", "Ev router'ınızın DNS ayarını FamSecur'a yönlendirin. Çocuğun cihazına uygulama gerekmez."],
   ["Politikanızı seçin", "Hangi kategorilerin hangi eşikte engelleneceğine ebeveyn panelinden karar verin."],
@@ -111,7 +119,7 @@ export default function Home() {
             </p>
             <div className="hero-actions">
               <Link to="/kayit" className="btn btn-primary">
-                Ücretsiz hesap oluştur
+                7 gün ücretsiz dene
               </Link>
               <a href="#demo" className="btn btn-ghost">
                 Canlı demoyu dene
@@ -241,6 +249,38 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      <section className="section" id="fiyatlar">
+        <div className="container pricing">
+          <span className="eyebrow">Fiyatlar</span>
+          <h2>Günde 5 TL'ye çocuğunu koru</h2>
+          <p className="muted">
+            7 gün ücretsiz deneyin, beğenmezseniz ödeme yapmazsınız. İstediğiniz zaman iptal edebilirsiniz.
+          </p>
+          <article className="card price-card">
+            <h3>Aile paketi</h3>
+            <div className="price-options">
+              <div className="price-option">
+                <span className="price-label">Aylık</span>
+                <b className="price">149 TL<small>/ay</small></b>
+                <span className="muted">Günde 5 TL'den az</span>
+              </div>
+              <div className="price-option">
+                <span className="price-label">Yıllık</span>
+                <b className="price">1.490 TL<small>/yıl</small></b>
+                <span className="muted">Ayda ~124 TL, 2 ay bedava</span>
+              </div>
+            </div>
+            <ul className="check-list">
+              {PLAN_FEATURES.map((f) => (
+                <li className="yes" key={f}>{f}</li>
+              ))}
+            </ul>
+            <Link to="/kayit" className="btn btn-primary">7 gün ücretsiz dene</Link>
+            <p className="muted price-note">Paket bir ev ağını kapsar. Fiyatlara KDV dahildir.</p>
+          </article>
+        </div>
+      </section>
 
       <section className="section cta">
         <div className="container cta-box">
