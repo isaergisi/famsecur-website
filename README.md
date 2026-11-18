@@ -49,7 +49,8 @@ tüm ailelerde geçerli tehdit istihbaratı kaynaklarını yönetir.
 | Oturum yönetimi | Anahtarlar `localStorage`'da; süresi dolan erişim anahtarı otomatik yenilenir, yenilenemezse oturum kapatılır (`src/api.js`) |
 | En az 5 veri modeli | 9 model (aşağıda) |
 | Basit CRUD'dan öte | Açıklanabilir risk puanlamalı alan adı karar motoru, 36.000+ resmî kumar alan adı havuzu, kendi eğittiğimiz yapay zeka risk modeli (%93 test doğruluğu) |
-| Testler | 20 API testi (`backend/tests/test_api.py`) |
+| API dokümantasyonu | Swagger arayüzü `http://127.0.0.1:8000/api/docs/` (koddan otomatik üretilir, JWT ile denenebilir) |
+| Testler | 21 API testi (`backend/tests/test_api.py`) |
 
 ## Veri modelleri
 
@@ -88,6 +89,21 @@ erDiagram
 - Herkese açık uç noktalar hız sınırlıdır (demo analizi 30/dk, iletişim formu 5/saat).
 
 ## API uç noktaları
+
+Tüm uç noktaların Türkçe açıklamalı, tarayıcıdan denenebilir belgesi backend
+çalışırken şu adreslerdedir:
+
+| Adres | Ne işe yarar |
+| --- | --- |
+| `http://127.0.0.1:8000/api/docs/` | **Swagger**: uç noktaları listeler, *Try it out* ile doğrudan denenir |
+| `http://127.0.0.1:8000/api/redoc/` | ReDoc: okunması kolay belge görünümü |
+| `http://127.0.0.1:8000/api/schema/` | OpenAPI 3 şeması (Postman'e içe aktarılabilir) |
+
+Kilitli uç noktaları denemek için: `POST /api/auth/login/` ile demo hesabıyla
+giriş yapın, yanıttaki `access` değerini kopyalayıp sağ üstteki **Authorize**
+düğmesine yapıştırın. Belge `drf-spectacular` ile koddan otomatik üretilir;
+internet bağlantısı olmadan da açılır.
+
 
 | Metot | Yol | Yetki | Açıklama |
 | --- | --- | --- | --- |

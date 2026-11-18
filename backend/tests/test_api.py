@@ -244,3 +244,15 @@ class AiRiskTests(BaseAPITest):
         self.client.post("/api/whitelist/", {"domain": "hotgirlsvideo.com"}, format="json")
         response = self.client.post("/api/check/", {"domain": "hotgirlsvideo.com"}, format="json")
         self.assertIsNone(response.data["ai"])
+
+
+class ApiDocsTests(APITestCase):
+    def test_schema_and_docs_pages_are_public(self):
+        schema = self.client.get("/api/schema/")
+        self.assertEqual(schema.status_code, 200)
+        body = schema.content.decode()
+        self.assertIn("FamSecur API", body)
+        self.assertIn("/api/devices/", body)
+        self.assertIn("jwtAuth", body)
+        for url in ("/api/docs/", "/api/redoc/"):
+            self.assertEqual(self.client.get(url).status_code, 200, url)

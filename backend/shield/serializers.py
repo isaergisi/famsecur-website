@@ -33,7 +33,7 @@ class PolicySerializer(serializers.ModelSerializer):
             }},
         }
 
-    def get_category_labels(self, obj):
+    def get_category_labels(self, obj) -> dict[str, str]:
         return CATEGORY_LABELS
 
     def validate_enabled_categories(self, value):
@@ -150,7 +150,7 @@ class ThreatSourceSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "updated_at"]
 
-    def get_domain_count(self, obj):
+    def get_domain_count(self, obj) -> int:
         return len(obj.domain_list())
 
     def validate_domains(self, value):
