@@ -8,6 +8,8 @@ import Contact from "./pages/public/Contact";
 import Login from "./pages/public/Login";
 import Register from "./pages/public/Register";
 import NotFound from "./pages/public/NotFound";
+import Privacy from "./pages/public/Privacy";
+import Terms from "./pages/public/Terms";
 import PanelLayout from "./pages/panel/PanelLayout";
 import Overview from "./pages/panel/Overview";
 import Devices from "./pages/panel/Devices";
@@ -42,6 +44,8 @@ export default function App() {
         <Route path="iletisim" element={<Contact />} />
         <Route path="giris" element={<Login />} />
         <Route path="kayit" element={<Register />} />
+        <Route path="gizlilik" element={<Privacy />} />
+        <Route path="kullanim-kosullari" element={<Terms />} />
         <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="panel" element={<RequireAuth><PanelLayout /></RequireAuth>}>

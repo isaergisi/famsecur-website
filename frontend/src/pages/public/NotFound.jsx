@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import usePageTitle from "../../components/usePageTitle";
 
 export default function NotFound() {
+  usePageTitle("Sayfa bulunamadı");
   return (
     <section className="section page">
       <div className="container narrow center">

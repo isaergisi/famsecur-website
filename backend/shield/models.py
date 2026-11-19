@@ -84,7 +84,7 @@ class Device(models.Model):
 
 
 class WhitelistEntry(models.Model):
-    """Ebeveynin yanlış engelleri düzeltmek için izin verdiği alan adı (alt alan adları dahil)."""
+    """Ebeveynin yanlış engelleri düzeltmek için izin verdiği alan adı (alt alan adları dâhil)."""
 
     family = models.ForeignKey(Family, on_delete=models.CASCADE, related_name="whitelist")
     domain = models.CharField(max_length=253)

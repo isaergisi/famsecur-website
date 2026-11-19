@@ -9,8 +9,9 @@ from .ml_risk import predict_risk
 from .models import BlockEvent, Device, Family, ThreatSource
 
 BLOCK_MESSAGES = {
-    "silent": "İstek sessizce engellendi (NXDOMAIN). Cihazda site açılmaz.",
-    "warning": "Cihaz FamSecur uyarı sayfasına yönlendirildi ve engelin nedeni gösterildi.",
+    "silent": "İstek sessizce engellendi. Site cihazda açılmaz, bağlantı hatası görünür.",
+    "warning": "Cihaz FamSecur uyarı sayfasına yönlendirildi. Uyarı sayfası yalnızca şifresiz (HTTP) sitelerde görünür; "
+               "HTTPS sitelerde tarayıcı bağlantı hatası gösterir.",
 }
 
 
@@ -25,17 +26,17 @@ def decide_for_family(family: Family, domain: str) -> Decision:
     )
 
 
-def is_in_known_list(family: Family, domain: str) -> bool:
-    """Alan adı beyaz listede, tehdit kaynaklarında veya resmî havuzda mı?"""
-    if matches_any(domain, family.whitelist.values_list("domain", flat=True)):
+def is_in_known_list(family: Family | None, domain: str) -> bool:
+    """Alan adı beyaz listede (aile verilmişse), tehdit kaynaklarında veya resmî havuzda mı?"""
+    if family is not None and matches_any(domain, family.whitelist.values_list("domain", flat=True)):
         return True
     if any(suffix in ThreatSource.active_domain_map() for suffix in domain_suffixes(domain)):
         return True
     return matches_any(domain, official_gambling_domains())
 
 
-def ai_prediction(family: Family, decision: Decision) -> dict | None:
-    """Hiçbir listede olmayan alan adları için yapay zeka risk tahmini.
+def ai_prediction(family: Family | None, decision: Decision) -> dict | None:
+    """Hiçbir listede olmayan alan adları için yapay zekâ risk tahmini.
 
     Listede olan alan adının sonucu zaten kesindir; model yalnızca bilinmeyen
     alan adları için ek bir uyarı üretir ve kararı değiştirmez.

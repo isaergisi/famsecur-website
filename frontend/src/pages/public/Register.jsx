@@ -4,8 +4,11 @@ import { fieldErrors } from "../../api";
 import { useAuth } from "../../auth";
 import Alert from "../../components/Alert";
 import Field from "../../components/Field";
+import usePageTitle from "../../components/usePageTitle";
+import { TRIAL_TERMS } from "../../site";
 
 export default function Register() {
+  usePageTitle("Kayıt ol");
   const { user, register } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ first_name: "", last_name: "", email: "", password: "", family_name: "" });
@@ -35,7 +38,13 @@ export default function Register() {
   return (
     <section className="section page">
       <div className="container auth-box">
-        <h1>Ebeveyn hesabı oluştur</h1>
+        <h1>Ebeveyn hesabı oluşturun</h1>
+        <p className="muted">7 gün ücretsiz deneme ile başlayın. Kayıttan sonra üç adımda korumaya geçersiniz:</p>
+        <ol className="auth-steps muted">
+          <li>Cihazlarınızı ekleyin.</li>
+          <li>Koruma ayarlarınızı seçin.</li>
+          <li>Modeminizin DNS ayarını FamSecur'a yönlendirin.</li>
+        </ol>
         <form className="card form" onSubmit={submit} noValidate>
           <Alert>{error}</Alert>
           <div className="form-row">
@@ -56,8 +65,18 @@ export default function Register() {
             <input value={form.family_name} onChange={set("family_name")} placeholder="Yılmaz Ailesi" />
           </Field>
           <button className="btn btn-primary" disabled={busy}>
-            {busy ? "Hesap oluşturuluyor…" : "Kayıt ol"}
+            {busy ? "Hesap oluşturuluyor…" : "Ücretsiz denemeyi başlat"}
           </button>
+          <div className="trial-terms">
+            <h4>Deneme ve ödeme koşulları</h4>
+            <ul>
+              {TRIAL_TERMS.map((t) => <li key={t}>{t}</li>)}
+            </ul>
+          </div>
+          <p className="muted small">
+            Kayıt olarak <Link to="/kullanim-kosullari">Kullanım Koşulları</Link>'nı ve{" "}
+            <Link to="/gizlilik">Gizlilik Politikası</Link>'nı kabul etmiş olursunuz.
+          </p>
           <p className="muted small">
             Zaten hesabınız var mı? <Link to="/giris">Giriş yapın</Link>
           </p>

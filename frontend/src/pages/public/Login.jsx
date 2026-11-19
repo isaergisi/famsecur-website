@@ -3,8 +3,10 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth";
 import Alert from "../../components/Alert";
 import Field from "../../components/Field";
+import usePageTitle from "../../components/usePageTitle";
 
 export default function Login() {
+  usePageTitle("Giriş");
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
@@ -30,7 +32,7 @@ export default function Login() {
   return (
     <section className="section page">
       <div className="container auth-box">
-        <h1>Giriş yap</h1>
+        <h1>Giriş yapın</h1>
         <form className="card form" onSubmit={submit}>
           <Alert>{error}</Alert>
           <Field label="E-posta">
@@ -43,7 +45,10 @@ export default function Login() {
             {busy ? "Giriş yapılıyor…" : "Giriş yap"}
           </button>
           <p className="muted small">
-            Hesabınız yok mu? <Link to="/kayit">Kayıt olun</Link>
+            Hesabınız yok mu? <Link to="/kayit">7 gün ücretsiz deneyin</Link>
+          </p>
+          <p className="muted small">
+            <Link to="/gizlilik">Gizlilik Politikası</Link> · <Link to="/kullanim-kosullari">Kullanım Koşulları</Link>
           </p>
         </form>
       </div>

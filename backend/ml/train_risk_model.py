@@ -23,6 +23,8 @@ Adımlar:
     7. Sınıflandırıcı: Lojistik Regresyon.
     8. Test kümesinde doğruluk ölçülür, model joblib ile kaydedilir.
        ``--compare eski.joblib`` verilirse eski model aynı kümede ölçülür.
+       ``--evaluate-only`` modeli yeniden eğitmeden, kayıtlı modeli aynı test
+       kümesinde sitedeki uyarı eşiğinde (%60) ölçer ve metrics.json'a ekler.
 """
 
 from __future__ import annotations
@@ -253,10 +255,32 @@ def evaluate(model: Pipeline, x_test: list[str], y_test: list[str], sources: lis
     }
 
 
+def threshold_metrics(model: Pipeline, x_test: list[str], y_test: list[str], sources: list[str],
+                      threshold: float) -> dict:
+    """Sitedeki uyarı eşiğinde riskli/temiz ölçümleri: yakalama, kesinlik ve yanlış alarm oranları."""
+    clean_index = list(model.classes_).index("clean")
+    risk = 1 - model.predict_proba(x_test)[:, clean_index]
+    risky = np.array([label != "clean" for label in y_test])
+    from_tr = np.array([source == "crux_tr" for source in sources])
+    warn = risk >= threshold
+    clean_tr = from_tr & ~risky
+    return {
+        "threshold": threshold,
+        "accuracy_risky_vs_clean": round(float((warn == risky).mean()), 4),
+        "risky_recall": round(float(warn[risky].mean()), 4),
+        "precision_risky": round(float(risky[warn].mean()), 4),
+        "false_positive_rate": round(float(warn[~risky].mean()), 4),
+        "false_positive_rate_turkey_popular": round(float(warn[clean_tr].mean()), 4),
+        "test_size": len(x_test),
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="FamSecur alan adı risk modelini eğitir.")
     parser.add_argument("--download", action="store_true", help="Ham verileri internetten indir")
     parser.add_argument("--compare", type=Path, help="Aynı test kümesinde karşılaştırılacak eski model dosyası")
+    parser.add_argument("--evaluate-only", action="store_true",
+                        help="Yeniden eğitmeden kayıtlı modeli uyarı eşiğinde ölç ve metrics.json'a ekle")
     args = parser.parse_args(argv)
 
     for url, path in SOURCES.values():
@@ -272,6 +296,16 @@ def main(argv: list[str] | None = None) -> int:
     x_train, x_test, y_train, y_test, _, src_test = train_test_split(
         texts, labels, sources, test_size=0.2, random_state=SEED, stratify=labels,
     )
+
+    if args.evaluate_only:
+        from shield.ml_risk import WARNING_THRESHOLD
+
+        model = joblib.load(MODEL_PATH)
+        metrics = json.loads(METRICS_PATH.read_text(encoding="utf-8"))
+        metrics["at_warning_threshold"] = threshold_metrics(model, x_test, y_test, src_test, WARNING_THRESHOLD / 100)
+        METRICS_PATH.write_text(json.dumps(metrics, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(json.dumps(metrics["at_warning_threshold"], indent=2))
+        return 0
 
     print("Model eğitiliyor…")
     started = time.time()
@@ -310,6 +344,9 @@ def main(argv: list[str] | None = None) -> int:
         "data": stats,
     }
     metrics["evaluation"] = {"new_model": evaluate(model, x_test, y_test, src_test)}
+    from shield.ml_risk import WARNING_THRESHOLD
+
+    metrics["at_warning_threshold"] = threshold_metrics(model, x_test, y_test, src_test, WARNING_THRESHOLD / 100)
     if args.compare:
         old = joblib.load(args.compare)
         metrics["evaluation"]["old_model"] = evaluate(old, x_test, y_test, src_test)
