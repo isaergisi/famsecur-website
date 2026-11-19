@@ -274,6 +274,7 @@ button.pill { cursor: pointer; }
 .pill-off, .status-new { background: rgba(255, 146, 118, 0.18); color: var(--coral); }
 .status-in_progress { background: rgba(111, 147, 255, 0.2); color: var(--blue-light); }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.pagination.numbered { gap: 6px; flex-wrap: wrap; margin-top: 16px; }
 .faq-admin { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
 .faq-admin p { margin: 6px 0 0; }
 

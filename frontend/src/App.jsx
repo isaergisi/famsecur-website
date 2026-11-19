@@ -22,6 +22,7 @@ import Users from "./pages/admin/Users";
 import ContactRequests from "./pages/admin/ContactRequests";
 import FaqAdmin from "./pages/admin/FaqAdmin";
 import ThreatSources from "./pages/admin/ThreatSources";
+import BlockedDomains from "./pages/admin/BlockedDomains";
 
 function RequireAuth({ children, admin = false }) {
   const { user, loading, isAdmin } = useAuth();
@@ -57,6 +58,7 @@ export default function App() {
         <Route path="talepler" element={<ContactRequests />} />
         <Route path="sss" element={<FaqAdmin />} />
         <Route path="tehdit-kaynaklari" element={<ThreatSources />} />
+        <Route path="engellenen-alan-adlari" element={<BlockedDomains />} />
       </Route>
     </Routes>
   );

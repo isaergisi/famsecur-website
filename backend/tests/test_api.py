@@ -208,6 +208,25 @@ class PublicAndAdminTests(BaseAPITest):
         self.assertEqual(self.client.delete(f"/api/admin/users/{self.admin.id}/").status_code, 400)
         self.assertEqual(self.client.get("/api/admin/stats/").data["users"], 2)
 
+    def test_admin_blocked_domains_list_search_and_pages(self):
+        self.login_as()
+        self.assertEqual(self.client.get("/api/admin/blocked-domains/").status_code, 403)
+        self.login_as("admin@example.com")
+        ThreatSource.objects.create(name="Test USOM", category="phishing", domains="sahte-banka-giris.com")
+        data = self.client.get("/api/admin/blocked-domains/").data
+        self.assertGreater(data["count"], 36000)
+        self.assertEqual(len(data["results"]), 50)
+        self.assertIn("Test USOM", [s["name"] for s in data["sources"]])
+        data = self.client.get("/api/admin/blocked-domains/", {"search": "sahte-banka"}).data
+        self.assertEqual(data["count"], 1)
+        self.assertEqual(data["results"][0], {
+            "domain": "sahte-banka-giris.com", "category": "phishing",
+            "category_label": data["results"][0]["category_label"], "source": "Test USOM",
+        })
+        data = self.client.get("/api/admin/blocked-domains/", {"category": "phishing", "source": "Test USOM"}).data
+        self.assertEqual(data["count"], 1)
+        self.assertEqual(self.client.get("/api/admin/blocked-domains/", {"page": 2}).status_code, 200)
+
     def test_threat_source_blocks_listed_domain(self):
         self.login_as("admin@example.com")
         response = self.client.post(

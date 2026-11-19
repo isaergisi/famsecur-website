@@ -126,6 +126,7 @@ internet bağlantısı olmadan da açılır.
 | GET / POST, PUT, PATCH, DELETE | `/api/threat-sources/` | Herkes / Yönetici | Tehdit kaynakları |
 | GET, POST, PATCH, DELETE | `/api/admin/users/` | Yönetici | Kullanıcı yönetimi (var olan hesapta yalnızca aktif/pasif) |
 | GET | `/api/admin/stats/` | Yönetici | Platform istatistikleri |
+| GET | `/api/admin/blocked-domains/` | Yönetici | Listelerdeki engelli alan adları (`?search=&category=&source=&page=`, sayfa başına 50) |
 
 ## Yapay zeka risk modeli
 

@@ -6,13 +6,14 @@ from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view, inline_serializer
 from rest_framework import generics, mixins, permissions, serializers, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.permissions import IsAdminOrReadOnly, IsAdminRole
 from config.schema import AUTH_ERRORS, E400, E404, E429
 
-from .classifier import analyze_domain
+from .classifier import CATEGORY_LABELS, OFFICIAL_SOURCE_NAME, analyze_domain, official_gambling_domains
 from .models import BlockEvent, Device, Family, ThreatSource
 from .serializers import (
     BlockEventSerializer,
@@ -368,3 +369,68 @@ class AdminStatsView(APIView):
                 BlockEvent.objects.values("category").annotate(count=Count("id")).order_by("-count")
             ),
         })
+
+
+class BlockedDomainPagination(PageNumberPagination):
+    page_size = 50
+
+
+@extend_schema(
+    tags=["Yönetim"],
+    summary="Engellenen alan adları",
+    description=(
+        "Karar motorunun doğrudan engellediği tüm liste kayıtları: resmî kumar alan adı havuzu ve aktif "
+        "tehdit kaynakları. `?search=` alan adında arar, `?category=` ve `?source=` (kaynak adı) filtreler. "
+        "Sayfa başına 50 kayıt."
+    ),
+    parameters=[
+        OpenApiParameter("search", str, description="Alan adında arama"),
+        OpenApiParameter("category", str, description="Kategori (ör. gambling, phishing)"),
+        OpenApiParameter("source", str, description="Kaynak adı"),
+        OpenApiParameter("page", int, description="Sayfa numarası"),
+    ],
+    responses={200: inline_serializer("EngellenenAlanAdlari", {
+        "count": serializers.IntegerField(),
+        "next": serializers.CharField(allow_null=True),
+        "previous": serializers.CharField(allow_null=True),
+        "page_size": serializers.IntegerField(),
+        "sources": serializers.ListField(child=serializers.DictField()),
+        "results": serializers.ListField(child=serializers.DictField()),
+    }), **AUTH_ERRORS},
+)
+class BlockedDomainsView(APIView):
+    """GET /api/admin/blocked-domains/ — listelerdeki tüm engelli alan adları, aranabilir ve sayfalı."""
+
+    permission_classes = [IsAdminRole]
+
+    @staticmethod
+    def _rows():
+        rows = [(d, "gambling", OFFICIAL_SOURCE_NAME) for d in sorted(official_gambling_domains())]
+        for source in ThreatSource.objects.filter(is_active=True):
+            rows.extend((d, source.category, source.name) for d in source.domain_list())
+        return rows
+
+    def get(self, request):
+        rows = self._rows()
+        sources = {}
+        for _, category, name in rows:
+            sources[name] = sources.get(name, 0) + 1
+
+        params = request.query_params
+        search = params.get("search", "").strip().lower()
+        if search:
+            rows = [r for r in rows if search in r[0]]
+        if params.get("category"):
+            rows = [r for r in rows if r[1] == params["category"]]
+        if params.get("source"):
+            rows = [r for r in rows if r[2] == params["source"]]
+
+        paginator = BlockedDomainPagination()
+        page = paginator.paginate_queryset(rows, request, view=self)
+        response = paginator.get_paginated_response([
+            {"domain": d, "category": c, "category_label": CATEGORY_LABELS.get(c, c), "source": s}
+            for d, c, s in page
+        ])
+        response.data["page_size"] = paginator.page_size
+        response.data["sources"] = [{"name": n, "count": c} for n, c in sorted(sources.items())]
+        return response

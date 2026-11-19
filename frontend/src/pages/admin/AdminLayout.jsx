@@ -6,6 +6,7 @@ const LINKS = [
   ["/yonetim/talepler", "İletişim talepleri", "✉️"],
   ["/yonetim/sss", "SSS içerikleri", "❓"],
   ["/yonetim/tehdit-kaynaklari", "Tehdit kaynakları", "🛡️"],
+  ["/yonetim/engellenen-alan-adlari", "Engellenen alan adları", "🚫"],
 ];
 
 export default function AdminLayout() {

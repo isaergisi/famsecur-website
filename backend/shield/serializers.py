@@ -2,7 +2,13 @@ import re
 
 from rest_framework import serializers
 
-from .classifier import ALL_CATEGORIES, CATEGORY_LABELS, normalize_domain
+from .classifier import (
+    ALL_CATEGORIES,
+    CATEGORY_LABELS,
+    OFFICIAL_SOURCE_NAME,
+    normalize_domain,
+    official_gambling_domains,
+)
 from .models import BlockEvent, Device, Family, Policy, ThreatSource, WhitelistEntry
 
 DOMAIN_RE = re.compile(r"^(?=.{3,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{0,62}$")
@@ -151,7 +157,11 @@ class ThreatSourceSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "updated_at"]
 
     def get_domain_count(self, obj) -> int:
-        return len(obj.domain_list())
+        count = len(obj.domain_list())
+        if obj.name == OFFICIAL_SOURCE_NAME:
+            # Resmî havuzun alan adları veritabanında değil, sürümlenmiş dosyada tutulur.
+            count += len(official_gambling_domains())
+        return count
 
     def validate_domains(self, value):
         cleaned, invalid = [], []
