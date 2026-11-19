@@ -10,10 +10,12 @@ Desteklenen adresler:
 Çekme başarısız olursa eski liste olduğu gibi korunur, hata kaynağa yazılır.
 """
 
+import io
 import json
 import re
 import socket
 import ssl
+import tarfile
 import time
 from datetime import timedelta
 from urllib.parse import urlencode, urlparse
@@ -28,6 +30,11 @@ USOM_API = "https://siberguvenlik.gov.tr/api/address/index"
 USOM_HOSTS = {"usom.gov.tr", "www.usom.gov.tr", "siberguvenlik.gov.tr", "www.siberguvenlik.gov.tr"}
 USOM_CODES = {"phishing": {"PH", "BP"}, "malware": {"MD", "MU", "MC"}}
 DOMAIN_RE = re.compile(r"^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$")
+# UT1 (Toulouse Capitole Üniversitesi) kara listeleri: kategori başına tar.gz, içinde "<kategori>/domains".
+# Yetişkin listesi milyonlarca kayıt içerdiği için alınmaz; yetişkin içerik sinyal ve yapay zeka katmanıyla yakalanır.
+UT1_HOSTS = {"dsi.ut-capitole.fr", "dsi.univ-tlse1.fr"}
+UT1_DOWNLOAD = "https://dsi.ut-capitole.fr/blacklists/download/{name}.tar.gz"
+UT1_CATEGORIES = {"gambling": "gambling", "drogue": "drugs", "phishing": "phishing", "malware": "malware"}
 XML_DOMAIN_RE = re.compile(r"<AdresDomeny>\s*([^<\s]+)\s*</AdresDomeny>", re.IGNORECASE)
 MAX_BYTES = 50 * 1024 * 1024
 # Resmî kumar sicili ~60.000 kayıtlık büyük bir XML; yavaş yanıt verebilir.
@@ -111,6 +118,21 @@ def parse_list(text: str) -> set[str]:
     return domains
 
 
+def fetch_ut1(timeout: int = DEFAULT_TIMEOUT) -> dict[str, str]:
+    """UT1 listelerini indirir; alan adı → FamSecur kategorisi döndürür."""
+    found: dict[str, str] = {}
+    for name, category in UT1_CATEGORIES.items():
+        data = _get(UT1_DOWNLOAD.format(name=name), timeout)
+        with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as archive:
+            member = next((m for m in archive.getmembers() if m.isfile() and m.name.endswith("/domains")), None)
+            if member is None:
+                raise ValueError(f"UT1 '{name}' arşivinde domains dosyası yok.")
+            text = archive.extractfile(member).read().decode("utf-8", errors="replace")
+        for domain in parse_list(text):
+            found.setdefault(domain, category)
+    return found
+
+
 def explain_error(exc: Exception) -> str:
     """Hatayı panelde gösterilecek anlaşılır Türkçe bir cümleye çevirir (teknik ayrıntı parantez içinde)."""
     reason = getattr(exc, "reason", exc)
@@ -134,7 +156,14 @@ def refresh_source(source, timeout: int = DEFAULT_TIMEOUT) -> int:
     try:
         if not source.source_url:
             raise ValueError("Kaynak adresi (URL) girilmemiş.")
-        if urlparse(source.source_url).hostname in USOM_HOSTS:
+        if urlparse(source.source_url).hostname in UT1_HOSTS:
+            # Kayıt bazlı kategori: "alan-adi.com gambling"
+            entries = fetch_ut1(timeout=timeout)
+            if not entries:
+                raise ValueError("UT1 listelerinden alan adı gelmedi; liste değiştirilmedi.")
+            fetched = set(entries)
+            lines = [f"{domain} {category}" for domain, category in sorted(entries.items())]
+        elif urlparse(source.source_url).hostname in USOM_HOSTS:
             fetched = fetch_usom(source.category, timeout=timeout)
             existing = source.domains.splitlines()
             known = {line.split()[0].lower() for line in existing if line.strip()}

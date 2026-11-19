@@ -315,6 +315,46 @@ class PublicAndAdminTests(BaseAPITest):
         self.login_as()
         self.assertEqual(self.client.post(f"/api/threat-sources/{official.id}/refresh/").status_code, 403)
 
+    def test_refresh_ut1_and_urlhaus(self):
+        import io
+        import tarfile
+        from unittest import mock
+
+        from shield.fetchers import refresh_source
+
+        def tarball(name, domains):
+            buffer = io.BytesIO()
+            with tarfile.open(fileobj=buffer, mode="w:gz") as archive:
+                data = "\n".join(domains).encode()
+                info = tarfile.TarInfo(f"{name}/domains")
+                info.size = len(data)
+                archive.addfile(info, io.BytesIO(data))
+            return buffer.getvalue()
+
+        archives = {
+            "gambling": ["kacak-kumar.example"], "drogue": ["ot-satis.example"],
+            "phishing": ["sahte-banka.example"], "malware": ["virus-indir.example", "kacak-kumar.example"],
+        }
+
+        def fake_get(url, timeout):
+            if "urlhaus" in url:
+                return b"# abuse.ch URLhaus\n127.0.0.1\tzararli-host.example\n127.0.0.1\tikinci.example\n"
+            return tarball(url.rsplit("/", 1)[1].split(".")[0], archives[url.rsplit("/", 1)[1].split(".")[0]])
+
+        ut1 = ThreatSource.objects.create(name="UT1", category="gambling", source_url="https://dsi.ut-capitole.fr/blacklists/")
+        urlhaus = ThreatSource.objects.create(name="URLhaus", category="malware", source_url="https://urlhaus.abuse.ch/downloads/hostfile/")
+        with mock.patch("shield.fetchers._get", fake_get):
+            self.assertEqual(refresh_source(ut1), 4)
+            self.assertEqual(refresh_source(urlhaus), 2)
+        self.assertEqual(dict(ut1.domain_entries()), {
+            "kacak-kumar.example": "gambling", "ot-satis.example": "drugs",
+            "sahte-banka.example": "phishing", "virus-indir.example": "malware",
+        })
+        self.assertEqual(urlhaus.domain_list(), ["ikinci.example", "zararli-host.example"])
+        # Karar motoru kayıt bazlı kategoriyi kullanır (önbellek de yenilenir)
+        self.assertEqual(self.client.post("/api/analyze/", {"domain": "ot-satis.example"}, format="json").data["category"], "drugs")
+        self.assertEqual(self.client.post("/api/analyze/", {"domain": "www.zararli-host.example"}, format="json").data["category"], "malware")
+
     def test_threat_source_blocks_listed_domain(self):
         self.login_as("admin@example.com")
         response = self.client.post(
@@ -329,7 +369,7 @@ class PublicAndAdminTests(BaseAPITest):
         response = self.client.post("/api/analyze/", {"domain": "giris.kotu-site.com"}, format="json")
         self.assertEqual(response.data["action"], "block")
         self.assertEqual(response.data["category"], "phishing")
-        self.assertEqual(ThreatSource.objects.count(), 1)
+        self.assertTrue(ThreatSource.objects.filter(name="Test").exists())
 
 
 class AiRiskTests(BaseAPITest):

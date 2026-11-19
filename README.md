@@ -336,9 +336,14 @@ python manage.py seed_families
 
 ### Tehdit kaynaklarını otomatik güncellemek (internet gerekir)
 
-İki kaynak adresinden otomatik güncellenir: **Resmî Kumar Alan Adı Havuzu**
-(Polonya Maliye Bakanlığı sicili) ve **USOM Zararlı Bağlantılar** (Siber
-Güvenlik Başkanlığı'nın herkese açık API'si, son 30 gün, kritiklik 1-4).
+Dört kaynak adresinden otomatik güncellenir:
+
+| Kaynak | İçerik |
+| --- | --- |
+| Resmî Kumar Alan Adı Havuzu | Polonya Maliye Bakanlığı yasa dışı kumar sicili (`/api/Register`, XML) |
+| USOM Zararlı Bağlantılar | Siber Güvenlik Başkanlığı'nın herkese açık API'si; son 30 gün, kritiklik 1-4 |
+| UT1 Kara Listeleri | Toulouse Capitole Üniversitesi; kumar, uyuşturucu, oltalama, zararlı yazılım (kayıt bazlı kategori). Yetişkin listesi milyonlarca kayıt olduğu için alınmaz |
+| URLhaus (abuse.ch) | Zararlı yazılım dağıtan alan adları (hosts dosyası) |
 Yönetim panelinde Tehdit kaynakları sayfasındaki **Şimdi güncelle** düğmesiyle
 ya da hepsini birden komutla:
 

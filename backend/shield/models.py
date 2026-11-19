@@ -161,10 +161,20 @@ class ThreatSource(models.Model):
     def domain_list(self) -> list[str]:
         return [domain for domain, _ in self.domain_entries()]
 
+    _map_cache: tuple = (None, {})
+
     @classmethod
     def active_domain_map(cls) -> dict[str, str]:
+        """Aktif kaynaklardaki alan adı → kategori. Yüz binlerce kayıt olabileceği için kaynaklar
+        değişmedikçe (sayı veya son güncelleme zamanı) önbellekten döner."""
+        active = cls.objects.filter(is_active=True)
+        key = tuple(active.order_by("id").values_list("id", "updated_at"))
+        cached_key, cached_map = cls._map_cache
+        if cached_key == key:
+            return cached_map
         mapping: dict[str, str] = {}
-        for source in cls.objects.filter(is_active=True):
+        for source in active:
             for domain, category in source.domain_entries():
                 mapping.setdefault(domain, category)
+        cls._map_cache = (key, mapping)
         return mapping
