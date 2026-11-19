@@ -14,6 +14,7 @@ export const PLANS = {
     tagline: "Evde neler oluyor, görün",
     short: "Riskli girişleri raporlar; engellemez, cihazı göstermez.",
     monthly: 100,
+    yearly: 1000,
     features: [
       "Ağınızda riskli bir siteye girilmeye çalışıldığında panelinizde görürsünüz: site, kategori ve zaman",
       "Resmî kumar sicili, güvenilir tehdit kaynakları ve yapay zekâ ile risk tespiti",
@@ -32,6 +33,7 @@ export const PLANS = {
     short: "Zararlı siteleri engeller, hangi cihazdan geldiğini gösterir.",
     monthly: 149,
     yearly: 1490,
+    perDayNote: "Günde 5 TL'den az.",
     features: [
       "Zararlı siteler açılmadan engellenir",
       "Her engelin hangi cihazdan geldiğini görürsünüz",

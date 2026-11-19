@@ -25,7 +25,7 @@ export default function Terms() {
         </p>
         <ul>
           <li>
-            <b>{PLANS.izleme.name}</b> (aylık {TL(PLANS.izleme.monthly)} TL): Ağınızda riskli bir siteye girilmeye
+            <b>{PLANS.izleme.name}</b> (aylık {TL(PLANS.izleme.monthly)} TL veya yıllık {TL(PLANS.izleme.yearly)} TL): Ağınızda riskli bir siteye girilmeye
             çalışıldığında bu durum panelinizde raporlanır. Siteler engellenmez ve isteğin hangi cihazdan geldiği
             gösterilmez.
           </li>
@@ -45,7 +45,7 @@ export default function Terms() {
             ({PLANS.izleme.name} için {TL(PLANS.izleme.monthly)} TL, {PLANS.tam.name} için {TL(PLANS.tam.monthly)} TL)
             kartınızdan otomatik olarak tahsil edilir. Üyelik, iptal edilene kadar her ay aynı şekilde yenilenir.
           </li>
-          <li>{PLANS.tam.name} paketinin yıllık ücreti {TL(PLANS.tam.yearly)} TL'dir. Fiyatlara KDV dâhildir.</li>
+          <li>Yıllık ücretler {PLANS.izleme.name} için {TL(PLANS.izleme.yearly)} TL, {PLANS.tam.name} için {TL(PLANS.tam.yearly)} TL'dir. Fiyatlara KDV dâhildir.</li>
         </ul>
 
         <h2>3. İptal</h2>

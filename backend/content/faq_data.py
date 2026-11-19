@@ -49,7 +49,7 @@ FAQS = [
      "içeriğini görmediği için \"better.com\" gibi masum adlarda yanılabilir. Analiz FamSecur'un kendi sunucusunda "
      "yapılır; alan adları harici bir yapay zekâ hizmetine gönderilmez."),
     ("İzleme ve Tam koruma paketleri arasındaki fark nedir?",
-     "İzleme paketi (aylık 100 TL) ağınızda riskli bir siteye girilmeye çalışıldığında bunu panelinizde sitenin adı, "
+     "İzleme paketi (aylık 100 TL veya yıllık 1.000 TL) ağınızda riskli bir siteye girilmeye çalışıldığında bunu panelinizde sitenin adı, "
      "kategorisi ve zamanıyla gösterir; siteyi engellemez ve isteğin hangi cihazdan geldiğini göstermez. Tam koruma "
      "paketi (aylık 149 TL veya yıllık 1.490 TL) zararlı siteleri açılmadan engeller, her engelin hangi cihazdan "
      "geldiğini gösterir; beyaz liste ve koruma seviyesi ayarları da bu pakettedir. Paketinizi değiştirmek için "
