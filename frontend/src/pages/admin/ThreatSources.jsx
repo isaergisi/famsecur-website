@@ -7,9 +7,9 @@ import PageHead from "../../components/PageHead";
 import Spinner from "../../components/Spinner";
 import { useToast } from "../../components/Toast";
 import useFetch from "../../components/useFetch";
-import { confirmAction, formatDate } from "../../utils";
+import { confirmAction, formatDate, CATEGORY_LABELS } from "../../utils";
 
-const CATEGORIES = { gambling: "Kumar / bahis", adult: "Yetişkin içerik", drugs: "Uyuşturucu", phishing: "Dolandırıcılık / phishing", malware: "Kötü amaçlı yazılım" };
+const CATEGORIES = CATEGORY_LABELS;
 const EMPTY = { name: "", category: "phishing", description: "", source_url: "", is_active: true, auto_update: true };
 
 function SourceForm({ initial, onClose, onSaved }) {
@@ -48,7 +48,7 @@ function SourceForm({ initial, onClose, onSaved }) {
         <Field label="Kaynak adresi" error={errors.source_url}><input value={form.source_url} onChange={set("source_url")} placeholder="https://" /></Field>
         <label className="switch"><input type="checkbox" checked={form.is_active} onChange={set("is_active")} /><span>Kaynak aktif</span></label>
         <label className="switch"><input type="checkbox" checked={form.auto_update} onChange={set("auto_update")} /><span>Kaynak adresinden otomatik güncelle</span></label>
-        <p className="muted small">USOM adresleri resmî API'den, diğer adresler düz metin liste veya XML sicil olarak okunur. Çekme başarısız olursa eski liste korunur.</p>
+        <p className="muted small">USOM adresleri resmî API'den, UT1 adresleri kategori arşivlerinden, diğer adresler düz metin liste veya XML sicil olarak okunur. Çekme başarısız olursa eski liste korunur.</p>
         <div className="modal-actions">
           <button type="button" className="btn btn-ghost" onClick={onClose}>Vazgeç</button>
           <button className="btn btn-primary">Kaydet</button>

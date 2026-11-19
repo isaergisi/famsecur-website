@@ -3,8 +3,9 @@ import Alert from "../../components/Alert";
 import PageHead from "../../components/PageHead";
 import Spinner from "../../components/Spinner";
 import useFetch from "../../components/useFetch";
+import { CATEGORY_LABELS } from "../../utils";
 
-const LABELS = { gambling: "Kumar / bahis", adult: "Yetişkin içerik", drugs: "Uyuşturucu", phishing: "Dolandırıcılık / phishing", malware: "Kötü amaçlı yazılım" };
+const LABELS = CATEGORY_LABELS;
 
 export default function AdminOverview() {
   const { data, error, loading } = useFetch("/admin/stats/");

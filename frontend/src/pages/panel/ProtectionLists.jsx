@@ -9,7 +9,7 @@ import { BlockedDomainsBrowser } from "../admin/BlockedDomains";
 // Koruma listelerindeki önemli gelişmeler. Yeni kaynak veya özellik eklendikçe başa yeni satır eklenir.
 const MILESTONES = [
   { date: "2026-11-19", title: "UT1 Kara Listeleri eklendi", text: "Toulouse Capitole Üniversitesi'nin kumar, uyuşturucu, oltalama ve zararlı yazılım listeleri korumaya katıldı." },
-  { date: "2026-11-19", title: "Listeler otomatik güncelleniyor", text: "Tüm kaynaklar resmî adreslerinden düzenli olarak yenileniyor; yeni tehditler ek bir işlem gerekmeden ailenize ulaşıyor." },
+  { date: "2026-11-19", title: "Listeler kaynağından güncelleniyor", text: "Listeler artık doğrudan yayımlandıkları adreslerden yenileniyor; her güncelleme bu sayfada tarihiyle görünür." },
   { date: "2026-11-19", title: "USOM resmî API'ye bağlandı", text: "T.C. Siber Güvenlik Başkanlığı'nın yayımladığı oltalama bağlantıları doğrudan alınıyor." },
   { date: "2026-07-23", title: "Resmî kumar alan adı havuzu", text: "Polonya Maliye Bakanlığı'nın yasa dışı kumar sicili (36.282 alan adı) ile koruma başladı." },
 ];
@@ -27,7 +27,7 @@ function Updates({ sources }) {
   return (
     <div className="card">
       <h3>Güncellemeler ve yenilikler</h3>
-      <p className="muted small">FamSecur'un koruma listeleri sürekli büyüyor. Yeni kaynaklar ekleniyor, var olanlar düzenli olarak güncelleniyor.</p>
+      <p className="muted small">FamSecur'un koruma listeleri büyümeye devam ediyor: yeni kaynaklar ekleniyor, mevcut listeler güncelleniyor.</p>
       <ul className="timeline">
         {items.map((item, i) => (
           <li key={i}>
@@ -52,7 +52,7 @@ export default function ProtectionLists() {
     <>
       <PageHead
         title="Koruma listeleri"
-        desc="Ailenizi koruyan güvenilir kaynaklar ve engellenen alan adları. Bu sayfa yalnızca bilgilendirme amaçlıdır; listeleri FamSecur ekibi yönetir."
+        desc="Ailenizi koruyan güvenilir kaynaklar ve engellenen alan adları. Bu sayfa bilgilendirme amaçlıdır; listeler FamSecur tarafından yönetilir."
       />
       {loading && <Spinner />}
       <Alert>{error?.message}</Alert>

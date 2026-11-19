@@ -4,22 +4,23 @@ import { api, asList } from "../../api";
 import Alert from "../../components/Alert";
 import DecisionResult from "../../components/DecisionResult";
 import useFetch from "../../components/useFetch";
+import { CATEGORY_LABELS } from "../../utils";
 
 const FEATURES = [
-  { icon: "🛡️", title: "Ağ seviyesinde koruma", text: "Router'daki DNS katmanında çalışır. Gizli mod, tarayıcı değişikliği veya uygulama silme korumayı kapatmaz." },
-  { icon: "🤖", title: "Yapay zeka destekli analiz", text: "Kendi eğittiğimiz model, hiçbir listede olmayan yeni kumar ve yetişkin içerik sitelerini adından tanır ve sizi uyarır. Hiçbir veri dışarı gönderilmez." },
-  { icon: "🔍", title: "Açıklanabilir kararlar", text: "Her engelin kategorisi, risk puanı ve gerekçesi panelde görünür. Kara kutu yok." },
-  { icon: "🇹🇷", title: "Resmî kaynaklar", text: "Oltalama ve zararlı yazılım için USOM verisi, yasa dışı bahis için resmî alan adı havuzu kullanılır." },
-  { icon: "✅", title: "Beyaz liste", text: "Yanlış engellenen bir siteyi tek tıkla izinli hâle getirin; alt alan adları da otomatik açılır." },
-  { icon: "🎚️", title: "Ayarlanabilir eşik", text: "Risk eşiğini ailenize göre belirleyin; kategori bazında açıp kapatın." },
-  { icon: "🔕", title: "Sessiz veya uyarılı engel", text: "Site sessizce açılmasın ya da çocuğunuz nedenini anlatan bir uyarı sayfası görsün." },
+  { icon: "🛡️", title: "Ağ seviyesinde koruma", text: "Ev router'ınızın DNS katmanında çalışır. Gizli sekme açmak ya da cihazdan bir uygulamayı silmek korumayı kapatmaz." },
+  { icon: "🤖", title: "Yapay zeka destekli analiz", text: "Kendi eğittiğimiz model, henüz hiçbir listede olmayan yeni kumar ve yetişkin içerik sitelerini adından tanır ve sizi uyarır. Analiz FamSecur'un içinde yapılır; alan adları üçüncü taraf bir yapay zeka hizmetine gönderilmez." },
+  { icon: "🔍", title: "Açıklanabilir kararlar", text: "Her engelin kategorisi, risk puanı ve gerekçesi panelinizde açıkça görünür. Hiçbir karar kara kutuda verilmez." },
+  { icon: "📚", title: "Güvenilir kaynaklar", text: "Oltalama için T.C. Siber Güvenlik Başkanlığı'nın USOM verisi, yasa dışı kumar için Polonya Maliye Bakanlığı'nın resmî sicili, zararlı yazılım ve uyuşturucu için Toulouse Capitole Üniversitesi'nin UT1 listeleri kullanılır." },
+  { icon: "✅", title: "Beyaz liste", text: "Yanlışlıkla engellenen bir siteye tek tıkla izin verin; alt alan adları da otomatik olarak açılır." },
+  { icon: "🎚️", title: "Ayarlanabilir eşik", text: "Risk eşiğini ailenizin ihtiyacına göre ayarlayın, kategorileri tek tek açıp kapatın." },
+  { icon: "🔕", title: "Sessiz veya uyarılı engel", text: "Site sessizce açılmasın ya da çocuğunuz nedenini anlatan nazik bir uyarı sayfası görsün; seçim sizin." },
 ];
 
 const WHY = [
-  { icon: "👁️‍🗨️", title: "Gözetlemeden korur", text: "Birçok ebeveyn kontrol uygulaması çocuğun mesajlarını, ekranını ve gezinme geçmişini izler; bu da aile içinde güveni zedeler. FamSecur yalnızca zararlı siteyi durdurur. Mesajlara, ekrana ya da geçmişe hiç bakmaz." },
-  { icon: "🎯", title: "Türkiye'deki yasa dışı bahse odaklı", text: "Bahis siteleri her gün adres değiştiriyor (ör. yenibahis123.net) ve listeler buna yetişemiyor. FamSecur'un yapay zeka modeli, hiçbir listede olmayan yeni bir adresi adından tanır ve sizi uyarır. Model, Türkiye'de popüler sitelerle eğitildi." },
-  { icon: "📶", title: "Tek kurulum, tüm cihazlar", text: "FamSecur ev ağında çalışır. Telefon, tablet ve oyun konsoluna ayrı ayrı uygulama kurmanız gerekmez. Cihazda uygulama olmadığı için çocuk onu silerek korumayı kapatamaz." },
-  { icon: "🤫", title: "Çocuk merak etmeden güvende kalır", text: "Sessiz engel modunda zararlı site yalnızca açılmaz; çocuk \"kumar\" ya da \"yetişkin içerik\" yazan bir uyarıyla karşılaşmaz. Bu yaş grubunda böyle içeriklerin varlığını öğrenmek bile merak uyandırabilir. FamSecur bu kapıyı hiç aralamaz." },
+  { icon: "👁️‍🗨️", title: "Gözetlemeden korur", text: "Pek çok ebeveyn kontrol uygulaması çocuğun mesajlarını, ekranını ve gezinme geçmişini izler; bu da aile içindeki güveni zedeleyebilir. FamSecur yalnızca zararlı siteyi durdurur; mesajlara, ekrana ya da geçmişe hiç bakmaz." },
+  { icon: "🎯", title: "Yasa dışı bahse karşı özel dikkat", text: "Yasa dışı bahis siteleri sık sık adres değiştirir (ör. yenibahis123.net) ve listeler her zaman yetişemez. FamSecur'un yapay zeka modeli, henüz hiçbir listede olmayan yeni bir adresi adından tanır ve sizi uyarır. Model, Türkiye'de sık ziyaret edilen sitelerle de eğitildi." },
+  { icon: "📶", title: "Tek kurulum, evdeki tüm cihazlar", text: "FamSecur ev ağınızda çalışır; telefon, tablet ve oyun konsoluna tek tek uygulama kurmanız gerekmez. Cihazda uygulama olmadığı için silinerek devre dışı bırakılamaz. Koruma, cihazlar ev Wi-Fi'ınıza bağlıyken geçerlidir." },
+  { icon: "🤫", title: "Merak uyandırmadan korur", text: "Sessiz engel modunda zararlı site yalnızca açılmaz; çocuğunuz \"kumar\" ya da \"yetişkin içerik\" yazan bir uyarıyla karşılaşmaz. Bu yaşlarda böyle içeriklerin varlığını öğrenmek bile merak uyandırabilir; FamSecur bu kapıyı hiç aralamaz." },
 ];
 
 const COMPARE_ROWS = [
@@ -49,21 +50,30 @@ function Mark({ value }) {
 }
 
 const PLAN_FEATURES = [
-  "Resmi kumar ve yetişkin içerik listelerine karşı koruma",
-  "Yapay zeka ile risk tahmini: listede olmayan yeni riskli sitelerde sizi uyarır",
+  "Resmî kumar sicili ve güvenilir tehdit kaynaklarıyla koruma",
+  "Yapay zeka destekli risk tahmini: listelerde henüz olmayan riskli sitelerde sizi uyarır",
   "Sessiz engelleme modu",
   "Haftalık özet raporu",
-  "Evdeki tüm cihazlar (sınırsız)",
+  "Evdeki tüm cihazlar için sınırsız koruma",
 ];
 
 const STEPS = [
-  ["Router'a bağlayın", "Ev router'ınızın DNS ayarını FamSecur'a yönlendirin. Çocuğun cihazına uygulama gerekmez."],
-  ["Politikanızı seçin", "Hangi kategorilerin hangi eşikte engelleneceğine ebeveyn panelinden karar verin."],
-  ["Gerisini FamSecur yapsın", "Zararlı alan adları milisaniyeler içinde engellenir, yalnızca engel olayları size raporlanır."],
+  ["Router'ınıza bağlayın", "Ev router'ınızın DNS ayarını FamSecur'a yönlendirin. Çocuğunuzun cihazına uygulama kurmanıza gerek yok."],
+  ["Politikanızı belirleyin", "Hangi kategorilerin hangi risk eşiğinde engelleneceğini ebeveyn panelinden seçin."],
+  ["Gerisini FamSecur'a bırakın", "Zararlı alan adları anında engellenir; size yalnızca engellenen istekler raporlanır."],
 ];
 
-const CATEGORIES = ["Kumar / bahis", "Yetişkin içerik", "Dolandırıcılık / phishing", "Kötü amaçlı yazılım", "Uyuşturucu"];
+const CATEGORIES = [
+  CATEGORY_LABELS.gambling, CATEGORY_LABELS.adult, CATEGORY_LABELS.phishing, CATEGORY_LABELS.malware, CATEGORY_LABELS.drugs,
+];
 const EXAMPLES = ["casino777.xyz", "bet2x.com", "e-devlet-giris-dogrula.com", "eba.gov.tr"];
+
+// Kaynaklardaki toplam alan adı sayısı, binlik aşağı yuvarlanır (ör. 61.523 → "61.000+").
+function domainTotalLabel(sources) {
+  const total = asList(sources).reduce((sum, s) => sum + (s.domain_count || 0), 0);
+  if (total === 0) return null;
+  return total < 1000 ? total.toLocaleString("tr-TR") : `${(Math.floor(total / 1000) * 1000).toLocaleString("tr-TR")}+`;
+}
 
 function LiveDemo() {
   const [domain, setDomain] = useState("");
@@ -129,31 +139,32 @@ function LiveDemo() {
 
 export default function Home() {
   const { data: sources } = useFetch("/threat-sources/");
+  const domainTotal = domainTotalLabel(sources);
   return (
     <>
       <section className="hero">
         <div className="container hero-grid">
           <div>
-            <span className="eyebrow">Yapay zeka destekli, gizlilik odaklı aile internet kalkanı</span>
+            <span className="eyebrow hero-eyebrow">Yapay zeka destekli, gizlilik odaklı aile internet kalkanı</span>
             <h1>
-              Müdahale etmeden, <span className="lime">Aileni koru.</span>
+              Müdahale etmeden, <span className="lime">aileni koru.</span>
             </h1>
             <p className="lead">
-              FamSecur ev ağınızda çalışır ve yalnızca kumar, yetişkin içerik, oltalama ve zararlı yazılım sitelerini
-              engeller. Mesajlar, ekran ya da gezinme geçmişi asla toplanmaz. Yapay zeka destekli risk analizi, listelerde
-              henüz olmayan yeni siteleri de adından tanır ve sizi uyarır.
+              FamSecur ev ağınızda sessizce çalışır; kumar, yetişkin içerik, uyuşturucu, oltalama ve zararlı yazılım
+              sitelerini çocuğunuza ulaşmadan durdurur. Mesajlara, ekrana ya da gezinme geçmişine hiçbir zaman bakmaz.
+              Yapay zeka destekli risk analizi ise henüz hiçbir listeye girmemiş yeni siteleri adından tanır ve sizi uyarır.
             </p>
             <div className="hero-actions">
               <Link to="/kayit" className="btn btn-primary">
-                7 gün ücretsiz dene
+                7 gün ücretsiz deneyin
               </Link>
               <a href="#demo" className="btn btn-ghost">
-                Canlı demoyu dene
+                Canlı demoyu deneyin
               </a>
             </div>
             <ul className="hero-stats">
-              <li><b>36.000+</b><span>resmî bahis alan adı</span></li>
-              <li><b>%93</b><span>yapay zeka doğruluğu</span></li>
+              {domainTotal && <li><b>{domainTotal}</b><span>engellenen alan adı</span></li>}
+              <li><b>%93</b><span>test kümesinde yapay zeka doğruluğu</span></li>
               <li><b>0</b><span>kaydedilen izinli istek</span></li>
             </ul>
           </div>
@@ -279,8 +290,9 @@ export default function Home() {
             <span className="eyebrow">Gizlilik ilkemiz</span>
             <h2>Neyi görmediğimiz, neyi gördüğümüz kadar önemli</h2>
             <p className="muted">
-              FamSecur yalnızca istenen alan adına bakar. HTTPS trafiğini açmaz, içerik okumaz. İzin verilen her istek
-              iz bırakmadan geçer; panelinize yalnızca engellenen alan adı, kategori, puan ve zaman düşer.
+              FamSecur yalnızca ziyaret edilmek istenen alan adına bakar; HTTPS trafiğini açmaz, sayfa içeriğini okumaz.
+              İzin verilen her istek iz bırakmadan geçer. Panelinize yalnızca engellenen alan adı, kategori, risk puanı ve
+              zaman bilgisi düşer.
             </p>
           </div>
           <ul className="check-list">
@@ -296,7 +308,7 @@ export default function Home() {
         <section className="section">
           <div className="container">
             <span className="eyebrow">Tehdit istihbaratı</span>
-            <h2>Kaynaklarımız</h2>
+            <h2>Güvendiğimiz kaynaklar</h2>
             <div className="card-grid">
               {asList(sources).map((s) => (
                 <article className="card" key={s.id}>
@@ -313,9 +325,9 @@ export default function Home() {
       <section className="section" id="fiyatlar">
         <div className="container pricing">
           <span className="eyebrow">Fiyatlar</span>
-          <h2>Günde 5 TL'ye çocuğunu koru</h2>
+          <h2>Ailenizin dijital güvenliği, günde 5 TL'den az</h2>
           <p className="muted">
-            7 gün ücretsiz deneyin, beğenmezseniz ödeme yapmazsınız. İstediğiniz zaman iptal edebilirsiniz.
+            İlk 7 gün ücretsiz; beğenmezseniz hiçbir ödeme yapmazsınız. Aboneliğinizi dilediğiniz zaman iptal edebilirsiniz.
           </p>
           <article className="card price-card">
             <h3>Aile paketi</h3>
@@ -328,7 +340,7 @@ export default function Home() {
               <div className="price-option">
                 <span className="price-label">Yıllık</span>
                 <b className="price">1.490 TL<small>/yıl</small></b>
-                <span className="muted">Ayda ~124 TL, 2 ay bedava</span>
+                <span className="muted">Aylık yaklaşık 124 TL, 2 ay hediye</span>
               </div>
             </div>
             <ul className="check-list">
@@ -336,7 +348,7 @@ export default function Home() {
                 <li className="yes" key={f}>{f}</li>
               ))}
             </ul>
-            <Link to="/kayit" className="btn btn-primary">7 gün ücretsiz dene</Link>
+            <Link to="/kayit" className="btn btn-primary">7 gün ücretsiz deneyin</Link>
             <p className="muted price-note">Paket bir ev ağını kapsar. Fiyatlara KDV dahildir.</p>
           </article>
         </div>
@@ -350,10 +362,9 @@ export default function Home() {
             FamSecur, Ankara'dan genç bir Türk mühendis olan <b>İsa Ergişi</b> tarafından geliştirildi.
           </p>
           <p className="muted">
-            Yabancı bir ürünün Türkçeye çevrilmiş hâli değil. Yapay zeka modeli Türkiye'de popüler sitelerle eğitildi.
-            Oltalama verisi T.C. Siber Güvenlik Başkanlığı'nın USOM listesinden, bahis listesi resmî kaynaklardan geliyor.
-            Türkiye'de her gün adres değiştiren yasa dışı bahis sitelerine karşı burada, bu sorunu bilen biri tarafından
-            yazıldı.
+            FamSecur, yabancı bir ürünün Türkçeye çevrilmiş hâli değil. Yapay zeka modeli Türkiye'de sık ziyaret edilen
+            sitelerle eğitildi; oltalama verisi T.C. Siber Güvenlik Başkanlığı'nın USOM listesinden alınıyor. Sık sık adres
+            değiştiren yasa dışı bahis sitelerine karşı, bu sorunu yakından bilen biri tarafından burada yazıldı.
           </p>
           <blockquote className="maker-quote">Amacım basit: çocuğunuzu gözetlemeden korumak.</blockquote>
           <p className="maker-sign">
@@ -378,8 +389,8 @@ export default function Home() {
           />
           <div className="cta-text">
             <h2>Ailenizi bugün koruma altına alın</h2>
-            <p>Hesabınızı oluşturun, cihazlarınızı ekleyin ve politikanızı birkaç dakikada belirleyin.</p>
-            <Link to="/kayit" className="btn btn-dark">Hemen başla</Link>
+            <p>Hesabınızı oluşturun, cihazlarınızı ekleyin ve koruma politikanızı birkaç dakika içinde belirleyin.</p>
+            <Link to="/kayit" className="btn btn-dark">Hemen başlayın</Link>
           </div>
         </div>
       </section>

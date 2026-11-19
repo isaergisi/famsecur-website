@@ -48,7 +48,7 @@ class PolicySerializer(serializers.ModelSerializer):
         missing = [c for c in ("phishing", "malware") if c not in value]
         if missing:
             raise serializers.ValidationError(
-                "Dolandırıcılık ve kötü amaçlı yazılım koruması kapatılamaz."
+                "Oltalama ve zararlı yazılım koruması güvenliğiniz için kapatılamaz."
             )
         return value
 

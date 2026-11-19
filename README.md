@@ -1,6 +1,6 @@
 # FamSecur Web
 
-**Müdahale etmeden, Aileni koru.**
+**Müdahale etmeden, aileni koru.**
 
 FamSecur'un tanıtım sitesi, ebeveyn paneli ve yönetim paneli. Proje aynı zamanda
 *Web Tabanlı Teknolojiler* dersi dönem sonu projesidir: birbirinden ayrı bir
@@ -34,11 +34,11 @@ tüm ailelerde geçerli tehdit istihbaratı kaynaklarını yönetir.
 
 | Şart | Karşılandığı yer |
 | --- | --- |
-| Backend REST API | `backend/` — Django 5 + Django REST Framework |
+| Backend REST API | `backend/` — Django 5.2/6 + Django REST Framework |
 | CRUD işlemleri | Cihaz, beyaz liste, SSS, iletişim talebi, tehdit kaynağı, kullanıcı (yönetici) için tam CRUD; politika ve aile için okuma/güncelleme; olaylar için okuma/silme |
 | Veritabanı, kalıcı veri | SQLite (Django ORM, migration'lar `*/migrations/`) |
 | HTTP metotları | `GET`, `POST`, `PUT`, `PATCH`, `DELETE` |
-| HTTP durum kodları | 200, 201, 204, 400, 401, 403, 404, 405, 409, 429 |
+| HTTP durum kodları | 200, 201, 204, 400, 401, 403, 404, 405, 409, 429, 502 |
 | Anlamlı hata mesajları | Tüm hatalar `{"detail": "...", "errors": {alan: [mesaj]}}` biçiminde Türkçe döner (`config/exceptions.py`) |
 | İş kuralları backend'de | Karar motoru, aile bazlı veri izolasyonu, politika kuralları, olay saklama süresi (`shield/services.py`, `shield/serializers.py`) |
 | Kayıt ve giriş | `POST /api/auth/register/`, `POST /api/auth/login/` |
@@ -48,9 +48,9 @@ tüm ailelerde geçerli tehdit istihbaratı kaynaklarını yönetir.
 | Hata ve başarı durumlarını gösterme | Alan bazlı form hataları, uyarı kutuları, bildirim (toast) mesajları |
 | Oturum yönetimi | Anahtarlar `localStorage`'da; süresi dolan erişim anahtarı otomatik yenilenir, yenilenemezse oturum kapatılır (`src/api.js`) |
 | En az 5 veri modeli | 9 model (aşağıda) |
-| Basit CRUD'dan öte | Açıklanabilir risk puanlamalı alan adı karar motoru, 36.000+ resmî kumar alan adı havuzu, kendi eğittiğimiz yapay zeka risk modeli (%93 test doğruluğu) |
+| Basit CRUD'dan öte | Açıklanabilir risk puanlamalı alan adı karar motoru, 60.000+ alan adlık, kaynağından güncellenen resmî kumar havuzu, kendi eğittiğimiz yapay zeka risk modeli (%93 test doğruluğu) |
 | API dokümantasyonu | Swagger arayüzü `http://127.0.0.1:8000/api/docs/` (koddan otomatik üretilir, JWT ile denenebilir) |
-| Testler | 21 API testi (`backend/tests/test_api.py`) |
+| Testler | 25 API testi (`backend/tests/test_api.py`) |
 
 ## Veri modelleri
 
@@ -343,6 +343,7 @@ python manage.py seed_families
 | Resmî Kumar Alan Adı Havuzu | Polonya Maliye Bakanlığı yasa dışı kumar sicili (`/api/Register`, XML) |
 | USOM Zararlı Bağlantılar | Siber Güvenlik Başkanlığı'nın herkese açık API'si; son 30 gün, kritiklik 1-4 |
 | UT1 Kara Listeleri | Toulouse Capitole Üniversitesi; kumar, uyuşturucu, oltalama, zararlı yazılım (kayıt bazlı kategori). Yetişkin listesi milyonlarca kayıt olduğu için alınmaz |
+
 Yönetim panelinde Tehdit kaynakları sayfasındaki **Şimdi güncelle** düğmesiyle
 ya da hepsini birden komutla:
 
@@ -351,7 +352,7 @@ python manage.py refresh_sources
 ```
 
 Kaynak düzenleme ekranındaki "Kaynak adresinden otomatik güncelle" işaretli her
-kaynak güncellenir. USOM adresleri API'den, diğer adresler düz metin liste
+kaynak güncellenir. USOM adresleri API'den, UT1 adresleri kategori arşivlerinden (tar.gz), diğer adresler düz metin liste
 (satır başına bir alan adı / hosts biçimi) veya XML sicil olarak okunur. Çekme
 başarısız olursa eski liste korunur ve hata panelde görünür. Resmî havuz hiç
 güncellenmediyse repodaki sürümlenmiş dosya kullanılır. Düzenli çalışması için

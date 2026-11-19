@@ -29,7 +29,7 @@ export default function PublicLayout() {
               <>
                 <NavLink to="/giris">Giriş</NavLink>
                 <Link className="btn btn-primary btn-sm" to="/kayit">
-                  Ücretsiz başla
+                  Ücretsiz başlayın
                 </Link>
               </>
             )}
@@ -43,7 +43,7 @@ export default function PublicLayout() {
         <div className="container footer-grid">
           <div>
             <Logo />
-            <p className="muted">Müdahale etmeden, Aileni koru.</p>
+            <p className="muted">Müdahale etmeden, aileni koru.</p>
           </div>
           <div>
             <h4>Ürün</h4>
