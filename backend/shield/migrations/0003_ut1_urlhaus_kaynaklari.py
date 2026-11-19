@@ -8,12 +8,6 @@ NEW_SOURCES = [
                        "uyuşturucu, oltalama ve zararlı yazılım alt listeleri. Her kayıt kendi kategorisiyle alınır.",
         "source_url": "https://dsi.ut-capitole.fr/blacklists/",
     },
-    {
-        "name": "URLhaus (abuse.ch)",
-        "category": "malware",
-        "description": "abuse.ch'nin topluluk destekli, sürekli güncellenen zararlı yazılım dağıtan alan adları listesi.",
-        "source_url": "https://urlhaus.abuse.ch/downloads/hostfile/",
-    },
 ]
 
 

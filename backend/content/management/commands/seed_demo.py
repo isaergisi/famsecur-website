@@ -61,13 +61,6 @@ SOURCES = [
         "source_url": "https://dsi.ut-capitole.fr/blacklists/",
         "auto_update": True,
     },
-    {
-        "name": "URLhaus (abuse.ch)",
-        "category": "malware",
-        "description": "abuse.ch'nin topluluk destekli, sürekli güncellenen zararlı yazılım dağıtan alan adları listesi.",
-        "source_url": "https://urlhaus.abuse.ch/downloads/hostfile/",
-        "auto_update": True,
-    },
 ]
 
 

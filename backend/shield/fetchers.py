@@ -65,14 +65,20 @@ def _download(url: str, timeout: int) -> bytes:
 
 
 def _get(url: str, timeout: int) -> bytes:
-    """İndirir; zaman aşımı veya bağlantı hatasında bir kez daha dener (HTTP hata kodlarında denemez)."""
+    """İndirir; zaman aşımı veya bağlantı hatasında bir kez daha dener (HTTP hata kodlarında denemez).
+    Hata olursa denenen adres hataya eklenir, panelde gösterilir."""
     try:
-        return _download(url, timeout)
-    except HTTPError:
+        try:
+            return _download(url, timeout)
+        except HTTPError:
+            raise
+        except (URLError, TimeoutError, socket.timeout, ConnectionError):
+            time.sleep(RETRY_DELAY)
+            return _download(url, timeout)
+    except Exception as exc:
+        exc.famsecur_url = url
         raise
-    except (URLError, TimeoutError, socket.timeout, ConnectionError):
-        time.sleep(RETRY_DELAY)
-        return _download(url, timeout)
+
 
 
 def fetch_usom(category: str, days: int = 30, max_criticality: int = 4, timeout: int = DEFAULT_TIMEOUT) -> set[str]:
@@ -148,7 +154,9 @@ def explain_error(exc: Exception) -> str:
         return str(exc)
     else:
         text = "Beklenmeyen hata."
-    return f"{text} ({type(exc).__name__}: {reason})"[:500]
+    url = getattr(exc, "famsecur_url", None)
+    tried = f" Denenen adres: {url}" if url else ""
+    return f"{text} ({type(exc).__name__}: {reason}).{tried}"[:500]
 
 
 def refresh_source(source, timeout: int = DEFAULT_TIMEOUT) -> int:
