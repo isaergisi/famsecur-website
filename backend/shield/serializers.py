@@ -186,7 +186,8 @@ class ThreatSourceSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         user = self.context["request"].user
-        if not (user.is_authenticated and user.is_admin):
-            # Alan adı listesi yalnızca yöneticilere gösterilir.
+        if not (user.is_authenticated and user.is_admin) or self.context.get("view_action") == "list":
+            # Alan adı listesi yalnızca yöneticilere ve tek kayıt isteğinde gösterilir; on binlerce satırlık
+            # listeler kaynak listesini ağırlaştırmasın (hepsi "Engellenen alan adları" sayfasında görünür).
             data.pop("domains")
         return data

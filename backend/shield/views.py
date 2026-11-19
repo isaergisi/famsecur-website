@@ -324,6 +324,9 @@ class ThreatSourceViewSet(viewsets.ModelViewSet):
     serializer_class = ThreatSourceSerializer
     permission_classes = [IsAdminOrReadOnly]
 
+    def get_serializer_context(self):
+        return {**super().get_serializer_context(), "view_action": self.action}
+
     @extend_schema(
         summary="Kaynağı adresinden şimdi güncelle",
         description="Kaynak adresinden (USOM API, düz metin liste veya XML sicil) alan adlarını çeker. "
