@@ -79,6 +79,8 @@ SIGNALS: dict[str, tuple[str, ...]] = {
 }
 RISKY_TLDS = {"zip", "mov", "top", "xyz", "click", "gq", "work"}
 
+# Yönetim panelinde bu dosyanın bağlı olduğu tehdit kaynağının adı.
+OFFICIAL_SOURCE_NAME = "Resmî Kumar Alan Adı Havuzu"
 OFFICIAL_GAMBLING_FEED = Path(__file__).with_name("feeds") / "poland_official_gambling_domains_20260723.txt"
 ALL_CATEGORIES = tuple(CATEGORY_LABELS)
 
