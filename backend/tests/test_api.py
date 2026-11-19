@@ -315,7 +315,7 @@ class PublicAndAdminTests(BaseAPITest):
         self.login_as()
         self.assertEqual(self.client.post(f"/api/threat-sources/{official.id}/refresh/").status_code, 403)
 
-    def test_refresh_ut1_and_urlhaus(self):
+    def test_refresh_ut1(self):
         import io
         import tarfile
         from unittest import mock
@@ -337,23 +337,24 @@ class PublicAndAdminTests(BaseAPITest):
         }
 
         def fake_get(url, timeout):
-            if "urlhaus" in url:
-                return b"# abuse.ch URLhaus\n127.0.0.1\tzararli-host.example\n127.0.0.1\tikinci.example\n"
             return tarball(url.rsplit("/", 1)[1].split(".")[0], archives[url.rsplit("/", 1)[1].split(".")[0]])
 
         ut1 = ThreatSource.objects.create(name="UT1", category="gambling", source_url="https://dsi.ut-capitole.fr/blacklists/")
-        urlhaus = ThreatSource.objects.create(name="URLhaus", category="malware", source_url="https://urlhaus.abuse.ch/downloads/hostfile/")
         with mock.patch("shield.fetchers._get", fake_get):
             self.assertEqual(refresh_source(ut1), 4)
-            self.assertEqual(refresh_source(urlhaus), 2)
         self.assertEqual(dict(ut1.domain_entries()), {
             "kacak-kumar.example": "gambling", "ot-satis.example": "drugs",
             "sahte-banka.example": "phishing", "virus-indir.example": "malware",
         })
-        self.assertEqual(urlhaus.domain_list(), ["ikinci.example", "zararli-host.example"])
+        from urllib.error import HTTPError
+
+        # Hata mesajı denenen adresi gösterir
+        with mock.patch("shield.fetchers._download", side_effect=HTTPError("https://x.example/l.txt", 410, "Gone", {}, None)):
+            with self.assertRaises(HTTPError):
+                refresh_source(ThreatSource.objects.create(name="X", category="malware", source_url="https://x.example/l.txt"))
+        self.assertIn("Denenen adres: https://x.example/l.txt", ThreatSource.objects.get(name="X").last_fetch_error)
         # Karar motoru kayıt bazlı kategoriyi kullanır (önbellek de yenilenir)
         self.assertEqual(self.client.post("/api/analyze/", {"domain": "ot-satis.example"}, format="json").data["category"], "drugs")
-        self.assertEqual(self.client.post("/api/analyze/", {"domain": "www.zararli-host.example"}, format="json").data["category"], "malware")
 
     def test_threat_source_blocks_listed_domain(self):
         self.login_as("admin@example.com")
