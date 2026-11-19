@@ -14,7 +14,7 @@ export const PLANS = {
     tagline: "Evde neler oluyor, görün",
     short: "Riskli girişleri raporlar; engellemez, cihazı göstermez.",
     monthly: 100,
-    yearly: 1000,
+    yearly: 1099,
     features: [
       "Ağınızda riskli bir siteye girilmeye çalışıldığında panelinizde görürsünüz: site, kategori ve zaman",
       "Resmî kumar sicili, güvenilir tehdit kaynakları ve yapay zekâ ile risk tespiti",
@@ -47,6 +47,9 @@ export const PLANS = {
 export const DEFAULT_PLAN = "tam";
 export const planFromQuery = (value) => (value in PLANS ? value : DEFAULT_PLAN);
 export const TL = (n) => n.toLocaleString("tr-TR");
+// Yıllık ödemenin kazancı: tam 2 ay bedavaysa öyle söylenir, değilse kazanılan tutar yazılır.
+export const yearlySaving = (plan) =>
+  plan.yearly === plan.monthly * 10 ? "2 ay ücretsiz" : `yılda ${TL(plan.monthly * 12 - plan.yearly)} TL daha az`;
 
 export const TRIAL_TERMS = [
   "İki pakette de ilk 7 gün ücretsizdir; seçtiğiniz paketin tüm özellikleri açıktır.",

@@ -8,7 +8,7 @@ import Alert from "../../components/Alert";
 import DecisionResult from "../../components/DecisionResult";
 import useFetch from "../../components/useFetch";
 import usePageTitle from "../../components/usePageTitle";
-import { AI_METRICS, DATA_INVENTORY, DATA_NEVER, PLANS, SUPPORT, TL, TRIAL_TERMS } from "../../site";
+import { AI_METRICS, DATA_INVENTORY, DATA_NEVER, PLANS, SUPPORT, TL, TRIAL_TERMS, yearlySaving } from "../../site";
 import { CATEGORY_LABELS, formatDate } from "../../utils";
 
 const WHY = [
@@ -137,7 +137,7 @@ function PlanCard({ plan, featured = false }) {
       <b className="price">{TL(plan.monthly)} TL<small>/ay</small></b>
       <p className="muted plan-price-note">
         {plan.perDayNote && <>{plan.perDayNote} </>}
-        Yıllık ödemede {TL(plan.yearly)} TL (2 ay ücretsiz).
+        Yıllık ödemede {TL(plan.yearly)} TL ({yearlySaving(plan)}).
       </p>
       <Link to={`/kayit?paket=${plan.id}`} className={`btn ${featured ? "btn-primary" : "btn-ghost"}`}>
         7 gün ücretsiz deneyin
