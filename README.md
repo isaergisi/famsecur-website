@@ -322,6 +322,17 @@ npm run dev                      # http://localhost:5173
 Geliştirmede Vite, `/api` isteklerini `http://127.0.0.1:8000` adresine yönlendirir.
 API başka bir adresteyse `frontend/.env` dosyasında `VITE_API_URL` tanımlayın.
 
+### Örnek aileler ve iletişim talepleri (isteğe bağlı)
+
+Panelleri dolu göstermek için 10 örnek aile (cihazları ve engel olaylarıyla)
+ve 3 iletişim talebi ekler. Tekrar çalıştırmak güvenlidir.
+
+```bash
+python manage.py seed_families
+```
+
+Örnek ebeveynlerin hepsinin şifresi `Aile.12345` (ör. `mehmet.demir@ornek.com`).
+
 ### Demo hesapları (`seed_demo` sonrası)
 
 | Rol | E-posta | Şifre |
