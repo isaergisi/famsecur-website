@@ -1,6 +1,6 @@
 # FamSecur Web
 
-**Müdahale etmeden, aileni koru.**
+**Müdahale etmeden aileni koru.**
 
 FamSecur'un tanıtım sitesi, ebeveyn paneli ve yönetim paneli. Proje aynı zamanda
 *Web Tabanlı Teknolojiler* dersi dönem sonu projesidir: birbirinden ayrı bir
@@ -48,9 +48,9 @@ tüm ailelerde geçerli tehdit istihbaratı kaynaklarını yönetir.
 | Hata ve başarı durumlarını gösterme | Alan bazlı form hataları, uyarı kutuları, bildirim (toast) mesajları |
 | Oturum yönetimi | Anahtarlar `localStorage`'da; süresi dolan erişim anahtarı otomatik yenilenir, yenilenemezse oturum kapatılır (`src/api.js`) |
 | En az 5 veri modeli | 9 model (aşağıda) |
-| Basit CRUD'dan öte | Açıklanabilir risk puanlamalı alan adı karar motoru, 60.000+ alan adlık, kaynağından güncellenen resmî kumar havuzu, kendi eğittiğimiz yapay zeka risk modeli (%93 test doğruluğu) |
+| Basit CRUD'dan öte | Açıklanabilir risk puanlamalı alan adı karar motoru, 60.000+ alan adlık, kaynağından güncellenen resmî kumar havuzu, kendi eğittiğimiz yapay zekâ risk modeli (uyarı eşiğinde %92,6 test doğruluğu) |
 | API dokümantasyonu | Swagger arayüzü `http://127.0.0.1:8000/api/docs/` (koddan otomatik üretilir, JWT ile denenebilir) |
-| Testler | 25 API testi (`backend/tests/test_api.py`) |
+| Testler | 28 API testi (`backend/tests/test_api.py`) |
 
 ## Veri modelleri
 
@@ -60,7 +60,7 @@ tüm ailelerde geçerli tehdit istihbaratı kaynaklarını yönetir.
 | `Family` | shield | Ebeveynin koruduğu ev (kullanıcıyla bire bir) |
 | `Policy` | shield | Risk eşiği, engel biçimi, etkin kategoriler, olay saklama süresi |
 | `Device` | shield | Ailenin cihazları; cihaz bazında koruma açılıp kapatılabilir |
-| `WhitelistEntry` | shield | Ailenin izin verdiği alan adları (alt alan adları dahil) |
+| `WhitelistEntry` | shield | Ailenin izin verdiği alan adları (alt alan adları dâhil) |
 | `BlockEvent` | shield | Yalnızca engellenen istekler: alan adı, kategori, puan, gerekçe |
 | `ThreatSource` | shield | Yöneticinin yönettiği tehdit istihbaratı kaynağı ve alan adları |
 | `FAQ` | content | Sitedeki sıkça sorulan sorular |
@@ -81,7 +81,7 @@ erDiagram
 - Her ebeveyn yalnızca kendi ailesinin verisini görebilir; başka ailenin kaydı `404` döner.
 - Kayıt olan her kullanıcıya otomatik olarak bir aile ve varsayılan politika (eşik 70, sessiz engel, tüm kategoriler) oluşturulur.
 - Risk eşiği 30-100 arasında olmalıdır; oltalama ve zararlı yazılım kategorileri kapatılamaz.
-- `POST /api/check/` alan adını şu sırayla değerlendirir: cihaz koruması → beyaz liste → aktif tehdit kaynakları → resmî kumar havuzu → açıklanabilir sinyal puanlaması. Alan adı hiçbir listede yoksa yanıta ayrıca yapay zeka risk tahmini (`ai`) eklenir; bu tahmin kararı değiştirmez.
+- `POST /api/check/` alan adını şu sırayla değerlendirir: cihaz koruması → beyaz liste → aktif tehdit kaynakları → resmî kumar havuzu → açıklanabilir sinyal puanlaması. Alan adı hiçbir listede yoksa yanıta ayrıca yapay zekâ risk tahmini (`ai`) eklenir; bu tahmin kararı değiştirmez.
 - İzin verilen istekler **hiçbir yerde kaydedilmez**; engellenenler `BlockEvent` olarak yazılır, saklama süresi dolanlar silinir.
 - Olaylar elle oluşturulamaz (`POST /api/events/` → `405`); yalnızca karar motoru üretir.
 - Aynı ailede aynı adlı iki cihaz veya aynı alan adı iki kez beyaz listede olamaz.
@@ -128,7 +128,7 @@ internet bağlantısı olmadan da açılır.
 | GET | `/api/admin/stats/` | Yönetici | Platform istatistikleri |
 | GET | `/api/admin/blocked-domains/` | Yönetici | Listelerdeki engelli alan adları (`?search=&category=&source=&page=`, sayfa başına 50) |
 
-## Yapay zeka risk modeli
+## Yapay zekâ risk modeli
 
 Listeler ne kadar büyük olursa olsun her gün yeni kumar ve yetişkin içerik
 siteleri açılıyor. Bu yüzden FamSecur'a, **hiçbir listede olmayan** bir alan
@@ -137,7 +137,7 @@ adının adına bakarak ne kadar riskli göründüğünü tahmin eden küçük b
 bilgisayarımızda) eğitilir ve çalışır; dışarıya hiçbir veri gönderilmez.
 
 Ebeveyn panelindeki **Alan adı test et** sayfasında sonuç kartının altında
-"Yapay zeka risk tahmini: %NN" olarak görünür. Tahmin %60 ve üzerindeyse
+"Yapay zekâ risk tahmini: %NN" olarak görünür. Tahmin %60 ve üzerindeyse
 ebeveyne uyarı gösterilir. Model **engellemez**, yalnızca uyarır: kesin engel
 kararını açıklanabilir karar motoru ve listeler verir. Böylece modelin olası
 yanlışları çocuğun masum bir siteye girmesini engellemez.
@@ -159,8 +159,8 @@ yanlışları çocuğun masum bir siteye girmesini engellemez.
    kümeden çıkarılır ve riskli örnek olarak eklenir. Model böylece
    `canlibahis`, `yenibahisadresi` gibi Türkçe adları öğrenir, ama kurala
    birebir bağlı kalmaz: kuralın bilmediği benzer adları da tanıyabilir.
-4. **Örneklem.** 100.000 kumar, 100.000 yetişkin ve ≈520.000 temiz alan adı
-   (toplam ≈720.000). Sınıflar eşit sayıda değil; bunu
+4. **Örneklem.** 100.000 kumar, 100.000 yetişkin ve ≈524.000 temiz alan adı
+   (toplam ≈724.000). Sınıflar eşit sayıda değil; bunu
    `class_weight="balanced"` ile dengeliyoruz (az örnekli sınıfın hatası daha
    "pahalı" sayılır).
 5. **Ayrım.** Verinin %80'i eğitime, %20'si teste ayrılır. Test kümesini model
@@ -177,44 +177,34 @@ yanlışları çocuğun masum bir siteye girmesini engellemez.
    `backend/ml/model/domain_risk.joblib` dosyasına (≈3 MB) kaydedilir;
    ölçümler `backend/ml/model/metrics.json` dosyasına yazılır.
 
-### Sonuçlar (143.999 alan adlık test kümesi)
+### Sonuçlar (144.850 alan adlık test kümesi)
 
-| Ölçüm | Değer |
+Model eğitimde hiç görmediği alan adlarıyla ölçülür. Sitede uyarı, risk tahmini
+**%60 ve üzerindeyse** gösterilir; bu yüzden asıl ölçüm o eşikte yapılır
+(`metrics.json` → `at_warning_threshold`).
+
+| Ölçüm (uyarı eşiği %60) | Değer |
 | --- | --- |
-| Doğruluk (temiz / kumar / yetişkin) | **%92,8** |
-| Doğruluk (riskli / temiz) | **%93,0** |
-| Riskli alan adlarını yakalama oranı | %90,5 |
-| Temiz alan adlarını doğru bırakma oranı | %93,9 |
-| Türkiye'de popüler temiz siteleri doğru bırakma oranı | %94,9 |
-| ROC AUC (riskli / temiz) | 0,974 |
+| Doğruluk (riskli / temiz) | **%92,6** |
+| Riskli alan adlarını yakalama oranı (recall) | %90,0 |
+| Uyarıların gerçekten riskli çıkma oranı (precision) | %84,3 |
+| Temiz sitelerde yanlış alarm oranı | %6,4 |
+| Türkiye'de popüler temiz sitelerde yanlış alarm oranı | %5,4 |
+| ROC AUC (riskli / temiz) | 0,972 |
 
 | Sınıf | Kesinlik (precision) | Duyarlılık (recall) |
 | --- | --- | --- |
-| Kumar | %92,7 | %94,0 |
-| Yetişkin | %77,6 | %83,1 |
-| Temiz | %96,1 | %94,5 |
+| Kumar | %89,5 | %94,1 |
+| Yetişkin | %71,0 | %84,7 |
+| Temiz | %96,4 | %92,0 |
 
-### İlk model ile karşılaştırma
+Örnek tahminler: `yenibahisadresi.net` %100, `canlimacizle-bahis.com` %97
+(uyarı); `sahibinden.com` %10, `yemeksepeti.com` %1, `eba.gov.tr` %0 (uyarı yok).
 
-İlk model yalnızca Polonya kumar listesi, yetişkin listesi ve Umbrella ile
-eğitilmişti. İki modeli **aynı test kümesinde** ölçtük:
-
-| Ölçüm | İlk model | Yeni model |
-| --- | --- | --- |
-| Doğruluk (riskli / temiz) | %87,3 | **%93,0** |
-| Riskli alan adlarını yakalama | %79,6 | **%90,5** |
-| Temiz alan adlarını doğru bırakma | %90,2 | **%93,9** |
-| Türkiye'de popüler temiz siteleri doğru bırakma | %86,2 | **%94,9** |
-| 40 bilinen Türk sitesinde ortalama risk | %11,8 | **%4,0** |
-
-Örnekler (risk tahmini, ilk → yeni): `sahibinden.com` %36 → %6,
-`yemeksepeti.com` %55 → %2, `cumhuriyet.com.tr` %45 → %0,
-`yenibahisadresi.net` %56 → %95, `canlimacizle-bahis.com` %81 → %92.
-
-Not: İlk modelin daha önce ölçülen %92'lik doğruluğu kendi (daha kolay,
-Türkçe örnek içermeyen) test kümesindeydi; burada iki model aynı ve daha zor
-kümede yarışıyor. Test kümesindeki Türkçe riskli örneklerin etiketi kural
-motorundan geldiği için bu dilimde ölçülen başarı biraz iyimser olabilir.
+Not: Test kümesindeki Türkçe riskli örneklerin etiketi kural motorundan geldiği
+için bu dilimde ölçülen başarı biraz iyimser olabilir. Temiz listeler (Cisco
+Umbrella) günlük değiştiği için model her yeniden eğitildiğinde sonuçlar küçük
+farklar gösterebilir; sitedeki sayılar `metrics.json` dosyasıyla aynı tutulur.
 
 Model yalnızca alan adının harflerine bakar, sitenin içeriğini görmez. Bu
 yüzden `better.com` gibi "bet" içeren masum adlarda veya `n11.com` gibi çok
@@ -227,14 +217,14 @@ kullanmamızın nedeni budur.
 cd backend
 pip install -r requirements.txt
 python -m ml.train_risk_model --download   # verileri indirir (~85 MB) ve eğitir, ~2 dk
-python manage.py test tests                # model testleri dahil
+python manage.py test tests                # model testleri dâhil
 ```
 
 Ham veriler `backend/ml/data/` klasörüne iner ve git'e eklenmez. Eğitim
 betiği sabit rastgelelik tohumu (`SEED = 42`) kullanır; aynı verilerle
 çalıştırıldığında aynı sonucu verir. Model dosyası farklı bir scikit-learn
 sürümüyle açılamazsa yukarıdaki komutla yeniden eğitmek yeterlidir; model
-yüklenemezse site çalışmaya devam eder, yalnızca yapay zeka tahmini görünmez.
+yüklenemezse site çalışmaya devam eder, yalnızca yapay zekâ tahmini görünmez.
 
 Dosyalar: `backend/ml/train_risk_model.py` (eğitim),
 `backend/ml/features.py` (eğitim ve tahminde ortak ön işleme),
@@ -344,8 +334,15 @@ python manage.py seed_families
 | USOM Zararlı Bağlantılar | Siber Güvenlik Başkanlığı'nın herkese açık API'si; son 30 gün, kritiklik 1-4 |
 | UT1 Kara Listeleri | Toulouse Capitole Üniversitesi; kumar, uyuşturucu, oltalama, zararlı yazılım (kayıt bazlı kategori). Yetişkin listesi milyonlarca kayıt olduğu için alınmaz |
 
-Yönetim panelinde Tehdit kaynakları sayfasındaki **Şimdi güncelle** düğmesiyle
-ya da hepsini birden komutla:
+**Her gün otomatik:** Sunucu çalışırken arka planda saatte bir uyanan bir görev
+(`shield/scheduler.py`), son başarılı güncellemesinin üzerinden 24 saat geçen
+kaynakları yeniler (başarısız olursa 6 saat sonra yeniden dener) ve saklama
+süresi dolan engel olaylarını siler. `runserver` ile kendiliğinden başlar;
+gunicorn gibi başka bir sunucuda `FAMSECUR_AUTO_UPDATE=1`, kapatmak için
+`FAMSECUR_AUTO_UPDATE=0` ortam değişkenini kullanın.
+
+**İstendiğinde:** Yönetim panelinde Tehdit kaynakları sayfasındaki
+**Şimdi güncelle** düğmesiyle ya da hepsini birden komutla:
 
 ```bash
 python manage.py refresh_sources
@@ -355,8 +352,7 @@ Kaynak düzenleme ekranındaki "Kaynak adresinden otomatik güncelle" işaretli 
 kaynak güncellenir. USOM adresleri API'den, UT1 adresleri kategori arşivlerinden (tar.gz), diğer adresler düz metin liste
 (satır başına bir alan adı / hosts biçimi) veya XML sicil olarak okunur. Çekme
 başarısız olursa eski liste korunur ve hata panelde görünür. Resmî havuz hiç
-güncellenmediyse repodaki sürümlenmiş dosya kullanılır. Düzenli çalışması için
-komut Windows Görev Zamanlayıcı'ya veya cron'a eklenebilir.
+güncellenmediyse repodaki sürümlenmiş dosya kullanılır.
 
 Tehdit kaynaklarında her satıra kayda özel kategori de yazılabilir
 (`ornek-bahis.com gambling`); Engellenen alan adları sayfasındaki kategori
@@ -383,7 +379,7 @@ backend/
   accounts/    kullanıcı modeli, kayıt/giriş, rol izinleri, kullanıcı yönetimi
   shield/      aile, politika, cihaz, beyaz liste, olay, tehdit kaynağı, karar motoru
   content/     SSS, iletişim talepleri, seed_demo komutu
-  ml/          yapay zeka risk modeli: eğitim betiği ve kayıtlı model
+  ml/          yapay zekâ risk modeli: eğitim betiği ve kayıtlı model
   tests/       API testleri
 frontend/
   src/api.js            REST istemcisi (JWT, otomatik yenileme, hata yönetimi)

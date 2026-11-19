@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import Alert from "../../components/Alert";
 import Spinner from "../../components/Spinner";
 import useFetch from "../../components/useFetch";
+import usePageTitle from "../../components/usePageTitle";
 
 export default function Faq() {
+  usePageTitle("Sıkça sorulan sorular");
   const { data, error, loading } = useFetch("/faqs/");
   return (
     <section className="section page">

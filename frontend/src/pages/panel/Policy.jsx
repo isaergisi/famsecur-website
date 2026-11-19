@@ -64,8 +64,8 @@ export default function PolicyPage() {
           <span className="field-label">Engelleme biçimi</span>
           <div className="radio-cards">
             {[
-              ["silent", "Sessiz engel", "Site hiç açılmaz; cihaz bağlantı hatası görür."],
-              ["warning", "Uyarı sayfası", "Cihaz, engelin nedenini açıklayan FamSecur sayfasına yönlenir."],
+              ["silent", "Sessiz engel (önerilen)", "Site açılmaz, cihazda bağlantı hatası görünür. Çocuğunuz engellenen içeriğin türünü öğrenmez."],
+              ["warning", "Uyarı sayfası", "Engelin nedeni bir FamSecur sayfasında gösterilir. Bu sayfa yalnızca şifresiz (HTTP) sitelerde görünür; HTTPS sitelerde tarayıcı güvenlik uyarısı gösterir."],
             ].map(([value, title, text]) => (
               <label key={value} className={`radio-card ${form.enforcement_mode === value ? "active" : ""}`}>
                 <input type="radio" name="mode" value={value} checked={form.enforcement_mode === value} onChange={() => setForm({ ...form, enforcement_mode: value })} />

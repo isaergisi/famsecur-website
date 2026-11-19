@@ -138,18 +138,18 @@ class Decision:
 def _signal_score(label: str, word: str) -> tuple[int, str]:
     """Bir alan adı parçası ile sinyal kelimesi eşleşmesinin puanı ve gerekçesi."""
     if label.count(word) >= 2:
-        return 80, f"tekrarlanan risk sinyali ({word} × {label.count(word)})"
+        return 80, f"riskli bir kelime adında birden fazla kez geçiyor ({word} × {label.count(word)})"
     if label == word:
-        return 75, word
+        return 75, f"adında riskli bir kelime var ({word})"
     if label.startswith(word):
         suffix = label[len(word):]
         if suffix.isalnum() and any(char.isdigit() for char in suffix):
-            return 75, f"{word} + sayısal varyasyon ({label})"
+            return 75, f"riskli kelimeye sayı eklenmiş, sık adres değiştiren sitelere özgü ({label})"
     if label.endswith(word):
         prefix = label[: -len(word)]
         if prefix.isalnum() and any(char.isdigit() for char in prefix):
-            return 75, f"{word} + sayısal varyasyon ({label})"
-    return 35, word
+            return 75, f"riskli kelimeye sayı eklenmiş, sık adres değiştiren sitelere özgü ({label})"
+    return 35, f"adında riskli olabilecek bir kelime var ({word})"
 
 
 def analyze_domain(
@@ -166,9 +166,9 @@ def analyze_domain(
     """
     domain = normalize_domain(value)
     if not domain or "." not in domain:
-        return Decision(domain, "allow", None, None, 0, ["geçerli bir alan adı çözümlenemedi"])
+        return Decision(domain, "allow", None, None, 0, ["geçerli bir alan adı bulunamadı"])
     if whitelist and matches_any(domain, whitelist):
-        return Decision(domain, "allow", None, None, 0, ["Beyaz listede izinli"])
+        return Decision(domain, "allow", None, None, 0, ["beyaz listenizde izinli"])
 
     if blocked_domains:
         for suffix in domain_suffixes(domain):
@@ -176,13 +176,13 @@ def analyze_domain(
             if category and category in enabled_categories:
                 return Decision(
                     domain, "block", category, CATEGORY_LABELS[category], 100,
-                    [f"tehdit istihbaratı kaynağında kayıtlı ({suffix})"],
+                    [f"güvenilir bir tehdit listesinde kayıtlı ({suffix})"],
                 )
 
     if "gambling" in enabled_categories and matches_any(domain, official_gambling_domains()):
         return Decision(
             domain, "block", "gambling", CATEGORY_LABELS["gambling"], 100,
-            ["resmî kumar alan adı havuzunda kayıtlı"],
+            ["resmî yasa dışı kumar sicilinde kayıtlı"],
         )
 
     labels = domain.replace("-", ".").replace("_", ".").split(".")
@@ -197,11 +197,11 @@ def analyze_domain(
                 # Yüksek yakalama politikası: kumar sözlüğündeki her eşleşme
                 # doğrudan engel eşiğini aşar ("better" gibi yanlış pozitifler
                 # beyaz listeyle düzeltilir).
-                score, reason = 75, f"kumar anahtar kelimesi ({word})"
+                score, reason = 75, f"adında kumar/bahis kelimesi var ({word})"
             elif category == "adult" and word in ADULT_HIGH_CONFIDENCE_SIGNALS:
-                score, reason = 75, f"yüksek güvenli yetişkin içerik sinyali ({word})"
+                score, reason = 75, f"adında açıkça yetişkin içeriğe işaret eden bir kelime var ({word})"
             elif category == "adult":
-                score, reason = 35, f"belirsiz yetişkin içerik sinyali ({word})"
+                score, reason = 35, f"adında yetişkin içeriğe işaret edebilecek bir kelime var ({word})"
             else:
                 score, reason = _signal_score(matching_label, word)
             scores[category] += score
@@ -212,21 +212,21 @@ def analyze_domain(
         for category in scores:
             if scores[category]:
                 scores[category] += 12
-                matches[category].append(f".{tld} yüksek riskli TLD")
+                matches[category].append(f"riskli sitelerde sık görülen bir uzantı (.{tld})")
     if len(domain) > 55 or domain.count("-") >= 4:
         for category in scores:
             if scores[category]:
                 scores[category] += 8
-                matches[category].append("olağandışı alan adı biçimi")
+                matches[category].append("alışılmadık derecede uzun veya çok tireli bir ad")
 
     category = max(scores, key=scores.get)
     score = min(scores[category], 100)
     if not score:
-        return Decision(domain, "allow", None, None, 0, ["zararlı bir sinyal bulunamadı"])
+        return Decision(domain, "allow", None, None, 0, ["adında veya listelerde risk işareti bulunamadı"])
     action = "block" if score >= threshold and category in enabled_categories else "allow"
     reasons = matches[category]
     if action == "allow" and category not in enabled_categories:
-        reasons = reasons + ["kategori bu politikada kapalı"]
+        reasons = reasons + ["bu kategori koruma ayarlarınızda kapalı"]
     elif action == "allow":
-        reasons = reasons + [f"puan eşiğin altında ({score} < {threshold})"]
+        reasons = reasons + [f"risk puanı koruma seviyenizin altında ({score} < {threshold})"]
     return Decision(domain, action, category, CATEGORY_LABELS[category], score, reasons)

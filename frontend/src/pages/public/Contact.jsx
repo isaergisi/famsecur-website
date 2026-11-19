@@ -2,10 +2,14 @@ import { useState } from "react";
 import { api, fieldErrors } from "../../api";
 import Alert from "../../components/Alert";
 import Field from "../../components/Field";
+import { Clock, Mail, MessageCircle } from "lucide-react";
+import usePageTitle from "../../components/usePageTitle";
+import { SUPPORT } from "../../site";
 
 const EMPTY = { name: "", email: "", topic: "demo", message: "" };
 
 export default function Contact() {
+  usePageTitle("İletişim");
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
@@ -34,9 +38,24 @@ export default function Contact() {
     <section className="section page">
       <div className="container narrow">
         <span className="eyebrow">İletişim</span>
-        <h1>Demo talep edin veya bize yazın</h1>
-        <p className="muted">Kurulum, demo veya iş birliği için formu doldurmanız yeterli; size en kısa sürede e-postayla dönüş yapalım.</p>
-        {sent && <Alert type="success">Mesajınız bize ulaştı, teşekkür ederiz. En kısa sürede size dönüş yapacağız.</Alert>}
+        <h1>Size nasıl yardımcı olabiliriz?</h1>
+        <p className="muted">Kurulum, abonelik, demo veya iş birliği için bize dilediğiniz kanaldan ulaşabilirsiniz.</p>
+        <div className="contact-channels">
+          <a className="card contact-channel" href={SUPPORT.whatsappLink} target="_blank" rel="noreferrer">
+            <MessageCircle aria-hidden strokeWidth={1.8} />
+            <span><b>WhatsApp</b><span className="muted small">{SUPPORT.whatsapp}</span></span>
+          </a>
+          <a className="card contact-channel" href={`mailto:${SUPPORT.email}`}>
+            <Mail aria-hidden strokeWidth={1.8} />
+            <span><b>E-posta</b><span className="muted small">{SUPPORT.email}</span></span>
+          </a>
+          <div className="card contact-channel">
+            <Clock aria-hidden strokeWidth={1.8} />
+            <span><b>Yanıt süresi</b><span className="muted small">Mesajlarınıza {SUPPORT.responseTime} dönüş yapıyoruz.</span></span>
+          </div>
+        </div>
+        <h2 className="section-title">İletişim formu</h2>
+        {sent && <Alert type="success">Mesajınız bize ulaştı, teşekkür ederiz. {SUPPORT.responseTime[0].toLocaleUpperCase("tr-TR") + SUPPORT.responseTime.slice(1)} size dönüş yapacağız.</Alert>}
         <form className="card form" onSubmit={submit} noValidate>
           <Alert>{error}</Alert>
           <div className="form-row">

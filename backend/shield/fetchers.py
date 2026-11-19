@@ -31,7 +31,7 @@ USOM_HOSTS = {"usom.gov.tr", "www.usom.gov.tr", "siberguvenlik.gov.tr", "www.sib
 USOM_CODES = {"phishing": {"PH", "BP"}, "malware": {"MD", "MU", "MC"}}
 DOMAIN_RE = re.compile(r"^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$")
 # UT1 (Toulouse Capitole Üniversitesi) kara listeleri: kategori başına tar.gz, içinde "<kategori>/domains".
-# Yetişkin listesi milyonlarca kayıt içerdiği için alınmaz; yetişkin içerik sinyal ve yapay zeka katmanıyla yakalanır.
+# Yetişkin listesi milyonlarca kayıt içerdiği için alınmaz; yetişkin içerik sinyal ve yapay zekâ katmanıyla yakalanır.
 UT1_HOSTS = {"dsi.ut-capitole.fr", "dsi.univ-tlse1.fr"}
 UT1_DOWNLOAD = "https://dsi.ut-capitole.fr/blacklists/download/{name}.tar.gz"
 UT1_CATEGORIES = {"gambling": "gambling", "drogue": "drugs", "phishing": "phishing", "malware": "malware"}

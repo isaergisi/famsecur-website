@@ -385,7 +385,7 @@ class PublicAndAdminTests(BaseAPITest):
 
 
 class AiRiskTests(BaseAPITest):
-    """Eğitilmiş yapay zeka modeli: yalnızca listede olmayan alan adlarına uyarı verir."""
+    """Eğitilmiş yapay zekâ modeli: yalnızca listede olmayan alan adlarına uyarı verir."""
 
     def setUp(self):
         super().setUp()
@@ -411,6 +411,59 @@ class AiRiskTests(BaseAPITest):
         self.client.post("/api/whitelist/", {"domain": "hotgirlsvideo.com"}, format="json")
         response = self.client.post("/api/check/", {"domain": "hotgirlsvideo.com"}, format="json")
         self.assertIsNone(response.data["ai"])
+
+    def test_public_demo_includes_ai_prediction_for_unlisted_domains(self):
+        self.client.credentials()
+        data = self.client.post("/api/analyze/", {"domain": "hotgirlsvideo.com"}, format="json").data
+        self.assertEqual(data["action"], "allow")
+        self.assertTrue(data["ai"]["warning"])
+        data = self.client.post("/api/analyze/", {"domain": "0-romancasino.com"}, format="json").data
+        self.assertEqual(data["action"], "block")
+        self.assertIsNone(data["ai"])
+
+
+class DailyTaskTests(BaseAPITest):
+    """Günlük bakım: 24 saati geçen kaynaklar yenilenir, süresi dolan olaylar silinir."""
+
+    def test_refreshes_only_due_sources_and_prunes_old_events(self):
+        from datetime import timedelta
+        from unittest import mock
+
+        from django.utils import timezone
+
+        from shield import scheduler
+
+        now = timezone.now()
+        ThreatSource.objects.all().delete()  # migration'ın eklediği kaynaklar bu testi etkilemesin
+        due = ThreatSource.objects.create(name="Eski", category="phishing", source_url="https://ornek.com/a.txt",
+                                          auto_update=True, last_fetched_at=now - timedelta(hours=25))
+        ThreatSource.objects.create(name="Taze", category="phishing", source_url="https://ornek.com/b.txt",
+                                    auto_update=True, last_fetched_at=now - timedelta(hours=2))
+        ThreatSource.objects.create(name="Elle", category="phishing", domains="x.com")
+        with mock.patch("shield.fetchers.refresh_source", return_value=1) as refresh:
+            self.assertEqual(scheduler.refresh_due_sources(now), ["Eski"])
+        refresh.assert_called_once_with(due)
+
+        self.register()
+        family = Family.objects.get(owner__email="veli@example.com")
+        old = BlockEvent.objects.create(family=family, domain="a.com", category="gambling", score=90,
+                                        reasons=[], enforcement_mode="silent")
+        BlockEvent.objects.filter(pk=old.pk).update(created_at=now - timedelta(days=family.policy.retention_days + 1))
+        BlockEvent.objects.create(family=family, domain="b.com", category="gambling", score=90,
+                                  reasons=[], enforcement_mode="silent")
+        self.assertEqual(scheduler.prune_all_families(), 1)
+        self.assertEqual(family.events.count(), 1)
+
+    def test_scheduler_does_not_start_in_tests_or_when_disabled(self):
+        from unittest import mock
+
+        from shield import scheduler
+
+        self.assertFalse(scheduler.should_start())
+        with mock.patch.dict("os.environ", {"FAMSECUR_AUTO_UPDATE": "1"}):
+            self.assertTrue(scheduler.should_start())
+        with mock.patch.dict("os.environ", {"FAMSECUR_AUTO_UPDATE": "0"}):
+            self.assertFalse(scheduler.should_start())
 
 
 class ApiDocsTests(APITestCase):

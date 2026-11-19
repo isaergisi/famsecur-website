@@ -53,6 +53,16 @@ export default function Overview() {
         )}
       </PageHead>
 
+      {f.device_count === 0 && (
+        <div className="card first-steps">
+          <h3>Hoş geldiniz! Korumaya üç adımda başlayın</h3>
+          <ol className="muted">
+            <li><Link to="/panel/cihazlar">Cihazlarınızı ekleyin</Link>; böylece engellerin hangi cihazdan geldiğini görebilirsiniz.</li>
+            <li><Link to="/panel/politika">Koruma ayarlarınızı seçin</Link>: risk eşiği, engelleme biçimi ve kategoriler.</li>
+            <li>Modeminizin DNS ayarını FamSecur'a yönlendirin. Takıldığınız adımda <Link to="/iletisim">destek ekibimize</Link> ulaşabilirsiniz.</li>
+          </ol>
+        </div>
+      )}
       {s.weekly && <WeeklySummary weekly={s.weekly} categoryLabels={f.policy.category_labels} />}
 
       <div className="stat-grid">
@@ -68,7 +78,7 @@ export default function Overview() {
       <div className="two-col">
         <div className="card">
           <h3>Kategoriye göre engeller</h3>
-          {s.by_category.length === 0 && <p className="muted">Henüz engellenen bir istek yok. Harika!</p>}
+          {s.by_category.length === 0 && <p className="muted">Henüz engellenen bir istek yok.</p>}
           {s.by_category.map((c) => (
             <div key={c.category} className="bar-row">
               <span>{f.policy.category_labels[c.category]}</span>

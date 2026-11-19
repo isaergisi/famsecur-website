@@ -26,21 +26,29 @@ from .serializers import (
     ThreatSourceSerializer,
     WhitelistEntrySerializer,
 )
-from .services import check_domain
+from .services import ai_prediction, check_domain
 
 
-DECISION = inline_serializer("Karar", {
-    "domain": serializers.CharField(),
-    "action": serializers.ChoiceField(choices=["allow", "block"]),
-    "category": serializers.CharField(allow_null=True),
-    "category_label": serializers.CharField(allow_null=True),
-    "score": serializers.IntegerField(help_text="0-100 risk puanı"),
-    "reasons": serializers.ListField(child=serializers.CharField(), help_text="Kararın gerekçeleri"),
+def decision_fields() -> dict:
+    return {
+        "domain": serializers.CharField(),
+        "action": serializers.ChoiceField(choices=["allow", "block"]),
+        "category": serializers.CharField(allow_null=True),
+        "category_label": serializers.CharField(allow_null=True),
+        "score": serializers.IntegerField(help_text="0-100 risk puanı"),
+        "reasons": serializers.ListField(child=serializers.CharField(), help_text="Kararın gerekçeleri"),
+    }
+
+
+AI_FIELD_HELP = "Yapay zekâ risk tahmini (yalnızca listelerde olmayan alan adları için)"
+DECISION = inline_serializer("Karar", decision_fields())
+DEMO_DECISION = inline_serializer("DemoKarari", {
+    **decision_fields(), "ai": serializers.DictField(allow_null=True, help_text=AI_FIELD_HELP),
 })
 OpenApiResponse_CHECK = inline_serializer("DegerlendirmeYaniti", {
     "decision": DECISION,
     "message": serializers.CharField(),
-    "ai": serializers.DictField(allow_null=True, help_text="Yapay zeka risk tahmini (yalnızca listelerde olmayan alan adları için)"),
+    "ai": serializers.DictField(allow_null=True, help_text=AI_FIELD_HELP),
     "event": BlockEventSerializer(allow_null=True),
 })
 
@@ -258,7 +266,7 @@ class BlockEventViewSet(
     description=(
         "Sıra: cihaz koruması → beyaz liste → tehdit kaynakları → resmî kumar havuzu → sinyal puanlaması. "
         "Engellenirse olay kaydedilir ve **201**, izin verilirse hiçbir şey kaydedilmez ve **200** döner. "
-        "Alan adı hiçbir listede yoksa `ai` alanında yapay zeka risk tahmini de gelir (kararı değiştirmez)."
+        "Alan adı hiçbir listede yoksa `ai` alanında yapay zekâ risk tahmini de gelir (kararı değiştirmez)."
     ),
     request=CheckDomainSerializer,
     responses={
@@ -291,10 +299,10 @@ class CheckDomainView(APIView):
 @extend_schema(
     tags=["Karar motoru"],
     summary="Canlı demo: alan adını analiz et",
-    description="Tanıtım sitesindeki demo. Giriş gerekmez, hiçbir şey kaydedilmez. Dakikada 30 istekle sınırlıdır.",
+    description="Tanıtım sitesindeki demo. Giriş gerekmez, hiçbir şey kaydedilmez. Dakikada 30 istekle sınırlıdır. Alan adı hiçbir listede yoksa `ai` alanında yapay zekâ risk tahmini de gelir.",
     auth=[],
     request=PublicAnalyzeSerializer,
-    responses={200: DECISION, 400: E400, 429: E429},
+    responses={200: DEMO_DECISION, 400: E400, 429: E429},
 )
 class PublicAnalyzeView(APIView):
     """POST /api/analyze/ — tanıtım sitesindeki canlı demo. Hiçbir şey kaydetmez."""
@@ -308,7 +316,7 @@ class PublicAnalyzeView(APIView):
         decision = analyze_domain(
             serializer.validated_data["domain"], blocked_domains=ThreatSource.active_domain_map()
         )
-        return Response(decision.to_dict())
+        return Response({**decision.to_dict(), "ai": ai_prediction(None, decision)})
 
 
 @extend_schema_view(

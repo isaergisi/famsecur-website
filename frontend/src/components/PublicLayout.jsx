@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth";
+import { SUPPORT } from "../site";
 import Logo from "./Logo";
 
 export default function PublicLayout() {
@@ -16,7 +17,7 @@ export default function PublicLayout() {
           </button>
           <nav className={open ? "nav-links open" : "nav-links"} onClick={() => setOpen(false)}>
             <a href="/#neden-famsecur">Neden FamSecur?</a>
-            <a href="/#nasil-calisir">Nasıl çalışır</a>
+            <a href="/#nasil-calisir">Nasıl çalışır?</a>
             <a href="/#demo">Canlı demo</a>
             <a href="/#fiyatlar">Fiyatlar</a>
             <NavLink to="/sss">SSS</NavLink>
@@ -29,7 +30,7 @@ export default function PublicLayout() {
               <>
                 <NavLink to="/giris">Giriş</NavLink>
                 <Link className="btn btn-primary btn-sm" to="/kayit">
-                  Ücretsiz başlayın
+                  Ücretsiz deneyin
                 </Link>
               </>
             )}
@@ -43,13 +44,14 @@ export default function PublicLayout() {
         <div className="container footer-grid">
           <div>
             <Logo />
-            <p className="muted">Müdahale etmeden, aileni koru.</p>
+            <p className="muted">Müdahale etmeden aileni koru.</p>
           </div>
           <div>
             <h4>Ürün</h4>
             <a href="/#neden-famsecur">Neden FamSecur?</a>
             <a href="/#ozellikler">Özellikler</a>
-            <a href="/#gizlilik">Gizlilik</a>
+            <a href="/#koruma-yaklasimi">Koruma yaklaşımı</a>
+            <a href="/#yapay-zeka">Yapay zekâ</a>
             <a href="/#demo">Canlı demo</a>
             <a href="/#fiyatlar">Fiyatlar</a>
           </div>
@@ -57,9 +59,12 @@ export default function PublicLayout() {
             <h4>Destek</h4>
             <Link to="/sss">Sıkça sorulan sorular</Link>
             <Link to="/iletisim">İletişim</Link>
-            <a href="https://github.com/isaergisi/FamSecur" target="_blank" rel="noreferrer">
-              GitHub
-            </a>
+            <a href={SUPPORT.whatsappLink} target="_blank" rel="noreferrer">WhatsApp destek</a>
+          </div>
+          <div>
+            <h4>Yasal</h4>
+            <Link to="/gizlilik">Gizlilik Politikası</Link>
+            <Link to="/kullanim-kosullari">Kullanım Koşulları</Link>
           </div>
         </div>
         <div className="container footer-bottom muted">© {new Date().getFullYear()} FamSecur</div>

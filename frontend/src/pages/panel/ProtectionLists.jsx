@@ -9,7 +9,7 @@ import { BlockedDomainsBrowser } from "../admin/BlockedDomains";
 // Koruma listelerindeki önemli gelişmeler. Yeni kaynak veya özellik eklendikçe başa yeni satır eklenir.
 const MILESTONES = [
   { date: "2026-11-19", title: "UT1 Kara Listeleri eklendi", text: "Toulouse Capitole Üniversitesi'nin kumar, uyuşturucu, oltalama ve zararlı yazılım listeleri korumaya katıldı." },
-  { date: "2026-11-19", title: "Listeler kaynağından güncelleniyor", text: "Listeler artık doğrudan yayımlandıkları adreslerden yenileniyor; her güncelleme bu sayfada tarihiyle görünür." },
+  { date: "2026-11-19", title: "Listeler her gün güncelleniyor", text: "Listeler her gün, yayımlandıkları adreslerden otomatik olarak yenileniyor; her güncelleme bu sayfada tarihiyle görünür." },
   { date: "2026-11-19", title: "USOM resmî API'ye bağlandı", text: "T.C. Siber Güvenlik Başkanlığı'nın yayımladığı oltalama bağlantıları doğrudan alınıyor." },
   { date: "2026-07-23", title: "Resmî kumar alan adı havuzu", text: "Polonya Maliye Bakanlığı'nın yasa dışı kumar sicili (36.282 alan adı) ile koruma başladı." },
 ];

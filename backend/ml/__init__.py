@@ -1,1 +1,1 @@
-"""FamSecur yapay zeka (makine öğrenmesi) alan adı risk modeli."""
+"""FamSecur yapay zekâ (makine öğrenmesi) alan adı risk modeli."""

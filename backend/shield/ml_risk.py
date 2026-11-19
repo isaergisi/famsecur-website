@@ -1,4 +1,4 @@
-"""Eğitilmiş yapay zeka modeliyle alan adı risk tahmini.
+"""Eğitilmiş yapay zekâ modeliyle alan adı risk tahmini.
 
 Model ``ml/train_risk_model.py`` ile eğitilir ve ``ml/model/domain_risk.joblib``
 dosyasına kaydedilir. Burada yalnızca dosya bir kez belleğe yüklenir ve
@@ -31,7 +31,7 @@ def load_model():
 
         return joblib.load(MODEL_PATH)
     except Exception as exc:  # dosya yok, scikit-learn kurulu değil, sürüm uyumsuz…
-        logger.warning("Yapay zeka risk modeli yüklenemedi: %s", exc)
+        logger.warning("Yapay zekâ risk modeli yüklenemedi: %s", exc)
         return None
 
 

@@ -1,31 +1,31 @@
 {
-  "trained_at": "2026-11-17T21:32:08+00:00",
+  "trained_at": "2026-11-19T19:12:15+00:00",
   "sklearn_version": "1.9.1",
-  "train_size": 575994,
-  "test_size": 143999,
-  "train_seconds": 149.0,
-  "accuracy_3class": 0.9284,
-  "accuracy_risky_vs_clean": 0.9295,
-  "risky_recall": 0.9051,
-  "clean_recall": 0.9389,
-  "roc_auc_risky_vs_clean": 0.9736,
+  "train_size": 579396,
+  "test_size": 144850,
+  "train_seconds": 49.2,
+  "accuracy_3class": 0.9125,
+  "accuracy_risky_vs_clean": 0.9126,
+  "risky_recall": 0.9169,
+  "clean_recall": 0.911,
+  "roc_auc_risky_vs_clean": 0.9722,
   "per_class": {
     "adult": {
-      "precision": 0.7762,
-      "recall": 0.8305,
-      "f1-score": 0.8024,
+      "precision": 0.7104,
+      "recall": 0.8466,
+      "f1-score": 0.7725,
       "support": 20000.0
     },
     "clean": {
-      "precision": 0.9605,
-      "recall": 0.945,
-      "f1-score": 0.9527,
-      "support": 103999.0
+      "precision": 0.9643,
+      "recall": 0.9196,
+      "f1-score": 0.9414,
+      "support": 104850.0
     },
     "gambling": {
-      "precision": 0.927,
-      "recall": 0.9404,
-      "f1-score": 0.9337,
+      "precision": 0.8953,
+      "recall": 0.9411,
+      "f1-score": 0.9176,
       "support": 20000.0
     }
   },
@@ -37,19 +37,19 @@
     ],
     "rows_true_cols_pred": [
       [
-        16609,
-        3076,
-        315
+        16931,
+        2671,
+        398
       ],
       [
-        4559,
-        98275,
-        1165
+        6625,
+        96421,
+        1804
       ],
       [
-        230,
-        963,
-        18807
+        276,
+        903,
+        18821
       ]
     ]
   },
@@ -57,41 +57,40 @@
     "gambling_available": 360657,
     "adult_available": 739563,
     "platforms_removed": 286,
-    "clean_available": 519993,
+    "clean_available": 524246,
     "clean_by_source": {
       "crux_tr": 323809,
-      "umbrella": 196184
+      "umbrella": 200437
     },
     "rule_labeled_risky_by_source": {
       "crux_tr": 20179,
-      "umbrella": 4086
+      "umbrella": 4043
     },
-    "rule_labeled_gambling": 21679,
-    "rule_labeled_adult": 2586,
+    "rule_labeled_gambling": 21610,
+    "rule_labeled_adult": 2612,
     "gambling_used": 100000,
     "adult_used": 100000,
-    "clean_used": 519993
+    "clean_used": 524246
   },
   "evaluation": {
     "new_model": {
-      "accuracy_3class": 0.9284,
-      "accuracy_risky_vs_clean": 0.9295,
-      "risky_recall": 0.9051,
-      "clean_recall": 0.9389,
-      "clean_recall_turkey_popular": 0.9492,
-      "turkish_probes_false_alarms": 1,
+      "accuracy_3class": 0.9125,
+      "accuracy_risky_vs_clean": 0.9126,
+      "risky_recall": 0.9169,
+      "clean_recall": 0.911,
+      "clean_recall_turkey_popular": 0.926,
+      "turkish_probes_false_alarms": 2,
       "turkish_probes_warnings": 1,
-      "turkish_probes_mean_risk": 4.0
-    },
-    "old_model": {
-      "accuracy_3class": 0.8633,
-      "accuracy_risky_vs_clean": 0.8725,
-      "risky_recall": 0.796,
-      "clean_recall": 0.902,
-      "clean_recall_turkey_popular": 0.8615,
-      "turkish_probes_false_alarms": 1,
-      "turkish_probes_warnings": 0,
-      "turkish_probes_mean_risk": 11.8
+      "turkish_probes_mean_risk": 5.7
     }
+  },
+  "at_warning_threshold": {
+    "threshold": 0.6,
+    "accuracy_risky_vs_clean": 0.926,
+    "risky_recall": 0.9002,
+    "precision_risky": 0.8427,
+    "false_positive_rate": 0.0641,
+    "false_positive_rate_turkey_popular": 0.0537,
+    "test_size": 144850
   }
 }
