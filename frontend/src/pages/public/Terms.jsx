@@ -40,12 +40,13 @@ export default function Terms() {
         <p>
           Aboneliğinizi dilediğiniz zaman <a href={`mailto:${SUPPORT.email}`}>{SUPPORT.email}</a> adresinden veya{" "}
           <a href={SUPPORT.whatsappLink} target="_blank" rel="noreferrer">{SUPPORT.whatsapp}</a> numaralı WhatsApp
-          hattından iptal edebilirsiniz. Deneme süresi içinde iptal ederseniz hiçbir ücret alınmaz.
+          hattından iptal edebilirsiniz. Deneme süresi içinde iptal ederseniz hiçbir ücret alınmaz. Ücretli dönemde iptal
+          ettiğinizde korumanız ödemesi yapılmış dönemin sonuna kadar devam eder; sonraki dönem için ücret alınmaz.
         </p>
 
         <h2>4. Hizmetin sınırları</h2>
         <ul>
-          <li>Koruma, cihazlar ev ağınıza bağlıyken geçerlidir. Mobil veri, VPN veya tarayıcıdaki güvenli DNS ayarıyla bağlanan cihazlar korumanın dışında kalabilir.</li>
+          <li>Koruma, cihazlar ev ağınıza bağlıyken ve DNS ayarları değiştirilmediği sürece geçerlidir. Mobil veri, VPN, tarayıcıdaki güvenli DNS ayarı veya cihazda elle değiştirilen DNS ayarı korumayı devre dışı bırakabilir.</li>
           <li>Hiçbir filtreleme yöntemi tüm zararlı siteleri yakalayamaz. Listeler her gün güncellense de yeni açılan siteler bir süre listelerde yer almayabilir.</li>
           <li>Yapay zekâ modeli yalnızca uyarı verir; tahminleri yanılabilir ve engelleme kararı yerine geçmez.</li>
           <li>Masum bir site yanlışlıkla engellenebilir; bu durumda siteyi beyaz listenize ekleyebilirsiniz.</li>

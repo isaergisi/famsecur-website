@@ -1,24 +1,13 @@
 import { Link } from "react-router-dom";
 import usePageTitle from "../../components/usePageTitle";
-import { SUPPORT } from "../../site";
+import { DATA_INVENTORY, DATA_NEVER, SUPPORT } from "../../site";
 
 const UPDATED = "19 Kasım 2026";
 
-const DATA = [
-  ["Hesap bilgileri", "Ad, soyad, e-posta adresi, şifrenin özeti (şifrenin kendisi saklanmaz)", "Hesabın açılması ve oturum yönetimi", "Hesabınız silinene kadar"],
-  ["Aile ve cihaz bilgileri", "Aile adı; cihaz adı, türü, kullanan kişinin adı ve isteğe bağlı MAC adresi", "Korumanın cihaz bazında uygulanması", "Siz silene kadar"],
-  ["Engel olayları", "Engellenen alan adı, kategori, risk puanı, gerekçe, cihaz ve zaman", "Engellerin panelinizde gösterilmesi ve haftalık özet", "Varsayılan 30 gün; panelden 1-365 gün arasında ayarlanabilir, süresi dolanlar her gün otomatik silinir"],
-  ["Beyaz liste", "İzin verdiğiniz alan adları ve notlarınız", "Yanlış engellerin düzeltilmesi", "Siz silene kadar"],
-  ["İletişim talepleri", "Ad, e-posta adresi, konu ve mesaj", "Talebinize yanıt verilmesi", "Talebiniz sonuçlanana kadar"],
-  ["Ödeme bilgileri", "Kart bilgileri ve abonelik durumu", "Deneme sonrası aylık üyelik ücretinin tahsili", "Kart bilgileri FamSecur sunucularında saklanmaz; ödeme kuruluşunda yasal süre boyunca tutulur"],
-];
-
-const NEVER = [
-  "Mesajlar, sohbetler, e-postalar",
-  "Ekran görüntüleri ve tuş kayıtları",
-  "Ziyaret edilen sayfaların içeriği, arama ve izleme geçmişi",
-  "İzin verilen sitelerin listesi",
-  "DNS kayıtlarında cihazların IP adresleri",
+const PROCESSORS = [
+  ["Barındırma hizmeti sağlayıcısı", "Hesap, cihaz, beyaz liste, engel olayı ve iletişim verileri", "Sitenin ve panelin çalıştığı sunucuların sağlanması"],
+  ["Ödeme kuruluşu", "Kart ve ödeme bilgileri", "Abonelik ücretinin güvenli şekilde tahsili; kart bilgileri FamSecur'a iletilmez"],
+  ["Cloudflare (1.1.1.1 DNS)", "Engellenmeyen sitelerin adı ve DNS sorgusunu ileten ağın IP adresi", "İzin verilen sitelerin adresinin çözülmesi"],
 ];
 
 export default function Privacy() {
@@ -45,10 +34,16 @@ export default function Privacy() {
         <h2>2. İşlediğimiz veriler ve saklama süreleri</h2>
         <div className="card table-wrap">
           <table className="data-table">
-            <thead><tr><th>Veri</th><th>İçerik</th><th>Amaç</th><th>Saklama süresi</th></tr></thead>
+            <thead><tr><th>Veri</th><th>İçerik</th><th>Amaç</th><th>Hukuki sebep</th><th>Saklama süresi</th></tr></thead>
             <tbody>
-              {DATA.map(([name, content, purpose, period]) => (
-                <tr key={name}><td><b>{name}</b></td><td>{content}</td><td>{purpose}</td><td className="muted">{period}</td></tr>
+              {DATA_INVENTORY.map((d) => (
+                <tr key={d.name}>
+                  <td data-label="Veri"><b>{d.name}</b></td>
+                  <td data-label="İçerik">{d.content}</td>
+                  <td data-label="Amaç">{d.purpose}</td>
+                  <td data-label="Hukuki sebep">{d.basis}</td>
+                  <td data-label="Saklama süresi" className="muted">{d.period}</td>
+                </tr>
               ))}
             </tbody>
           </table>
@@ -56,7 +51,7 @@ export default function Privacy() {
 
         <h2>3. Hiçbir zaman işlemediğimiz veriler</h2>
         <ul className="check-list">
-          {NEVER.map((item) => <li className="no" key={item}>{item}</li>)}
+          {DATA_NEVER.map((item) => <li className="no" key={item}>{item}</li>)}
         </ul>
 
         <h2>4. Koruma nasıl çalışır, hangi veri nereye gider?</h2>
@@ -72,18 +67,31 @@ export default function Privacy() {
           <li><b>Canlı demo</b>da yazdığınız alan adları kaydedilmez.</li>
         </ul>
 
-        <h2>5. İşlemenin hukuki sebebi</h2>
+        <h2>5. Hizmet sağlayıcıları ve aktarım</h2>
         <p>
-          Verileriniz, KVKK'nın 5. maddesi uyarınca hizmet sözleşmesinin kurulması ve ifası, hukuki yükümlülüklerimizin
-          yerine getirilmesi ve hizmetin güvenliğinin sağlanması için meşru menfaatimiz hukuki sebeplerine dayanılarak
-          işlenir.
+          Verileriniz satılmaz ve reklam amacıyla paylaşılmaz. Yalnızca hizmetin çalışması için aşağıdaki hizmet
+          sağlayıcılarıyla, gerekli olduğu ölçüde paylaşılır. Kanunen yetkili kurum ve kuruluşların talepleri saklıdır.
         </p>
+        <div className="card table-wrap">
+          <table className="data-table">
+            <thead><tr><th>Hizmet sağlayıcı</th><th>Paylaşılan veri</th><th>Amaç</th></tr></thead>
+            <tbody>
+              {PROCESSORS.map(([who, what, why]) => (
+                <tr key={who}>
+                  <td data-label="Hizmet sağlayıcı"><b>{who}</b></td>
+                  <td data-label="Paylaşılan veri">{what}</td>
+                  <td data-label="Amaç">{why}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        <h2>6. Verilerin aktarılması</h2>
+        <h2>6. Yurt dışına aktarım</h2>
         <p>
-          Verileriniz satılmaz ve reklam amacıyla paylaşılmaz. Yalnızca hizmetin çalışması için gerekli olduğu ölçüde
-          barındırma hizmeti sağlayıcısına, ödeme kuruluşuna ve DNS yanıtı için üst DNS sunucusuna aktarılır. Kanunen
-          yetkili kurumların talepleri saklıdır.
+          Cloudflare'in DNS sunucuları ve hizmet sağlayıcılarımızın bir kısmı yurt dışında bulunabilir. Bu durumda
+          verileriniz, KVKK'nın 9. maddesinde öngörülen şartlara uygun olarak ve yalnızca yukarıdaki amaçlarla
+          aktarılır.
         </p>
 
         <h2>7. Tarayıcıda saklanan bilgiler</h2>
@@ -92,7 +100,14 @@ export default function Privacy() {
           veya izleme çerezi kullanılmaz.
         </p>
 
-        <h2>8. Haklarınız</h2>
+        <h2>8. Verilerin silinmesi ve hesabın kapatılması</h2>
+        <ul>
+          <li>Engel olaylarını panelinizdeki <b>Engel olayları</b> sayfasından tek tek veya tümüyle, cihazları ve beyaz liste kayıtlarını ilgili sayfalardan dilediğiniz zaman silebilirsiniz.</li>
+          <li>Hesabınızın kapatılmasını ve tüm verilerinizin silinmesini <a href={`mailto:${SUPPORT.email}`}>{SUPPORT.email}</a> adresinden veya WhatsApp hattımızdan isteyebilirsiniz. Talebiniz en geç 30 gün içinde yerine getirilir ve size bildirilir.</li>
+          <li>Hesap kapatıldığında hesap, aile, cihaz, beyaz liste ve engel olayı verileri kalıcı olarak silinir. Mevzuat gereği saklanması gereken ödeme kayıtları, yasal süre dolana kadar saklanır.</li>
+        </ul>
+
+        <h2>9. Haklarınız</h2>
         <p>
           KVKK'nın 11. maddesi uyarınca kişisel verilerinizin işlenip işlenmediğini öğrenme, bilgi talep etme, düzeltilmesini
           veya silinmesini isteme, aktarıldığı üçüncü kişileri öğrenme ve itiraz etme haklarına sahipsiniz. Taleplerinizi{" "}

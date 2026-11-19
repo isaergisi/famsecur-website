@@ -9,7 +9,7 @@ export default function DashboardLayout({ title, links, switchLink }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="dash">
-      <aside className={open ? "dash-side open" : "dash-side"}>
+      <aside id="panel-menu" className={open ? "dash-side open" : "dash-side"}>
         <Logo />
         <p className="dash-title">{title}</p>
         <nav onClick={() => setOpen(false)}>
@@ -42,7 +42,7 @@ export default function DashboardLayout({ title, links, switchLink }) {
         </div>
       </aside>
       <div className="dash-main">
-        <button className="nav-toggle dash-toggle" onClick={() => setOpen(!open)} aria-label="Menü">
+        <button className="nav-toggle dash-toggle" onClick={() => setOpen(!open)} aria-label="Menüyü aç/kapat" aria-expanded={open} aria-controls="panel-menu">
           ☰
         </button>
         <Outlet />

@@ -8,7 +8,7 @@ import Alert from "../../components/Alert";
 import DecisionResult from "../../components/DecisionResult";
 import useFetch from "../../components/useFetch";
 import usePageTitle from "../../components/usePageTitle";
-import { AI_METRICS, PRICES, SUPPORT, TRIAL_TERMS } from "../../site";
+import { AI_METRICS, DATA_INVENTORY, DATA_NEVER, PRICES, SUPPORT, TRIAL_TERMS } from "../../site";
 import { CATEGORY_LABELS, formatDate } from "../../utils";
 
 const WHY = [
@@ -22,7 +22,7 @@ const FEATURES = [
   {
     icon: Wifi,
     title: "Evdeki tüm cihazlarda koruma",
-    text: "Modeminizin DNS ayarı üzerinden çalışır; yani her site isteği önce FamSecur'dan geçer. Gizli sekme açmak ya da tarayıcıyı silmek korumayı kaldırmaz.",
+    text: "Modeminizin DNS ayarı üzerinden çalışır: Ev ağına bağlı cihazlar, kendi DNS ayarları değiştirilmediği sürece site adreslerini FamSecur'a sorar. Gizli sekme açmak ya da başka bir tarayıcı kullanmak tek başına korumayı kaldırmaz; ancak cihazın veya tarayıcının DNS ayarı değiştirilirse koruma aşılabilir.",
     example: "Arkadaşının tableti ev Wi-Fi'ınıza bağlandığında o cihaz da korunur.",
   },
   {
@@ -72,23 +72,9 @@ const APPROACH = [
   ["Cihaza kurulum", "Gerekmez"],
   ["Neye bakar", "Yalnızca açılmak istenen sitenin adına"],
   ["Neye bakmaz", "Mesajlar, ekran, sayfa içerikleri, arama geçmişi"],
-  ["Ne kaydeder", "Yalnızca engellenen istekler (varsayılan 30 gün, 1-365 gün arasında ayarlanabilir)"],
+  ["Ne kaydeder", "Engellenen istekler (varsayılan 30 gün) ile sizin girdiğiniz hesap, cihaz ve beyaz liste bilgileri"],
   ["Yeni siteler", "Listede yoksa yapay zekâ sizi uyarır, karar sizindir"],
-  ["Nerede korumaz", "Mobil veri, VPN veya tarayıcıdaki güvenli DNS ayarıyla bağlanıldığında"],
-];
-
-const DATA_KEPT = [
-  ["Hesap bilgileri: ad, e-posta ve şifrenin özeti (şifrenin kendisi değil)", "Hesabınız silinene kadar"],
-  ["Cihaz adı, türü, kullanan kişi ve isteğe bağlı MAC adresi", "Siz silene kadar"],
-  ["Engellenen istek: alan adı, kategori, risk puanı, gerekçe ve zaman", "Varsayılan 30 gün (1-365 gün arasında ayarlanabilir)"],
-  ["İletişim formu: ad, e-posta ve mesaj", "Talebiniz sonuçlanana kadar"],
-];
-const DATA_NEVER = [
-  "Mesajlar ve sohbetler",
-  "Ekran görüntüleri ve tuş kayıtları",
-  "Sayfa içerikleri ve arama geçmişi",
-  "İzin verilen sitelerin listesi",
-  "DNS kayıtlarında IP adresiniz",
+  ["Nerede korumaz", "Mobil veri, VPN, tarayıcıdaki güvenli DNS ayarı veya cihazın DNS ayarı değiştirildiğinde"],
 ];
 
 const PLAN_FEATURES = [
@@ -99,17 +85,32 @@ const PLAN_FEATURES = [
   "Evdeki tüm cihazlar için sınırsız koruma",
 ];
 
+// [alan adı, risk tahmini, uyarı verildi mi, gerçek durum]. Hata örnekleri test kümesinden alındı.
 const AI_EXAMPLES = [
-  ["yenibahisadresi.net", "%100", true],
-  ["canlimacizle-bahis.com", "%97", true],
-  ["sahibinden.com", "%10", false],
-  ["eba.gov.tr", "%0", false],
+  ["yenibahisadresi.net", "%100", true, "doğru"],
+  ["canlimacizle-bahis.com", "%97", true, "doğru"],
+  ["sahibinden.com", "%10", false, "doğru"],
+  ["eba.gov.tr", "%0", false, "doğru"],
+];
+const AI_ERRORS = [
+  ["vibram.com", "%72", true, "yanlış alarm: temiz bir ayakkabı markası"],
+  ["pgadmin.org", "%72", true, "yanlış alarm: temiz bir yazılım sitesi"],
+  ["stakers.com", "%42", false, "kaçırıldı: listede kumar sitesi olarak kayıtlı"],
+  ["carousel.co.za", "%7", false, "kaçırıldı: listede kumar sitesi olarak kayıtlı"],
+];
+const AI_METHOD = [
+  ["Test tarihi", AI_METRICS.testedAt],
+  ["Veri kaynakları", "Riskli: Polonya Maliye Bakanlığı kumar sicili ve The Block List Project kumar/yetişkin listeleri. Temiz: Cisco Umbrella'nın en çok sorgulanan 1 milyon alan adı ve Google Chrome'un Türkiye'de en çok ziyaret edilen sitelerinin listesi (CrUX)."],
+  ["Test kümesi", `${AI_METRICS.testSize} alan adı: ${AI_METRICS.testMix}`],
+  ["Eğitim/test ayrımı", "Verinin %80'i eğitime, %20'si teste rastgele ve sınıf oranları korunarak ayrıldı. Test kümesindeki adlar eğitimde hiç kullanılmadı."],
+  ["Risk puanı ne demek?", "Modelin bu adın temiz olmadığına dair hesapladığı olasılıktır (lojistik regresyon). %60 ve üzeri uyarı üretir. \"%100\", olasılığın %99,5'in üzerinde olduğunu gösterir; kesinlik anlamına gelmez."],
+  ["Dikkat edilmesi gereken", "Ayrım rastgele yapıldığı için birbirine çok benzeyen adlar hem eğitim hem test kümesine düşebilir; bu, sonuçları bir miktar iyimser gösterebilir. Bazı Türkçe riskli örneklerin etiketi kural motorundan geldiği için o dilimdeki başarı da iyimser olabilir."],
 ];
 
 const CATEGORIES = [
   CATEGORY_LABELS.gambling, CATEGORY_LABELS.adult, CATEGORY_LABELS.phishing, CATEGORY_LABELS.malware, CATEGORY_LABELS.drugs,
 ];
-const EXAMPLES = ["casino777.xyz", "bet2x.com", "e-devlet-giris-dogrula.com", "eba.gov.tr"];
+const EXAMPLES = ["casino777.xyz", "bet2x.com", "e-devlet-giris-dogrula.com", "eba.gov.tr", "better.com"];
 const TL = (n) => n.toLocaleString("tr-TR");
 
 // Kaynaklardaki toplam alan adı sayısı, binlik aşağı yuvarlanır (ör. 61.523 → "61.000+").
@@ -180,6 +181,10 @@ function LiveDemo() {
               </button>
             ))}
           </div>
+          <p className="muted small">
+            <b>better.com</b>, masum bir sitenin yanlışlıkla engellenmesine örnektir; adında "bet" geçtiği için kural
+            motoru engeller. Böyle durumlarda siteyi tek tıkla beyaz listenize ekleyebilirsiniz.
+          </p>
           <h3 className="demo-how-title">Nasıl değerlendiriyoruz?</h3>
           <ol className="demo-how muted">
             <li><b>Tehdit listeleri:</b> Site adı USOM, resmî kumar sicili ve UT1 listelerinde aranır.</li>
@@ -237,8 +242,8 @@ export default function Home() {
                 <span>çocuğun cihazına uygulama yüklenmez</span>
               </li>
               <li>
-                <b>Yalnızca engeller</b>
-                <span>izin verilen siteler kaydedilmez</span>
+                <b>Geçmiş tutulmaz</b>
+                <span>yalnızca engellenen istekler kaydedilir</span>
               </li>
             </ul>
           </div>
@@ -347,6 +352,14 @@ export default function Home() {
               <span>temiz sitelerde yanlış alarm oranı (Türkiye'de popüler sitelerde {AI_METRICS.falseAlarmTurkey})</span>
             </div>
           </div>
+          <div className="card ai-method">
+            <h3>Nasıl ölçtük?</h3>
+            <dl>
+              {AI_METHOD.map(([term, desc]) => (
+                <div key={term}><dt>{term}</dt><dd className="muted">{desc}</dd></div>
+              ))}
+            </dl>
+          </div>
           <div className="ai-explain">
             <div className="card">
               <h3>Sınırları</h3>
@@ -366,6 +379,15 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
+              <h3 className="ai-errors-title">Hata örnekleri</h3>
+              <ul className="ai-examples">
+                {AI_ERRORS.map(([name, risk, warn, note]) => (
+                  <li key={name}>
+                    <span><code>{name}</code><span className="muted small ai-note">{note}</span></span>
+                    <span className={warn ? "tag tag-warn" : "tag"}>{risk} · {warn ? "uyarı" : "uyarı yok"}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
@@ -381,14 +403,17 @@ export default function Home() {
               <table className="data-table">
                 <thead><tr><th>İşlenen veri</th><th>Saklama süresi</th></tr></thead>
                 <tbody>
-                  {DATA_KEPT.map(([what, how]) => (
-                    <tr key={what}><td>{what}</td><td className="muted">{how}</td></tr>
+                  {DATA_INVENTORY.map((d) => (
+                    <tr key={d.name}>
+                      <td data-label="İşlenen veri">{d.short}</td>
+                      <td data-label="Saklama süresi" className="muted">{d.period}</td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             <p className="muted small privacy-note">
-              İzin verilen siteler kaydedilmez. Ancak sitenin açılabilmesi için istek, yanıtı veren DNS sunucusuna
+              Ziyaret edilen ve engellenmeyen siteler kaydedilmez. Ancak sitenin açılabilmesi için istek, yanıtı veren DNS sunucusuna
               (varsayılan olarak Cloudflare 1.1.1.1) iletilir. FamSecur HTTPS trafiğini açmaz ve sayfa içeriklerini
               okumaz. Ayrıntılar için <Link to="/gizlilik">Gizlilik Politikası</Link>'na bakabilirsiniz.
             </p>

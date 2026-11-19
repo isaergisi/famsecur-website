@@ -162,6 +162,7 @@ class PublicAndAdminTests(BaseAPITest):
         FAQ.objects.create(question="Taslak", answer="b", is_published=False)
         response = self.client.post("/api/analyze/", {"domain": "casino777.xyz"}, format="json")
         self.assertEqual(response.data["action"], "block")
+        self.assertEqual(response.data["source"], "signals")
         self.assertEqual(len(self.client.get("/api/faqs/").data), 1)
         self.assertEqual(self.client.post("/api/faqs/", {"question": "x", "answer": "y"}).status_code, 401)
 
@@ -381,6 +382,7 @@ class PublicAndAdminTests(BaseAPITest):
         response = self.client.post("/api/analyze/", {"domain": "giris.kotu-site.com"}, format="json")
         self.assertEqual(response.data["action"], "block")
         self.assertEqual(response.data["category"], "phishing")
+        self.assertEqual(response.data["source"], "threat_list")
         self.assertTrue(ThreatSource.objects.filter(name="Test").exists())
 
 
@@ -411,14 +413,17 @@ class AiRiskTests(BaseAPITest):
         self.client.post("/api/whitelist/", {"domain": "hotgirlsvideo.com"}, format="json")
         response = self.client.post("/api/check/", {"domain": "hotgirlsvideo.com"}, format="json")
         self.assertIsNone(response.data["ai"])
+        self.assertEqual(response.data["decision"]["source"], "whitelist")
 
     def test_public_demo_includes_ai_prediction_for_unlisted_domains(self):
         self.client.credentials()
         data = self.client.post("/api/analyze/", {"domain": "hotgirlsvideo.com"}, format="json").data
         self.assertEqual(data["action"], "allow")
+        self.assertEqual(data["source"], "none")
         self.assertTrue(data["ai"]["warning"])
         data = self.client.post("/api/analyze/", {"domain": "0-romancasino.com"}, format="json").data
         self.assertEqual(data["action"], "block")
+        self.assertEqual(data["source"], "official_list")
         self.assertIsNone(data["ai"])
 
 
