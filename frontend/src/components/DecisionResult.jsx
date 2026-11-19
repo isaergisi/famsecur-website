@@ -47,7 +47,7 @@ function AiRisk({ ai }) {
       </div>
       <p className="small">
         {ai.warning
-          ? `Dikkat: bu alan adı hiçbir listede yok ama adı ${ai.category_label ? ai.category_label.toLowerCase() + " sitelerine" : "riskli sitelere"} benziyor. Engellenmedi; isterseniz kontrol edin.`
+          ? `Dikkat: bu alan adı hiçbir listede yok ama adı ${ai.category_label ? ai.category_label.toLocaleLowerCase("tr-TR") + " sitelerine" : "riskli sitelere"} benziyor. Engellenmedi; isterseniz kontrol edin.`
           : "Bu alan adı hiçbir listede yok; yapay zeka modeli de adında belirgin bir risk görmedi."}
       </p>
       <p className="muted small">Model yalnızca alan adının harflerine bakar, sitenin içeriğini görmez. Tahmin yanılabilir.</p>

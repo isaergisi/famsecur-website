@@ -3,8 +3,9 @@ import Alert from "../../components/Alert";
 import PageHead from "../../components/PageHead";
 import Spinner from "../../components/Spinner";
 import useFetch from "../../components/useFetch";
+import { CATEGORY_LABELS } from "../../utils";
 
-const CATEGORIES = { gambling: "Kumar / bahis", adult: "Yetişkin içerik", drugs: "Uyuşturucu", phishing: "Dolandırıcılık / phishing", malware: "Kötü amaçlı yazılım" };
+const CATEGORIES = CATEGORY_LABELS;
 
 // 1 … 4 5 [6] 7 8 … 726 biçiminde sayfa numaraları
 function pageNumbers(current, total) {

@@ -12,15 +12,24 @@ from content.models import FAQ
 from shield.models import Device, Family, ThreatSource
 from shield.services import check_domain
 
+OUTSIDE_HOME_Q = "FamSecur ev dışında da koruma sağlar mı?"
+OUTSIDE_HOME_A = (
+    "FamSecur ev ağınızda çalışır; cihazlar ev Wi-Fi'ınıza bağlıyken korunur. Mobil veriyle, VPN üzerinden ya da "
+    "tarayıcının kendi güvenli DNS ayarıyla bağlanan bir cihaz bu korumanın dışında kalabilir. Çocuğunuzun "
+    "cihazında VPN uygulamalarını ve tarayıcıdaki güvenli DNS ayarını kontrol etmenizi öneririz."
+)
+
 FAQS = [
     ("FamSecur çocuğumun mesajlarını veya geçmişini okuyor mu?",
      "Hayır. FamSecur yalnızca DNS katmanında, istenen alan adına bakarak karar verir. Mesajlar, ekran, "
      "arama ve izleme geçmişi toplanmaz. İzin verilen istekler hiçbir yerde kaydedilmez; yalnızca engellenen "
      "alan adları, kategori ve gerekçeyle birlikte panelinizde görünür."),
     ("Hangi içerikleri engelliyor?",
-     "Kumar/bahis, yetişkin içerik, uyuşturucu, oltalama (phishing) ve kötü amaçlı yazılım. Oltalama ve zararlı "
-     "yazılım verileri T.C. Siber Güvenlik Başkanlığı'nın USOM listesinden, kumar alan adları resmî bir alan adı "
-     "havuzundan ve açıklanabilir alan adı sinyallerinden gelir."),
+     "Kumar ve bahis, yetişkin içerik, uyuşturucu, oltalama (phishing) ve zararlı yazılım. Oltalama verisi T.C. "
+     "Siber Güvenlik Başkanlığı'nın USOM listesinden, yasa dışı kumar alan adları Polonya Maliye Bakanlığı'nın resmî "
+     "sicilinden, zararlı yazılım ve uyuşturucu alan adları Toulouse Capitole Üniversitesi'nin UT1 listelerinden gelir. "
+     "Listelerde olmayan siteler açıklanabilir alan adı sinyalleriyle değerlendirilir; yapay zeka modeli de yeni riskli "
+     "sitelerde sizi uyarır."),
     ("Bir site yanlışlıkla engellenirse ne olur?",
      "Panelde her engelin nedenini görürsünüz. Yanlış engellenen siteyi tek tıkla beyaz listeye ekleyebilirsiniz; "
      "alt alan adları da otomatik olarak izinli olur."),
@@ -29,11 +38,17 @@ FAQS = [
      "sayfasına yönlendirilir."),
     ("Kurulum için ne gerekiyor?",
      "FamSecur ev router'ınızda veya ağdaki küçük bir cihazda çalışır. Router'ın DNS ayarını FamSecur'a "
-     "yönlendirmeniz yeterlidir; çocuğun cihazına uygulama yüklemeniz gerekmez."),
+     "yönlendirmeniz yeterlidir; çocuğunuzun cihazına uygulama yüklemeniz gerekmez."),
     ("Risk eşiği ne işe yarar?",
      "Her alan adı 0-100 arası bir risk puanı alır. Eşiği düşürdüğünüzde koruma sıkılaşır, yükselttiğinizde "
      "yalnızca çok net riskler engellenir. Varsayılan değer 70'tir."),
+    (OUTSIDE_HOME_Q, OUTSIDE_HOME_A),
 ]
+
+OFFICIAL_POOL_DESCRIPTION = (
+    "Polonya Maliye Bakanlığı'nın resmî yasa dışı kumar sicili. Kaynak adresinden güncellenir; yalnızca tam alan "
+    "adı ve alt alan adı eşleşmesiyle karar verir."
+)
 
 SOURCES = [
     {
@@ -48,12 +63,12 @@ SOURCES = [
     {
         "name": "Resmî Kumar Alan Adı Havuzu",
         "category": "gambling",
-        "description": "36.282 benzersiz alan adından oluşan sürümlenmiş resmî yasa dışı bahis listesi; "
-                       "yalnızca tam alan adı ve alt alan adı eşleşmesiyle karar verir.",
+        "description": OFFICIAL_POOL_DESCRIPTION,
         "source_url": "https://hazard.mf.gov.pl/api/Register",
         "auto_update": True,
         "domains": "",
-    },    {
+    },
+    {
         "name": "UT1 Kara Listeleri (Toulouse Capitole Üniversitesi)",
         "category": "gambling",
         "description": "Toulouse Capitole Üniversitesi'nin 1990'lardan beri güncellenen açık kara listeleri: kumar, "

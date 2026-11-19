@@ -329,7 +329,7 @@ class ThreatSourceViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Kaynağı adresinden şimdi güncelle",
-        description="Kaynak adresinden (USOM API, düz metin liste veya XML sicil) alan adlarını çeker. "
+        description="Kaynak adresinden (USOM API, UT1 arşivleri, düz metin liste veya XML sicil) alan adlarını çeker. "
                     "Başarısız olursa eski liste korunur ve 502 döner.",
         request=None,
         responses={200: ThreatSourceSerializer, 502: E400, **AUTH_ERRORS},

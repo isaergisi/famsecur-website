@@ -35,8 +35,8 @@ export default function Contact() {
       <div className="container narrow">
         <span className="eyebrow">İletişim</span>
         <h1>Demo talep edin veya bize yazın</h1>
-        <p className="muted">Kurulum, demo veya iş birliği için formu doldurun; ekibimiz size e-postayla dönsün.</p>
-        {sent && <Alert type="success">Mesajınız alındı. En kısa sürede size dönüş yapacağız.</Alert>}
+        <p className="muted">Kurulum, demo veya iş birliği için formu doldurmanız yeterli; size en kısa sürede e-postayla dönüş yapalım.</p>
+        {sent && <Alert type="success">Mesajınız bize ulaştı, teşekkür ederiz. En kısa sürede size dönüş yapacağız.</Alert>}
         <form className="card form" onSubmit={submit} noValidate>
           <Alert>{error}</Alert>
           <div className="form-row">

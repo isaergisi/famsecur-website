@@ -52,7 +52,7 @@ def check_domain(family: Family, domain: str, device: Device | None = None) -> d
     saklanmaz (FamSecur gizlilik ilkesi).
     """
     if device is not None and not device.is_protected:
-        decision = Decision(domain.strip().lower(), "allow", None, None, 0, ["Bu cihazda koruma kapalı"])
+        decision = Decision(domain.strip().lower(), "allow", None, None, 0, ["bu cihazda koruma kapalı"])
         return {"decision": decision.to_dict(), "event": None, "ai": None, "message": "Cihaz korumada olmadığı için istek iletildi."}
 
     decision = decide_for_family(family, domain)

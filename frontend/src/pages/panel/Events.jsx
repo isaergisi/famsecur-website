@@ -6,9 +6,9 @@ import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Spinner";
 import { useToast } from "../../components/Toast";
 import useFetch from "../../components/useFetch";
-import { confirmAction, formatDate } from "../../utils";
+import { confirmAction, formatDate, CATEGORY_LABELS } from "../../utils";
 
-const CATEGORIES = { gambling: "Kumar / bahis", adult: "Yetişkin içerik", drugs: "Uyuşturucu", phishing: "Dolandırıcılık / phishing", malware: "Kötü amaçlı yazılım" };
+const CATEGORIES = CATEGORY_LABELS;
 
 export default function Events() {
   const notify = useToast();

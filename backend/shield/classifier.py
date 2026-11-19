@@ -17,8 +17,8 @@ CATEGORY_LABELS = {
     "gambling": "Kumar / bahis",
     "adult": "Yetişkin içerik",
     "drugs": "Uyuşturucu",
-    "phishing": "Dolandırıcılık / phishing",
-    "malware": "Kötü amaçlı yazılım",
+    "phishing": "Oltalama / dolandırıcılık",
+    "malware": "Zararlı yazılım",
 }
 
 # Kumar kategorisi, ebeveynin talebiyle yüksek yakalama modunda çalışır. Bu
@@ -166,7 +166,7 @@ def analyze_domain(
     """
     domain = normalize_domain(value)
     if not domain or "." not in domain:
-        return Decision(domain, "allow", None, None, 0, ["Geçerli bir alan adı çözümlenemedi"])
+        return Decision(domain, "allow", None, None, 0, ["geçerli bir alan adı çözümlenemedi"])
     if whitelist and matches_any(domain, whitelist):
         return Decision(domain, "allow", None, None, 0, ["Beyaz listede izinli"])
 
@@ -222,7 +222,7 @@ def analyze_domain(
     category = max(scores, key=scores.get)
     score = min(scores[category], 100)
     if not score:
-        return Decision(domain, "allow", None, None, 0, ["Zararlı sinyal bulunamadı"])
+        return Decision(domain, "allow", None, None, 0, ["zararlı bir sinyal bulunamadı"])
     action = "block" if score >= threshold and category in enabled_categories else "allow"
     reasons = matches[category]
     if action == "allow" and category not in enabled_categories:
