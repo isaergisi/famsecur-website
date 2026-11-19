@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  BellOff, Check, Database, EyeOff, FileSearch, Gauge, ListChecks, Router, ShieldCheck, SlidersHorizontal, Sparkles, Wifi,
+  BellOff, Check, Minus, Database, EyeOff, FileSearch, Gauge, ListChecks, Router, ShieldCheck, SlidersHorizontal, Sparkles, Wifi,
 } from "lucide-react";
 import { api, asList } from "../../api";
 import Alert from "../../components/Alert";
 import DecisionResult from "../../components/DecisionResult";
 import useFetch from "../../components/useFetch";
 import usePageTitle from "../../components/usePageTitle";
-import { AI_METRICS, DATA_INVENTORY, DATA_NEVER, PRICES, SUPPORT, TRIAL_TERMS } from "../../site";
+import { AI_METRICS, DATA_INVENTORY, DATA_NEVER, PLANS, SUPPORT, TL, TRIAL_TERMS, yearlySaving } from "../../site";
 import { CATEGORY_LABELS, formatDate } from "../../utils";
 
 const WHY = [
@@ -77,14 +77,6 @@ const APPROACH = [
   ["Nerede korumaz", "Mobil veri, VPN, tarayıcıdaki güvenli DNS ayarı veya cihazın DNS ayarı değiştirildiğinde"],
 ];
 
-const PLAN_FEATURES = [
-  "Resmî kumar sicili ve güvenilir tehdit kaynaklarıyla koruma",
-  "Yapay zekâ destekli erken uyarı",
-  "Sessiz engelleme ve ayarlanabilir koruma seviyesi",
-  "Haftalık özet raporu",
-  "Evdeki tüm cihazlar için sınırsız koruma",
-];
-
 // [alan adı, risk tahmini, uyarı verildi mi, gerçek durum]. Hata örnekleri test kümesinden alındı.
 const AI_EXAMPLES = [
   ["yenibahisadresi.net", "%100", true, "doğru"],
@@ -111,7 +103,6 @@ const CATEGORIES = [
   CATEGORY_LABELS.gambling, CATEGORY_LABELS.adult, CATEGORY_LABELS.phishing, CATEGORY_LABELS.malware, CATEGORY_LABELS.drugs,
 ];
 const EXAMPLES = ["casino777.xyz", "bet2x.com", "e-devlet-giris-dogrula.com", "eba.gov.tr", "better.com"];
-const TL = (n) => n.toLocaleString("tr-TR");
 
 // Kaynaklardaki toplam alan adı sayısı, binlik aşağı yuvarlanır (ör. 61.523 → "61.000+").
 function listSummary(sources) {
@@ -132,6 +123,34 @@ function SectionHead({ eyebrow, title, children }) {
       <h2>{title}</h2>
       {children && <p className="muted section-lead">{children}</p>}
     </>
+  );
+}
+
+function PlanCard({ plan, featured = false }) {
+  return (
+    <article className={`card plan-card${featured ? " featured" : ""}`}>
+      <div className="plan-top">
+        <h3>{plan.name}</h3>
+        {featured && <span className="plan-badge">Önerilen</span>}
+      </div>
+      <p className="muted plan-tagline">{plan.tagline}</p>
+      <b className="price">{TL(plan.monthly)} TL<small>/ay</small></b>
+      <p className="muted plan-price-note">
+        {plan.perDayNote && <>{plan.perDayNote} </>}
+        Yıllık ödemede {TL(plan.yearly)} TL{yearlySaving(plan) && <> ({yearlySaving(plan)})</>}.
+      </p>
+      <Link to={`/kayit?paket=${plan.id}`} className={`btn ${featured ? "btn-primary" : "btn-ghost"}`}>
+        7 gün ücretsiz deneyin
+      </Link>
+      <ul className="plan-list">
+        {plan.features.map((f) => (
+          <li key={f}><Check aria-hidden strokeWidth={2.5} />{f}</li>
+        ))}
+        {(plan.limits || []).map((f) => (
+          <li key={f} className="plan-limit"><Minus aria-hidden strokeWidth={2.5} />{f}</li>
+        ))}
+      </ul>
+    </article>
   );
 }
 
@@ -417,7 +436,7 @@ export default function Home() {
               </table>
             </div>
             <p className="muted small privacy-note">
-              Ziyaret edilen ve engellenmeyen siteler kaydedilmez. Ancak sitenin açılabilmesi için istek, yanıtı veren DNS sunucusuna
+              Ziyaret edilen sitelerin geçmişi tutulmaz; yalnızca riskli bulunan istekler kaydedilir. Ancak sitenin açılabilmesi için istek, yanıtı veren DNS sunucusuna
               (varsayılan olarak Cloudflare 1.1.1.1) iletilir. FamSecur HTTPS trafiğini açmaz ve sayfa içeriklerini
               okumaz. Ayrıntılar için <Link to="/gizlilik">Gizlilik Politikası</Link>'na bakabilirsiniz.
             </p>
@@ -462,38 +481,21 @@ export default function Home() {
 
       <section className="section" id="fiyatlar">
         <div className="container pricing">
-          <div className="pricing-copy">
-            <SectionHead eyebrow="Fiyatlandırma" title="Tek paket, tüm özellikler dâhil">
-              Paket bir ev ağını kapsar; cihaz sayısında sınır yoktur.
+          <div className="pricing-head">
+            <SectionHead eyebrow="Fiyatlandırma" title="İki paket, ihtiyacınıza göre">
+              İki paket de bir ev ağını kapsar, cihaz sayısında sınır yoktur ve 7 gün ücretsiz denenir.
             </SectionHead>
-            <ul className="plan-list">
-              {PLAN_FEATURES.map((f) => (
-                <li key={f}><Check aria-hidden strokeWidth={2.5} />{f}</li>
-              ))}
-            </ul>
-            <div className="trial-terms">
-              <h4>Deneme ve ödeme koşulları</h4>
-              <ul>
-                {TRIAL_TERMS.map((t) => <li key={t}>{t}</li>)}
-              </ul>
-            </div>
           </div>
-          <article className="card price-card">
-            <h3>Aile paketi</h3>
-            <div className="price-options">
-              <div className="price-option">
-                <span className="price-label">Aylık</span>
-                <b className="price">{TL(PRICES.monthly)} TL<small>/ay</small></b>
-                <span className="muted">Her ay yenilenir</span>
-              </div>
-              <div className="price-option">
-                <span className="price-label">Yıllık</span>
-                <b className="price">{TL(PRICES.yearly)} TL<small>/yıl</small></b>
-                <span className="muted">Aylık ödemeye göre yılda {TL(PRICES.monthly * 12 - PRICES.yearly)} TL daha az</span>
-              </div>
-            </div>
-            <Link to="/kayit" className="btn btn-primary">7 gün ücretsiz deneyin</Link>
-          </article>
+          <div className="plans">
+            <PlanCard plan={PLANS.izleme} />
+            <PlanCard plan={PLANS.tam} featured />
+          </div>
+          <div className="trial-terms">
+            <h4>Deneme ve ödeme koşulları</h4>
+            <ul>
+              {TRIAL_TERMS.map((t) => <li key={t}>{t}</li>)}
+            </ul>
+          </div>
         </div>
       </section>
 

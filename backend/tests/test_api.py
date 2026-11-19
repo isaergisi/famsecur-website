@@ -29,6 +29,14 @@ class AuthTests(BaseAPITest):
         family = Family.objects.get(owner__email="veli@example.com")
         self.assertEqual(family.name, "Test Ailesi")
         self.assertEqual(family.policy.risk_threshold, 70)
+        self.assertEqual(family.plan, Family.Plan.FULL)
+
+    def test_register_stores_selected_plan_and_rejects_unknown(self):
+        self.assertEqual(self.register(plan="izleme").status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Family.objects.get(owner__email="veli@example.com").plan, Family.Plan.MONITOR)
+        response = self.register(email="baska@example.com", plan="altin")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("plan", response.data["errors"])
 
     def test_duplicate_email_and_weak_password_are_rejected(self):
         self.register()

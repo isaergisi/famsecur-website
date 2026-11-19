@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { api, asList } from "../../api";
 import Alert from "../../components/Alert";
 import PageHead from "../../components/PageHead";
+import { PLANS } from "../../site";
 import Spinner from "../../components/Spinner";
 import { useToast } from "../../components/Toast";
 import useFetch from "../../components/useFetch";
@@ -41,7 +42,7 @@ export default function Overview() {
 
   return (
     <>
-      <PageHead title={f.name} desc="Ailenizin koruma durumuna genel bakış.">
+      <PageHead title={f.name} desc={`${PLANS[f.plan]?.name ?? PLANS.tam.name} paketi · Ailenizin koruma durumuna genel bakış.`}>
         {editing ? (
           <form onSubmit={saveName} className="inline-form">
             <input value={name} onChange={(e) => setName(e.target.value)} aria-label="Aile adı" required />

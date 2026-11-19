@@ -29,7 +29,8 @@ FAQS = [
      "Hesabınız, aile ve cihaz bilgileriniz ile beyaz listeniz dışında yalnızca engellenen istekleri (alan adı, "
      "kategori, risk puanı, gerekçe, isteği yapan cihaz ve zaman) saklarız. Engel kayıtları varsayılan olarak 30 gün "
      "tutulur; bu süreyi panelden 1 ile 365 gün arasında değiştirebilirsiniz. Ziyaret edilen ve engellenmeyen "
-     "siteler, mesajlar, ekran görüntüleri ve arama geçmişi kaydedilmez. Ayrıntılar Gizlilik Politikası'nda yer alır."),
+     "siteler, mesajlar, ekran görüntüleri ve arama geçmişi kaydedilmez. İzleme paketinde siteler engellenmez; bu pakette "
+     "yalnızca riskli bulunan istekler cihaz bilgisi olmadan kaydedilir. Ayrıntılar Gizlilik Politikası'nda yer alır."),
     ("Bir site yanlışlıkla engellenirse ne olur?",
      "Panelde her engelin nedenini görürsünüz. Yanlışlıkla engellenen siteyi tek tıkla beyaz listeye ekleyebilirsiniz; "
      "sitenin alt adresleri de otomatik olarak açılır."),
@@ -47,10 +48,16 @@ FAQS = [
      "site adıyla karşılaştırır. Risk tahmini %60 ve üzerindeyse sizi uyarır, ancak siteyi engellemez. Sitenin "
      "içeriğini görmediği için \"better.com\" gibi masum adlarda yanılabilir. Analiz FamSecur'un kendi sunucusunda "
      "yapılır; alan adları harici bir yapay zekâ hizmetine gönderilmez."),
+    ("İzleme ve Tam koruma paketleri arasındaki fark nedir?",
+     "İzleme paketi (aylık 100 TL veya yıllık 1.099 TL) ağınızda riskli bir siteye girilmeye çalışıldığında bunu panelinizde sitenin adı, "
+     "kategorisi ve zamanıyla gösterir; siteyi engellemez ve isteğin hangi cihazdan geldiğini göstermez. Tam koruma "
+     "paketi (aylık 149 TL veya yıllık 1.490 TL) zararlı siteleri açılmadan engeller, her engelin hangi cihazdan "
+     "geldiğini gösterir; beyaz liste ve koruma seviyesi ayarları da bu pakettedir. Paketinizi değiştirmek için "
+     "WhatsApp hattımıza veya destek e-postamıza yazabilirsiniz."),
     ("Ücretsiz deneme nasıl işler?",
-     "Deneme süresi 7 gündür ve tüm özellikler açıktır. Kayıt sırasında kart bilgileriniz alınır, ancak deneme "
-     "süresince herhangi bir ücret çekilmez. Süre dolmadan iptal etmezseniz aylık üyeliğiniz başlar ve aylık ücret "
-     "kartınızdan otomatik olarak tahsil edilir."),
+     "İki pakette de deneme süresi 7 gündür ve seçtiğiniz paketin tüm özellikleri açıktır. Kayıt sırasında kart "
+     "bilgileriniz alınır, ancak deneme süresince herhangi bir ücret çekilmez. Süre dolmadan iptal etmezseniz "
+     "seçtiğiniz paketin aylık üyeliği başlar ve aylık ücret kartınızdan otomatik olarak tahsil edilir."),
     ("Aboneliğimi nasıl iptal ederim?",
      "Aboneliğinizi dilediğiniz zaman WhatsApp hattımızdan veya destek e-postamızdan iptal edebilirsiniz. Deneme "
      "süresi içinde iptal ederseniz hiçbir ücret alınmaz. Ücretli dönemde iptal ettiğinizde korumanız ödemesi "

@@ -60,8 +60,8 @@ class FamilySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Family
-        fields = ["id", "name", "created_at", "policy", "device_count", "whitelist_count"]
-        read_only_fields = ["id", "created_at"]
+        fields = ["id", "name", "plan", "created_at", "policy", "device_count", "whitelist_count"]
+        read_only_fields = ["id", "plan", "created_at"]
 
 
 class DeviceSerializer(serializers.ModelSerializer):

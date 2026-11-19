@@ -147,16 +147,8 @@ img { max-width: 100%; }
 td .tag { margin-bottom: 0; }
 
 .pricing { text-align: center; }
-.price-card { max-width: 560px; margin: 28px auto 0; text-align: left; border-color: var(--lime); padding: 28px; }
-.price-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0 20px; }
-.price-option { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 4px; }
-.price-label { color: var(--lime); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; }
 .price { font-size: 1.7rem; }
 .price small { font-size: 0.9rem; font-weight: 400; opacity: 0.8; }
-.price-card .check-list { margin: 0 0 20px; }
-.price-card .btn { width: 100%; justify-content: center; }
-.price-note { font-size: 0.85rem; margin: 12px 0 0; text-align: center; }
-@media (max-width: 480px) { .price-options { grid-template-columns: 1fr; } }
 .cta { padding-top: 40px; }
 .cta-box { background: var(--lime); color: var(--bg); border-radius: 24px; padding: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
 .cta-photo { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 18px; }
@@ -545,19 +537,34 @@ svg.feature-icon { width: 26px; height: 26px; margin-bottom: 18px; }
 .privacy { margin-top: 36px; grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
 .section-photo { aspect-ratio: 16 / 10; height: auto; border-radius: 18px; margin-bottom: 24px; }
 
-/* Fiyat */
-.pricing { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 64px; align-items: start; text-align: left; }
+/* Fiyat: iki paket yan yana, koşullar altta */
+.pricing { display: block; text-align: left; }
+.pricing-head { max-width: 680px; margin-bottom: 40px; }
 .pricing .section-lead { margin: 0 0 8px; }
-.plan-list { list-style: none; padding: 0; margin: 28px 0; display: grid; gap: 12px; }
+.plans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: stretch; }
+.plan-card { display: flex; flex-direction: column; padding: 32px; border-radius: 20px; }
+.plan-card.featured { border-color: var(--lime); background: linear-gradient(180deg, rgba(185, 237, 118, 0.08), var(--surface) 55%); }
+.plan-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 30px; }
+.plan-top h3 { font-size: 1.35rem; margin: 0; }
+.plan-badge { background: var(--lime); color: var(--bg); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; }
+.plan-tagline { margin: 6px 0 20px; }
+.price { font-family: "Manrope Variable", "Inter", sans-serif; font-size: 2.6rem; letter-spacing: -0.03em; line-height: 1.1; }
+.plan-price-note { font-size: 0.92rem; margin: 6px 0 24px; min-height: 1.5em; }
+.plan-card .btn { width: 100%; justify-content: center; padding: 0.95em 1.2em; }
+.plan-list { list-style: none; padding: 24px 0 0; margin: 24px 0 0; display: grid; gap: 12px; border-top: 1px solid var(--border); }
 .plan-list li { display: flex; gap: 12px; align-items: flex-start; }
 .plan-list svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; color: var(--lime); }
-.price-card { margin: 0; max-width: none; padding: 32px; background: linear-gradient(180deg, rgba(185, 237, 118, 0.07), var(--surface) 55%); }
-.price-card h3 { font-size: 1.25rem; }
-.price-options { grid-template-columns: 1fr; gap: 12px; margin: 20px 0 24px; }
-.price-option { padding: 18px 20px; background: var(--bg-2); }
-.price { font-family: "Manrope Variable", "Inter", sans-serif; font-size: 2.2rem; letter-spacing: -0.03em; }
-.price-card .btn { padding: 0.95em 1.2em; }
+.plan-list .plan-limit { color: var(--muted); }
+.plan-list .plan-limit svg { color: var(--muted); }
+.pricing .trial-terms { margin-top: 24px; background: transparent; border: 1px solid var(--border); }
+.pricing .trial-terms ul { display: block; columns: 2; column-gap: 40px; }
+.pricing .trial-terms li { break-inside: avoid; margin-bottom: 6px; }
 .trial-terms { background: transparent; border: 1px solid var(--border); }
+@media (max-width: 900px) {
+  .plans { grid-template-columns: minmax(0, 1fr); }
+  .pricing .trial-terms ul { columns: 1; }
+  .plan-card { padding: 24px; }
+}
 
 /* Geliştirici ve kapanış */
 .maker { padding-top: 0; }
