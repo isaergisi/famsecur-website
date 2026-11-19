@@ -211,6 +211,17 @@ class PublicAndAdminTests(BaseAPITest):
     def test_admin_blocked_domains_list_search_and_pages(self):
         self.login_as()
         self.assertEqual(self.client.get("/api/admin/blocked-domains/").status_code, 403)
+        # Ebeveyn aynı listeyi salt okunur görür; kaynakları değiştiremez veya güncelleyemez
+        self.assertEqual(self.client.get("/api/blocked-domains/").status_code, 200)
+        self.assertEqual(self.client.post("/api/blocked-domains/", {}).status_code, 405)
+        sources = self.client.get("/api/threat-sources/").data["results"]
+        self.assertTrue(sources)
+        self.assertNotIn("last_fetch_error", sources[0])
+        self.assertEqual(self.client.patch(f"/api/threat-sources/{sources[0]['id']}/", {"is_active": False}, format="json").status_code, 403)
+        self.assertEqual(self.client.post(f"/api/threat-sources/{sources[0]['id']}/refresh/").status_code, 403)
+        self.client.credentials()
+        self.assertEqual(self.client.get("/api/blocked-domains/").status_code, 401)
+        self.login_as()
         self.login_as("admin@example.com")
         ThreatSource.objects.create(name="Test USOM", category="phishing", domains="sahte-banka-giris.com")
         data = self.client.get("/api/admin/blocked-domains/").data

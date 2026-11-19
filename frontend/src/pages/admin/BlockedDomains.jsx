@@ -38,7 +38,8 @@ function NumberedPagination({ page, total, setPage }) {
   );
 }
 
-export default function BlockedDomains() {
+// Arama + filtre + numaralı sayfalı tablo. Yönetim paneli ve ebeveyn paneli (salt okunur) birlikte kullanır.
+export function BlockedDomainsBrowser({ path = "/admin/blocked-domains/" }) {
   const [page, setPage] = useState(1);
   const [input, setInput] = useState("");
   const [search, setSearch] = useState("");
@@ -51,17 +52,13 @@ export default function BlockedDomains() {
     return () => clearTimeout(t);
   }, [input]);
 
-  const { data, error, loading } = useFetch(`/admin/blocked-domains/?${new URLSearchParams({ page, search, category, source })}`);
+  const { data, error, loading } = useFetch(`${path}?${new URLSearchParams({ page, search, category, source })}`);
   const rows = data?.results ?? [];
   const total = data ? Math.max(1, Math.ceil(data.count / data.page_size)) : 1;
   const start = data ? (page - 1) * data.page_size + 1 : 0;
 
   return (
     <>
-      <PageHead
-        title="Engellenen alan adları"
-        desc="Karar motorunun listelerden doğrudan engellediği alan adları: resmî kumar havuzu ve aktif tehdit kaynakları."
-      />
       <div className="toolbar">
         <input type="search" placeholder="Alan adı ara…" value={input} onChange={(e) => setInput(e.target.value)} aria-label="Alan adı ara" />
         <select value={category} onChange={(e) => { setPage(1); setCategory(e.target.value); }} aria-label="Kategori">
@@ -100,6 +97,18 @@ export default function BlockedDomains() {
         </div>
       )}
       <NumberedPagination page={page} total={total} setPage={setPage} />
+    </>
+  );
+}
+
+export default function BlockedDomains() {
+  return (
+    <>
+      <PageHead
+        title="Engellenen alan adları"
+        desc="Karar motorunun listelerden doğrudan engellediği alan adları: resmî kumar havuzu ve aktif tehdit kaynakları."
+      />
+      <BlockedDomainsBrowser />
     </>
   );
 }

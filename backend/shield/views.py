@@ -462,3 +462,15 @@ class BlockedDomainsView(APIView):
         response.data["page_size"] = paginator.page_size
         response.data["sources"] = [{"name": n, "count": c} for n, c in sorted(sources.items())]
         return response
+
+
+@extend_schema(
+    tags=["Aile ve politika"],
+    summary="Engellenen alan adları (salt okunur)",
+    description="Yönetim panelindeki listenin ebeveynler için salt okunur hâli; aynı arama, filtre ve sayfalama.",
+)
+class ParentBlockedDomainsView(BlockedDomainsView):
+    """GET /api/blocked-domains/ — giriş yapmış her kullanıcı görebilir, yalnızca okuma."""
+
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "head", "options"]

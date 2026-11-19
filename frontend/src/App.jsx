@@ -16,6 +16,7 @@ import Whitelist from "./pages/panel/Whitelist";
 import Events from "./pages/panel/Events";
 import TestDomain from "./pages/panel/TestDomain";
 import Account from "./pages/panel/Account";
+import ProtectionLists from "./pages/panel/ProtectionLists";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
 import Users from "./pages/admin/Users";
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="beyaz-liste" element={<Whitelist />} />
         <Route path="olaylar" element={<Events />} />
         <Route path="test" element={<TestDomain />} />
+        <Route path="koruma-listeleri" element={<ProtectionLists />} />
         <Route path="hesap" element={<Account />} />
       </Route>
       <Route path="yonetim" element={<RequireAuth admin><AdminLayout /></RequireAuth>}>

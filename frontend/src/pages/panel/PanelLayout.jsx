@@ -8,6 +8,7 @@ const LINKS = [
   ["/panel/beyaz-liste", "Beyaz liste", "✅"],
   ["/panel/olaylar", "Engel olayları", "🚫"],
   ["/panel/test", "Alan adı test et", "🔍"],
+  ["/panel/koruma-listeleri", "Koruma listeleri", "🛡️"],
   ["/panel/hesap", "Hesabım", "👤"],
 ];
 

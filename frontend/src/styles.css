@@ -361,3 +361,9 @@ button.pill { cursor: pointer; }
 .maker-quote { margin: 20px 0 8px; padding: 4px 0 4px 18px; border-left: 3px solid var(--lime); font-size: 1.25rem; font-weight: 700; color: var(--text); }
 .maker-sign { margin-bottom: 6px; }
 .text-danger { color: var(--coral); }
+.source-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.source-cards h3 { margin: 8px 0 4px; font-size: 1rem; }
+.timeline { list-style: none; padding: 0; margin: 12px 0 0; }
+.timeline li { display: flex; flex-direction: column; gap: 2px; padding: 10px 0 10px 16px; border-left: 2px solid var(--border); position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 14px; width: 10px; height: 10px; border-radius: 50%; background: var(--lime); }
+.section-title { margin: 28px 0 12px; font-size: 1.25rem; }
