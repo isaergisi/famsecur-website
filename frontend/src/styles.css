@@ -360,3 +360,4 @@ button.pill { cursor: pointer; }
 .maker .lead { margin-bottom: 12px; }
 .maker-quote { margin: 20px 0 8px; padding: 4px 0 4px 18px; border-left: 3px solid var(--lime); font-size: 1.25rem; font-weight: 700; color: var(--text); }
 .maker-sign { margin-bottom: 6px; }
+.text-danger { color: var(--coral); }

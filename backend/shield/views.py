@@ -14,6 +14,7 @@ from accounts.permissions import IsAdminOrReadOnly, IsAdminRole
 from config.schema import AUTH_ERRORS, E400, E404, E429
 
 from .classifier import CATEGORY_LABELS, OFFICIAL_SOURCE_NAME, analyze_domain, official_gambling_domains
+from .fetchers import refresh_source, uses_file_feed
 from .models import BlockEvent, Device, Family, ThreatSource
 from .serializers import (
     BlockEventSerializer,
@@ -323,6 +324,27 @@ class ThreatSourceViewSet(viewsets.ModelViewSet):
     serializer_class = ThreatSourceSerializer
     permission_classes = [IsAdminOrReadOnly]
 
+    @extend_schema(
+        summary="Kaynağı adresinden şimdi güncelle",
+        description="Kaynak adresinden (USOM API, düz metin liste veya XML sicil) alan adlarını çeker. "
+                    "Başarısız olursa eski liste korunur ve 502 döner.",
+        request=None,
+        responses={200: ThreatSourceSerializer, 502: E400, **AUTH_ERRORS},
+    )
+    @action(detail=True, methods=["post"])
+    def refresh(self, request, pk=None):
+        source = self.get_object()
+        try:
+            count = refresh_source(source)
+        except Exception as exc:
+            return Response(
+                {"detail": f"Kaynak güncellenemedi, eski liste korundu. ({exc})", "errors": {}},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+        data = self.get_serializer(source).data
+        data["detail"] = f"{count} alan adı alındı."
+        return Response(data)
+
     def get_queryset(self):
         qs = ThreatSource.objects.all()
         user = self.request.user
@@ -405,7 +427,10 @@ class BlockedDomainsView(APIView):
 
     @staticmethod
     def _rows():
-        rows = [(d, "gambling", OFFICIAL_SOURCE_NAME) for d in sorted(official_gambling_domains())]
+        rows = []
+        official = ThreatSource.objects.filter(name=OFFICIAL_SOURCE_NAME).first()
+        if official is None or uses_file_feed(official):
+            rows = [(d, "gambling", OFFICIAL_SOURCE_NAME) for d in sorted(official_gambling_domains())]
         for source in ThreatSource.objects.filter(is_active=True):
             rows.extend((d, category, source.name) for d, category in source.domain_entries())
         return rows

@@ -153,12 +153,13 @@ class ThreatSourceSerializer(serializers.ModelSerializer):
         fields = [
             "id", "name", "category", "category_label", "description", "source_url",
             "domains", "domain_count", "is_active", "updated_at",
+            "auto_update", "last_fetched_at", "last_fetch_count", "last_fetch_error",
         ]
-        read_only_fields = ["id", "updated_at"]
+        read_only_fields = ["id", "updated_at", "last_fetched_at", "last_fetch_count", "last_fetch_error"]
 
     def get_domain_count(self, obj) -> int:
         count = len(obj.domain_list())
-        if obj.name == OFFICIAL_SOURCE_NAME:
+        if obj.name == OFFICIAL_SOURCE_NAME and not obj.domains.strip():
             # Resmî havuzun alan adları veritabanında değil, sürümlenmiş dosyada tutulur.
             count += len(official_gambling_domains())
         return count

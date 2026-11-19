@@ -246,27 +246,58 @@ class PublicAndAdminTests(BaseAPITest):
         result = self.client.post("/api/analyze/", {"domain": "kacak-bahis-giris.com"}, format="json").data
         self.assertEqual(result["category"], "gambling")
 
-    def test_update_usom_fills_sources_from_api(self):
+    def test_refresh_sources_from_url(self):
         import io
         import json
         from unittest import mock
 
         from django.core.management import call_command
 
-        payload = {"pageCount": 1, "models": [
+        usom = {"pageCount": 1, "models": [
             {"url": "https://giris.sahte-edevlet.com/login", "desc": "PH", "criticality_level": 2},
             {"url": "zararli-indir.net", "desc": "MD", "criticality_level": 1},
             {"url": "dusuk-kritik.com", "desc": "PH", "criticality_level": 9},
         ]}
+        register = "<Rejestr><PozycjaRejestru><AdresDomeny>yeni-kasyno.pl</AdresDomeny></PozycjaRejestru></Rejestr>"
 
-        def fake_urlopen(url, timeout):
-            return mock.MagicMock(**{"__enter__.return_value.read.return_value": json.dumps(payload).encode()})
+        def fake_get(url, timeout):
+            return json.dumps(usom).encode() if "siberguvenlik" in url else register.encode()
 
-        with mock.patch("shield.management.commands.update_usom.urlopen", fake_urlopen):
-            call_command("update_usom", stdout=io.StringIO())
-        phishing = ThreatSource.objects.get(name="USOM Zararlı Bağlantılar")
-        self.assertEqual(phishing.domain_list(), ["giris.sahte-edevlet.com"])
-        self.assertEqual(ThreatSource.objects.get(name="USOM Zararlı Yazılım").domain_list(), ["zararli-indir.net"])
+        phishing = ThreatSource.objects.create(
+            name="USOM Zararlı Bağlantılar", category="phishing", domains="eski-kayit.com",
+            source_url="https://www.usom.gov.tr/adres", auto_update=True,
+        )
+        official = ThreatSource.objects.create(
+            name="Resmî Kumar Alan Adı Havuzu", category="gambling",
+            source_url="https://hazard.mf.gov.pl/api/Register", auto_update=True,
+        )
+        manual = ThreatSource.objects.create(name="Elle", category="malware", domains="elle.com", source_url="https://x.example")
+        with mock.patch("shield.fetchers._get", fake_get):
+            call_command("refresh_sources", stdout=io.StringIO())
+        phishing.refresh_from_db(); official.refresh_from_db(); manual.refresh_from_db()
+        # USOM: yalnızca kaynağın kategorisi ve kritiklik 1-4; eski kayıtlar korunur
+        self.assertEqual(phishing.domain_list(), ["eski-kayit.com", "giris.sahte-edevlet.com"])
+        self.assertEqual(phishing.last_fetch_count, 1)
+        self.assertIsNotNone(phishing.last_fetched_at)
+        self.assertEqual(official.domain_list(), ["yeni-kasyno.pl"])
+        self.assertEqual(manual.domain_list(), ["elle.com"])  # otomatik güncelleme kapalı
+
+        # Panel düğmesi: başarısız çekmede eski liste korunur, hata kaydedilir
+        self.login_as("admin@example.com")
+        with mock.patch("shield.fetchers._get", side_effect=OSError("bağlantı yok")):
+            response = self.client.post(f"/api/threat-sources/{official.id}/refresh/")
+        self.assertEqual(response.status_code, 502)
+        official.refresh_from_db()
+        self.assertEqual(official.domain_list(), ["yeni-kasyno.pl"])
+        self.assertIn("bağlantı yok", official.last_fetch_error)
+        with mock.patch("shield.fetchers._get", fake_get):
+            response = self.client.post(f"/api/threat-sources/{official.id}/refresh/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["last_fetch_error"], "")
+        # Resmî havuz adresinden güncellenince dosya yerine bu liste gösterilir
+        self.assertEqual(self.client.get("/api/admin/blocked-domains/", {"source": "Resmî Kumar Alan Adı Havuzu"}).data["count"], 1)
+        self.login_as()
+        self.assertEqual(self.client.post(f"/api/threat-sources/{official.id}/refresh/").status_code, 403)
 
     def test_threat_source_blocks_listed_domain(self):
         self.login_as("admin@example.com")

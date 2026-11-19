@@ -43,20 +43,15 @@ SOURCES = [
                        "Kritiklik seviyesi 1-4 arası kayıtlar engellenir.",
         "source_url": "https://www.usom.gov.tr/adres",
         "domains": "e-devlet-giris-dogrula.com\nptt-kargo-takip-odeme.net",
-    },
-    {
-        "name": "USOM Zararlı Yazılım",
-        "category": "malware",
-        "description": "USOM listesindeki zararlı yazılım dağıtan alan adları.",
-        "source_url": "https://www.usom.gov.tr/adres",
-        "domains": "free-crack-indir.org",
+        "auto_update": True,
     },
     {
         "name": "Resmî Kumar Alan Adı Havuzu",
         "category": "gambling",
         "description": "36.282 benzersiz alan adından oluşan sürümlenmiş resmî yasa dışı bahis listesi; "
                        "yalnızca tam alan adı ve alt alan adı eşleşmesiyle karar verir.",
-        "source_url": "https://hazard.mf.gov.pl/",
+        "source_url": "https://hazard.mf.gov.pl/api/Register",
+        "auto_update": True,
         "domains": "",
     },
 ]
@@ -96,7 +91,7 @@ class Command(BaseCommand):
             family.whitelist.create(domain="betterhelp.com", note="Yanlış pozitif: sağlık sitesi")
             for device, domain in [
                 (tablet, "casino777.xyz"), (phone, "bet2x.com"), (phone, "e-devlet-giris-dogrula.com"),
-                (tablet, "free-crack-indir.org"), (phone, "canlibahis-tv.top"), (tablet, "eba.gov.tr"),
+                (tablet, "ptt-kargo-takip-odeme.net"), (phone, "canlibahis-tv.top"), (tablet, "eba.gov.tr"),
             ]:
                 check_domain(family, domain, device)
 

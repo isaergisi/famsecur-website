@@ -133,6 +133,11 @@ class ThreatSource(models.Model):
     domains = models.TextField("alan adları (satır başına bir)", blank=True)
     is_active = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # Kaynak adresinden otomatik güncelleme (python manage.py refresh_sources veya paneldeki düğme)
+    auto_update = models.BooleanField("adresten otomatik güncelle", default=False)
+    last_fetched_at = models.DateTimeField("son başarılı güncelleme", null=True, blank=True)
+    last_fetch_count = models.PositiveIntegerField("son güncellemede gelen alan adı", null=True, blank=True)
+    last_fetch_error = models.TextField("son güncelleme hatası", blank=True)
 
     class Meta:
         ordering = ["name"]

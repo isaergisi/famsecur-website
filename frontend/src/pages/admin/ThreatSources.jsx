@@ -10,7 +10,7 @@ import useFetch from "../../components/useFetch";
 import { confirmAction, formatDate } from "../../utils";
 
 const CATEGORIES = { gambling: "Kumar / bahis", adult: "Yetişkin içerik", drugs: "Uyuşturucu", phishing: "Dolandırıcılık / phishing", malware: "Kötü amaçlı yazılım" };
-const EMPTY = { name: "", category: "phishing", description: "", source_url: "", domains: "", is_active: true };
+const EMPTY = { name: "", category: "phishing", description: "", source_url: "", domains: "", is_active: true, auto_update: false };
 
 function SourceForm({ initial, onClose, onSaved }) {
   const [form, setForm] = useState(initial || EMPTY);
@@ -20,8 +20,8 @@ function SourceForm({ initial, onClose, onSaved }) {
 
   async function submit(e) {
     e.preventDefault();
-    const { name, category, description, source_url, domains, is_active } = form;
-    const payload = { name, category, description, source_url, domains, is_active };
+    const { name, category, description, source_url, domains, is_active, auto_update } = form;
+    const payload = { name, category, description, source_url, domains, is_active, auto_update };
     try {
       const saved = initial ? await api.put(`/threat-sources/${initial.id}/`, payload) : await api.post("/threat-sources/", payload);
       onSaved(saved, Boolean(initial));
@@ -49,6 +49,8 @@ function SourceForm({ initial, onClose, onSaved }) {
           <textarea rows={6} value={form.domains} onChange={set("domains")} className="mono" />
         </Field>
         <label className="switch"><input type="checkbox" checked={form.is_active} onChange={set("is_active")} /><span>Kaynak aktif</span></label>
+        <label className="switch"><input type="checkbox" checked={form.auto_update} onChange={set("auto_update")} /><span>Kaynak adresinden otomatik güncelle</span></label>
+        <p className="muted small">USOM adresleri resmî API'den, diğer adresler düz metin liste veya XML sicil olarak okunur. Çekme başarısız olursa eski liste korunur.</p>
         <div className="modal-actions">
           <button type="button" className="btn btn-ghost" onClick={onClose}>Vazgeç</button>
           <button className="btn btn-primary">Kaydet</button>
@@ -62,6 +64,20 @@ export default function ThreatSources() {
   const notify = useToast();
   const { data, error, loading, reload } = useFetch("/threat-sources/");
   const [editing, setEditing] = useState(null);
+  const [refreshing, setRefreshing] = useState(null);
+
+  async function refresh(item) {
+    setRefreshing(item.id);
+    try {
+      const res = await api.post(`/threat-sources/${item.id}/refresh/`);
+      notify(`${item.name}: ${res.detail}`);
+    } catch (err) {
+      notify(err.message, "error");
+    } finally {
+      setRefreshing(null);
+      reload();
+    }
+  }
 
   async function remove(item) {
     if (!confirmAction(`"${item.name}" kaynağı silinsin mi? Listedeki alan adları artık engellenmeyecek.`)) return;
@@ -85,7 +101,7 @@ export default function ThreatSources() {
       {items.length > 0 && (
         <div className="card table-wrap">
           <table>
-            <thead><tr><th>Kaynak</th><th>Kategori</th><th>Alan adı</th><th>Durum</th><th>Güncelleme</th><th /></tr></thead>
+            <thead><tr><th>Kaynak</th><th>Kategori</th><th>Alan adı</th><th>Durum</th><th>Otomatik güncelleme</th><th /></tr></thead>
             <tbody>
               {items.map((s) => (
                 <tr key={s.id}>
@@ -93,8 +109,24 @@ export default function ThreatSources() {
                   <td><span className="tag">{s.category_label}</span></td>
                   <td>{s.domain_count}</td>
                   <td><span className={`pill ${s.is_active ? "pill-on" : "pill-off"}`}>{s.is_active ? "Aktif" : "Pasif"}</span></td>
-                  <td className="muted small">{formatDate(s.updated_at)}</td>
+                  <td className="small">
+                    {s.auto_update ? (
+                      <>
+                        {s.last_fetched_at
+                          ? <div>{formatDate(s.last_fetched_at)} · {s.last_fetch_count?.toLocaleString("tr-TR")} alan adı</div>
+                          : <div className="muted">Henüz güncellenmedi</div>}
+                        {s.last_fetch_error && <div className="text-danger" title={s.last_fetch_error}>Son deneme başarısız, eski liste kullanılıyor</div>}
+                      </>
+                    ) : (
+                      <span className="muted">Elle yönetiliyor</span>
+                    )}
+                  </td>
                   <td className="row-actions">
+                    {s.auto_update && (
+                      <button className="btn btn-ghost btn-sm" disabled={refreshing === s.id} onClick={() => refresh(s)}>
+                        {refreshing === s.id ? "Güncelleniyor…" : "Şimdi güncelle"}
+                      </button>
+                    )}
                     <button className="btn btn-ghost btn-sm" onClick={() => setEditing(s)}>Düzenle</button>
                     <button className="btn btn-danger btn-sm" onClick={() => remove(s)}>Sil</button>
                   </td>
