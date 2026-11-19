@@ -1,17 +1,20 @@
 import { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { fieldErrors } from "../../api";
 import { useAuth } from "../../auth";
 import Alert from "../../components/Alert";
 import Field from "../../components/Field";
 import usePageTitle from "../../components/usePageTitle";
-import { TRIAL_TERMS } from "../../site";
+import { PLANS, TL, TRIAL_TERMS, planFromQuery } from "../../site";
 
 export default function Register() {
   usePageTitle("Kayıt ol");
   const { user, register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ first_name: "", last_name: "", email: "", password: "", family_name: "" });
+  const [params] = useSearchParams();
+  const [form, setForm] = useState({
+    first_name: "", last_name: "", email: "", password: "", family_name: "", plan: planFromQuery(params.get("paket")),
+  });
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -39,7 +42,7 @@ export default function Register() {
     <section className="section page">
       <div className="container auth-box">
         <h1>Ebeveyn hesabı oluşturun</h1>
-        <p className="muted">7 gün ücretsiz deneme ile başlayın. Kayıttan sonra üç adımda korumaya geçersiniz:</p>
+        <p className="muted">İki pakette de 7 gün ücretsiz deneme ile başlarsınız. Kayıttan sonra üç adımda kurulumu tamamlarsınız:</p>
         <ol className="auth-steps muted">
           <li>Cihazlarınızı ekleyin.</li>
           <li>Koruma ayarlarınızı seçin.</li>
@@ -47,6 +50,20 @@ export default function Register() {
         </ol>
         <form className="card form" onSubmit={submit} noValidate>
           <Alert>{error}</Alert>
+          <fieldset className="field">
+            <span className="field-label">Paket</span>
+            <div className="radio-cards">
+              {Object.values(PLANS).map((plan) => (
+                <label key={plan.id} className={`radio-card ${form.plan === plan.id ? "active" : ""}`}>
+                  <input type="radio" name="plan" value={plan.id} checked={form.plan === plan.id} onChange={set("plan")} />
+                  <b>{plan.name}</b>
+                  <span>{TL(plan.monthly)} TL/ay</span>
+                  <span className="muted small">{plan.short}</span>
+                </label>
+              ))}
+            </div>
+            {errors.plan && <span className="field-error">{errors.plan}</span>}
+          </fieldset>
           <div className="form-row">
             <Field label="Ad" error={errors.first_name}>
               <input value={form.first_name} onChange={set("first_name")} required />

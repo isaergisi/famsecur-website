@@ -14,8 +14,13 @@ def default_categories():
 class Family(models.Model):
     """Bir ebeveyn hesabının koruduğu ev. Cihazlar, politika ve olaylar aileye bağlıdır."""
 
+    class Plan(models.TextChoices):
+        MONITOR = "izleme", "İzleme"
+        FULL = "tam", "Tam koruma"
+
     owner = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="family")
     name = models.CharField("aile adı", max_length=80)
+    plan = models.CharField("paket", max_length=10, choices=Plan.choices, default=Plan.FULL)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -26,8 +31,8 @@ class Family(models.Model):
         return self.name
 
     @classmethod
-    def create_with_defaults(cls, owner, name):
-        family = cls.objects.create(owner=owner, name=name)
+    def create_with_defaults(cls, owner, name, plan=Plan.FULL):
+        family = cls.objects.create(owner=owner, name=name, plan=plan)
         Policy.objects.create(family=family)
         return family
 

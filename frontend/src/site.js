@@ -6,15 +6,53 @@ export const SUPPORT = {
   responseTime: "en geç 1 iş günü içinde",
 };
 
-export const PRICES = { monthly: 149, yearly: 1490 };
+// İki paket. Fiyatlar Ana sayfa, Kayıt ekranı, SSS ve Kullanım Koşulları'nda buradan okunur.
+export const PLANS = {
+  izleme: {
+    id: "izleme",
+    name: "İzleme",
+    tagline: "Evde neler oluyor, görün",
+    short: "Riskli girişleri raporlar; engellemez, cihazı göstermez.",
+    monthly: 100,
+    features: [
+      "Ağınızda riskli bir siteye girilmeye çalışıldığında panelinizde görürsünüz: site, kategori ve zaman",
+      "Resmî kumar sicili, güvenilir tehdit kaynakları ve yapay zekâ ile risk tespiti",
+      "Haftalık özet raporu",
+      "Evdeki tüm cihazlar, sınırsız",
+    ],
+    limits: [
+      "Siteler engellenmez, yalnızca raporlanır",
+      "İsteğin hangi cihazdan geldiği gösterilmez",
+    ],
+  },
+  tam: {
+    id: "tam",
+    name: "Tam koruma",
+    tagline: "Görün ve engelleyin",
+    short: "Zararlı siteleri engeller, hangi cihazdan geldiğini gösterir.",
+    monthly: 149,
+    yearly: 1490,
+    features: [
+      "Zararlı siteler açılmadan engellenir",
+      "Her engelin hangi cihazdan geldiğini görürsünüz",
+      "Resmî kumar sicili, güvenilir tehdit kaynakları ve yapay zekâ destekli erken uyarı",
+      "Sessiz engelleme, beyaz liste ve ayarlanabilir koruma seviyesi",
+      "Haftalık özet raporu",
+      "Evdeki tüm cihazlar, sınırsız",
+    ],
+  },
+};
+export const DEFAULT_PLAN = "tam";
+export const planFromQuery = (value) => (value in PLANS ? value : DEFAULT_PLAN);
+export const TL = (n) => n.toLocaleString("tr-TR");
 
 export const TRIAL_TERMS = [
-  "İlk 7 gün ücretsizdir; tüm özellikler açıktır.",
+  "İki pakette de ilk 7 gün ücretsizdir; seçtiğiniz paketin tüm özellikleri açıktır.",
   "Kayıt sırasında kart bilgileriniz alınır, ancak deneme süresince herhangi bir ücret çekilmez.",
-  `Deneme süresi dolmadan iptal etmezseniz aylık üyeliğiniz başlar ve ${PRICES.monthly} TL kartınızdan otomatik olarak tahsil edilir.`,
-  "Aboneliğinizi dilediğiniz zaman WhatsApp hattımızdan veya destek e-postamızdan iptal edebilirsiniz. İptal ettiğinizde korumanız ödemesi yapılmış dönemin sonuna kadar devam eder; sonraki dönem için ücret alınmaz.",
+  `Deneme süresi dolmadan iptal etmezseniz seçtiğiniz paketin aylık üyeliği başlar ve ücreti (İzleme ${PLANS.izleme.monthly} TL, Tam koruma ${PLANS.tam.monthly} TL) kartınızdan otomatik olarak tahsil edilir.`,
+  "Aboneliğinizi dilediğiniz zaman WhatsApp hattımızdan veya destek e-postamızdan iptal edebilirsiniz. İptal ettiğinizde hizmetiniz ödemesi yapılmış dönemin sonuna kadar devam eder; sonraki dönem için ücret alınmaz.",
   "Fiyatlara KDV dâhildir.",
-];
+]
 
 // Yapay zekâ modelinin test sonuçları: backend/ml/model/metrics.json → at_warning_threshold ile aynı tutulmalı.
 export const AI_METRICS = {
@@ -50,9 +88,9 @@ export const DATA_INVENTORY = [
   },
   {
     name: "Engel olayları",
-    short: "Engellenen istek: alan adı, kategori, risk puanı, gerekçe, cihaz ve zaman",
-    content: "Engellenen alan adı, kategori, risk puanı, gerekçe, isteği yapan cihaz ve zaman",
-    purpose: "Engellerin panelinizde gösterilmesi ve haftalık özet",
+    short: "Engellenen istek: alan adı, kategori, risk puanı, gerekçe, cihaz ve zaman (İzleme paketinde riskli istek, cihaz olmadan)",
+    content: "Tam koruma paketinde engellenen alan adı, kategori, risk puanı, gerekçe, isteği yapan cihaz ve zaman. İzleme paketinde siteler engellenmez; riskli istekler cihaz bilgisi olmadan (alan adı, kategori, risk puanı, gerekçe ve zaman) kaydedilir.",
+    purpose: "Engellerin ve riskli isteklerin panelinizde gösterilmesi ve haftalık özet",
     basis: "Sözleşmenin ifası (KVKK m. 5/2-c)",
     period: "Varsayılan 30 gün; panelden 1-365 gün arasında ayarlanabilir. Süresi dolanlar her gün otomatik silinir.",
   },
@@ -88,6 +126,6 @@ export const DATA_NEVER = [
   "Mesajlar, sohbetler ve e-postalar",
   "Ekran görüntüleri ve tuş kayıtları",
   "Sayfa içerikleri, arama ve izleme geçmişi",
-  "Ziyaret edilen ve engellenmeyen sitelerin geçmişi",
+  "Ziyaret edilen sitelerin geçmişi (yalnızca riskli bulunan istekler kaydedilir)",
   "DNS kayıtlarında IP adresiniz",
 ];

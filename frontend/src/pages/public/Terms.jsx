@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
 import usePageTitle from "../../components/usePageTitle";
-import { PRICES, SUPPORT } from "../../site";
+import { PLANS, SUPPORT, TL } from "../../site";
 
 const UPDATED = "19 Kasım 2026";
-const TL = (n) => n.toLocaleString("tr-TR");
 
 export default function Terms() {
   usePageTitle("Kullanım Koşulları");
@@ -19,21 +18,34 @@ export default function Terms() {
           koşulları kabul etmiş olursunuz.
         </p>
 
-        <h2>1. Hizmetin kapsamı</h2>
+        <h2>1. Hizmetin kapsamı ve paketler</h2>
         <p>
-          FamSecur, ev ağınıza bağlanan cihazların zararlı sitelere erişimini DNS düzeyinde engeller. Bir abonelik bir ev
-          ağını kapsar; cihaz sayısında sınır yoktur.
+          FamSecur, ev ağınıza bağlanan cihazların sitelere yaptığı istekleri DNS düzeyinde inceler. Bir abonelik bir
+          ev ağını kapsar; cihaz sayısında sınır yoktur. Hizmet iki paket hâlinde sunulur:
         </p>
+        <ul>
+          <li>
+            <b>{PLANS.izleme.name}</b> (aylık {TL(PLANS.izleme.monthly)} TL): Ağınızda riskli bir siteye girilmeye
+            çalışıldığında bu durum panelinizde raporlanır. Siteler engellenmez ve isteğin hangi cihazdan geldiği
+            gösterilmez.
+          </li>
+          <li>
+            <b>{PLANS.tam.name}</b> (aylık {TL(PLANS.tam.monthly)} TL veya yıllık {TL(PLANS.tam.yearly)} TL): Zararlı
+            sitelere erişim engellenir ve her engelin hangi cihazdan geldiği panelinizde gösterilir.
+          </li>
+        </ul>
+        <p>Paketinizi değiştirmek için destek kanallarımızdan bize ulaşabilirsiniz.</p>
 
         <h2>2. Ücretsiz deneme ve abonelik</h2>
         <ul>
-          <li>Deneme süresi 7 gündür ve tüm özellikler açıktır.</li>
+          <li>Her iki pakette de deneme süresi 7 gündür ve seçtiğiniz paketin tüm özellikleri açıktır.</li>
           <li>Kayıt sırasında kart bilgileriniz alınır; deneme süresince herhangi bir ücret çekilmez.</li>
           <li>
-            Deneme süresi dolmadan iptal etmezseniz aylık üyeliğiniz başlar ve aylık {TL(PRICES.monthly)} TL ücret
+            Deneme süresi dolmadan iptal etmezseniz seçtiğiniz paketin aylık üyeliği başlar ve aylık ücret
+            ({PLANS.izleme.name} için {TL(PLANS.izleme.monthly)} TL, {PLANS.tam.name} için {TL(PLANS.tam.monthly)} TL)
             kartınızdan otomatik olarak tahsil edilir. Üyelik, iptal edilene kadar her ay aynı şekilde yenilenir.
           </li>
-          <li>Yıllık paket ücreti {TL(PRICES.yearly)} TL'dir. Fiyatlara KDV dâhildir.</li>
+          <li>{PLANS.tam.name} paketinin yıllık ücreti {TL(PLANS.tam.yearly)} TL'dir. Fiyatlara KDV dâhildir.</li>
         </ul>
 
         <h2>3. İptal</h2>
@@ -41,7 +53,7 @@ export default function Terms() {
           Aboneliğinizi dilediğiniz zaman <a href={`mailto:${SUPPORT.email}`}>{SUPPORT.email}</a> adresinden veya{" "}
           <a href={SUPPORT.whatsappLink} target="_blank" rel="noreferrer">{SUPPORT.whatsapp}</a> numaralı WhatsApp
           hattından iptal edebilirsiniz. Deneme süresi içinde iptal ederseniz hiçbir ücret alınmaz. Ücretli dönemde iptal
-          ettiğinizde korumanız ödemesi yapılmış dönemin sonuna kadar devam eder; sonraki dönem için ücret alınmaz.
+          ettiğinizde hizmetiniz ödemesi yapılmış dönemin sonuna kadar devam eder; sonraki dönem için ücret alınmaz.
         </p>
 
         <h2>4. Hizmetin sınırları</h2>

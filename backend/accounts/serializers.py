@@ -20,10 +20,11 @@ class UserSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, style={"input_type": "password"})
     family_name = serializers.CharField(max_length=80, required=False, allow_blank=True)
+    plan = serializers.ChoiceField(choices=Family.Plan.choices, required=False, default=Family.Plan.FULL)
 
     class Meta:
         model = User
-        fields = ["email", "password", "first_name", "last_name", "family_name"]
+        fields = ["email", "password", "first_name", "last_name", "family_name", "plan"]
         extra_kwargs = {"first_name": {"required": True, "allow_blank": False}}
 
     def validate_email(self, value):
@@ -40,9 +41,10 @@ class RegisterSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         family_name = validated_data.pop("family_name", "") or f"{validated_data['first_name']} Ailesi"
+        plan = validated_data.pop("plan", Family.Plan.FULL)
         user = User.objects.create_user(**validated_data)
-        # Her ebeveyn kendi ailesiyle ve varsayılan koruma politikasıyla başlar.
-        Family.create_with_defaults(owner=user, name=family_name)
+        # Her ebeveyn kendi ailesiyle, seçtiği paketle ve varsayılan koruma politikasıyla başlar.
+        Family.create_with_defaults(owner=user, name=family_name, plan=plan)
         return user
 
 
