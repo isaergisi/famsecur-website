@@ -10,7 +10,7 @@ import useFetch from "../../components/useFetch";
 import { confirmAction, formatDate } from "../../utils";
 
 const CATEGORIES = { gambling: "Kumar / bahis", adult: "Yetişkin içerik", drugs: "Uyuşturucu", phishing: "Dolandırıcılık / phishing", malware: "Kötü amaçlı yazılım" };
-const EMPTY = { name: "", category: "phishing", description: "", source_url: "", domains: "", is_active: true, auto_update: false };
+const EMPTY = { name: "", category: "phishing", description: "", source_url: "", is_active: true, auto_update: true };
 
 function SourceForm({ initial, onClose, onSaved }) {
   const [form, setForm] = useState(initial || EMPTY);
@@ -20,10 +20,11 @@ function SourceForm({ initial, onClose, onSaved }) {
 
   async function submit(e) {
     e.preventDefault();
-    const { name, category, description, source_url, domains, is_active, auto_update } = form;
-    const payload = { name, category, description, source_url, domains, is_active, auto_update };
+    // Alan adları kaynak adresinden otomatik gelir; listesi "Engellenen alan adları" sayfasında görünür.
+    const { name, category, description, source_url, is_active, auto_update } = form;
+    const payload = { name, category, description, source_url, is_active, auto_update };
     try {
-      const saved = initial ? await api.put(`/threat-sources/${initial.id}/`, payload) : await api.post("/threat-sources/", payload);
+      const saved = initial ? await api.patch(`/threat-sources/${initial.id}/`, payload) : await api.post("/threat-sources/", payload);
       onSaved(saved, Boolean(initial));
     } catch (err) {
       setErrors(fieldErrors(err));
@@ -45,9 +46,6 @@ function SourceForm({ initial, onClose, onSaved }) {
         </div>
         <Field label="Açıklama" error={errors.description}><textarea rows={2} value={form.description} onChange={set("description")} /></Field>
         <Field label="Kaynak adresi" error={errors.source_url}><input value={form.source_url} onChange={set("source_url")} placeholder="https://" /></Field>
-        <Field label="Engellenecek alan adları" error={errors.domains} hint="Her satıra bir alan adı; alt alan adları da engellenir. Kayda özel kategori için yanına yazın, ör. ornek-bahis.com gambling (gambling, adult, drugs, phishing, malware).">
-          <textarea rows={6} value={form.domains} onChange={set("domains")} className="mono" />
-        </Field>
         <label className="switch"><input type="checkbox" checked={form.is_active} onChange={set("is_active")} /><span>Kaynak aktif</span></label>
         <label className="switch"><input type="checkbox" checked={form.auto_update} onChange={set("auto_update")} /><span>Kaynak adresinden otomatik güncelle</span></label>
         <p className="muted small">USOM adresleri resmî API'den, diğer adresler düz metin liste veya XML sicil olarak okunur. Çekme başarısız olursa eski liste korunur.</p>
