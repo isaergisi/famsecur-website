@@ -129,6 +129,7 @@ class ThreatSource(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     description = models.TextField(blank=True)
     source_url = models.URLField(blank=True)
+    # Satır başına bir alan adı; isteğe bağlı olarak kayda özel kategori: "ornek-bahis.com gambling"
     domains = models.TextField("alan adları (satır başına bir)", blank=True)
     is_active = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -141,13 +142,24 @@ class ThreatSource(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    def domain_entries(self) -> list[tuple[str, str]]:
+        """(alan adı, kategori) çiftleri. Satırda kategori yazmıyorsa kaynağın kategorisi geçerlidir."""
+        entries = []
+        for line in self.domains.splitlines():
+            parts = line.strip().lower().split()
+            if not parts:
+                continue
+            category = parts[1] if len(parts) > 1 and parts[1] in CATEGORY_LABELS else self.category
+            entries.append((parts[0], category))
+        return entries
+
     def domain_list(self) -> list[str]:
-        return [line.strip().lower() for line in self.domains.splitlines() if line.strip()]
+        return [domain for domain, _ in self.domain_entries()]
 
     @classmethod
     def active_domain_map(cls) -> dict[str, str]:
         mapping: dict[str, str] = {}
         for source in cls.objects.filter(is_active=True):
-            for domain in source.domain_list():
-                mapping.setdefault(domain, source.category)
+            for domain, category in source.domain_entries():
+                mapping.setdefault(domain, category)
         return mapping

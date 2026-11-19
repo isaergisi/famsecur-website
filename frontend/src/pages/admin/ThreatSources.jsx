@@ -45,7 +45,7 @@ function SourceForm({ initial, onClose, onSaved }) {
         </div>
         <Field label="Açıklama" error={errors.description}><textarea rows={2} value={form.description} onChange={set("description")} /></Field>
         <Field label="Kaynak adresi" error={errors.source_url}><input value={form.source_url} onChange={set("source_url")} placeholder="https://" /></Field>
-        <Field label="Engellenecek alan adları" error={errors.domains} hint="Her satıra bir alan adı. Alt alan adları da engellenir.">
+        <Field label="Engellenecek alan adları" error={errors.domains} hint="Her satıra bir alan adı; alt alan adları da engellenir. Kayda özel kategori için yanına yazın, ör. ornek-bahis.com gambling (gambling, adult, drugs, phishing, malware).">
           <textarea rows={6} value={form.domains} onChange={set("domains")} className="mono" />
         </Field>
         <label className="switch"><input type="checkbox" checked={form.is_active} onChange={set("is_active")} /><span>Kaynak aktif</span></label>

@@ -334,6 +334,23 @@ python manage.py seed_families
 
 Örnek ebeveynlerin hepsinin şifresi `Aile.12345` (ör. `mehmet.demir@ornek.com`).
 
+### USOM listelerini doldurmak (internet gerekir)
+
+`seed_demo` USOM kaynaklarını yalnızca birkaç örnek alan adıyla oluşturur.
+Gerçek listeleri T.C. Siber Güvenlik Başkanlığı'nın herkese açık API'sinden
+indirmek için:
+
+```bash
+python manage.py update_usom               # son 30 gün, kritiklik 1-4
+python manage.py update_usom --days 90     # daha geniş aralık
+```
+
+Oltalama kayıtları "USOM Zararlı Bağlantılar", zararlı yazılım kayıtları
+"USOM Zararlı Yazılım" kaynağına eklenir. Tekrar çalıştırmak güvenlidir.
+Tehdit kaynaklarında her satıra kayda özel kategori de yazılabilir
+(`ornek-bahis.com gambling`); Engellenen alan adları sayfasındaki kategori
+filtresi bu sayede tüm listelerde çalışır.
+
 ### Demo hesapları (`seed_demo` sonrası)
 
 | Rol | E-posta | Şifre |

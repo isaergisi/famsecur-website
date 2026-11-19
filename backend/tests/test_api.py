@@ -227,6 +227,47 @@ class PublicAndAdminTests(BaseAPITest):
         self.assertEqual(data["count"], 1)
         self.assertEqual(self.client.get("/api/admin/blocked-domains/", {"page": 2}).status_code, 200)
 
+    def test_blocked_domains_category_is_per_record_across_sources(self):
+        self.login_as("admin@example.com")
+        response = self.client.post("/api/threat-sources/", {
+            "name": "Karma liste", "category": "phishing",
+            "domains": "sahte-banka.com\nkacak-bahis-giris.com gambling",
+        }, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(self.client.post("/api/threat-sources/", {
+            "name": "Hatalı", "category": "phishing", "domains": "ornek.com uydurma",
+        }, format="json").status_code, 400)
+        # "Kumar" filtresi tüm listelerdeki kumar kayıtlarını getirir.
+        data = self.client.get("/api/admin/blocked-domains/", {"category": "gambling", "search": "kacak-bahis"}).data
+        self.assertEqual([(r["domain"], r["source"]) for r in data["results"]], [("kacak-bahis-giris.com", "Karma liste")])
+        data = self.client.get("/api/admin/blocked-domains/", {"category": "phishing", "source": "Karma liste"}).data
+        self.assertEqual([r["domain"] for r in data["results"]], ["sahte-banka.com"])
+        # Karar motoru da kayda özel kategoriyi kullanır.
+        result = self.client.post("/api/analyze/", {"domain": "kacak-bahis-giris.com"}, format="json").data
+        self.assertEqual(result["category"], "gambling")
+
+    def test_update_usom_fills_sources_from_api(self):
+        import io
+        import json
+        from unittest import mock
+
+        from django.core.management import call_command
+
+        payload = {"pageCount": 1, "models": [
+            {"url": "https://giris.sahte-edevlet.com/login", "desc": "PH", "criticality_level": 2},
+            {"url": "zararli-indir.net", "desc": "MD", "criticality_level": 1},
+            {"url": "dusuk-kritik.com", "desc": "PH", "criticality_level": 9},
+        ]}
+
+        def fake_urlopen(url, timeout):
+            return mock.MagicMock(**{"__enter__.return_value.read.return_value": json.dumps(payload).encode()})
+
+        with mock.patch("shield.management.commands.update_usom.urlopen", fake_urlopen):
+            call_command("update_usom", stdout=io.StringIO())
+        phishing = ThreatSource.objects.get(name="USOM Zararlı Bağlantılar")
+        self.assertEqual(phishing.domain_list(), ["giris.sahte-edevlet.com"])
+        self.assertEqual(ThreatSource.objects.get(name="USOM Zararlı Yazılım").domain_list(), ["zararli-indir.net"])
+
     def test_threat_source_blocks_listed_domain(self):
         self.login_as("admin@example.com")
         response = self.client.post(
