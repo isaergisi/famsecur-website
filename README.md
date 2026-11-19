@@ -334,19 +334,25 @@ python manage.py seed_families
 
 Örnek ebeveynlerin hepsinin şifresi `Aile.12345` (ör. `mehmet.demir@ornek.com`).
 
-### USOM listelerini doldurmak (internet gerekir)
+### Tehdit kaynaklarını otomatik güncellemek (internet gerekir)
 
-`seed_demo` USOM kaynaklarını yalnızca birkaç örnek alan adıyla oluşturur.
-Gerçek listeleri T.C. Siber Güvenlik Başkanlığı'nın herkese açık API'sinden
-indirmek için:
+İki kaynak adresinden otomatik güncellenir: **Resmî Kumar Alan Adı Havuzu**
+(Polonya Maliye Bakanlığı sicili) ve **USOM Zararlı Bağlantılar** (Siber
+Güvenlik Başkanlığı'nın herkese açık API'si, son 30 gün, kritiklik 1-4).
+Yönetim panelinde Tehdit kaynakları sayfasındaki **Şimdi güncelle** düğmesiyle
+ya da hepsini birden komutla:
 
 ```bash
-python manage.py update_usom               # son 30 gün, kritiklik 1-4
-python manage.py update_usom --days 90     # daha geniş aralık
+python manage.py refresh_sources
 ```
 
-Oltalama kayıtları "USOM Zararlı Bağlantılar", zararlı yazılım kayıtları
-"USOM Zararlı Yazılım" kaynağına eklenir. Tekrar çalıştırmak güvenlidir.
+Kaynak düzenleme ekranındaki "Kaynak adresinden otomatik güncelle" işaretli her
+kaynak güncellenir. USOM adresleri API'den, diğer adresler düz metin liste
+(satır başına bir alan adı / hosts biçimi) veya XML sicil olarak okunur. Çekme
+başarısız olursa eski liste korunur ve hata panelde görünür. Resmî havuz hiç
+güncellenmediyse repodaki sürümlenmiş dosya kullanılır. Düzenli çalışması için
+komut Windows Görev Zamanlayıcı'ya veya cron'a eklenebilir.
+
 Tehdit kaynaklarında her satıra kayda özel kategori de yazılabilir
 (`ornek-bahis.com gambling`); Engellenen alan adları sayfasındaki kategori
 filtresi bu sayede tüm listelerde çalışır.

@@ -27,7 +27,7 @@ FAMILIES = [
      ["canlibahis-tv.top"]),
     ("Ahmet", "Çelik", "ahmet.celik@ornek.com",
      [("Defne'nin telefonu", "phone", "Defne"), ("Oyun konsolu", "console", "Kerem")],
-     ["free-crack-indir.org", "yenibahisadresi.net"]),
+     ["ptt-kargo-takip-odeme.net", "yenibahisadresi.net"]),
     ("Elif", "Şahin", "elif.sahin@ornek.com",
      [("Mert'in bilgisayarı", "computer", "Mert")],
      ["e-devlet-giris-dogrula.com"]),
@@ -48,7 +48,7 @@ FAMILIES = [
      ["yenibahisadresi.net"]),
     ("Hatice", "Öztürk", "hatice.ozturk@ornek.com",
      [("Eymen'in tableti", "tablet", "Eymen"), ("Oyun konsolu", "console", "Eymen")],
-     ["free-crack-indir.org"]),
+     ["ptt-kargo-takip-odeme.net"]),
 ]
 
 CONTACT_REQUESTS = [
