@@ -135,54 +135,6 @@ function SectionHead({ eyebrow, title, children }) {
   );
 }
 
-// Hero'daki panel önizlemesi: ebeveyn panelinin sadeleştirilmiş görünümü (örnek veriyle).
-const PREVIEW_WEEK = [4, 7, 3, 9, 5, 2, 6];
-const PREVIEW_DAYS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Bugün"];
-const PREVIEW_ROWS = [
-  ["bet2x.com", CATEGORY_LABELS.gambling, "Tablet", "block"],
-  ["e-devlet-giris-dogrula.com", CATEGORY_LABELS.phishing, "Dizüstü", "block"],
-  ["yenibahisadresi.net", "Yapay zekâ uyarısı · %100", "Telefon", "warn"],
-];
-
-function HeroPanel() {
-  const max = Math.max(...PREVIEW_WEEK);
-  return (
-    <div className="app-frame" aria-hidden="true">
-      <div className="app-bar">
-        <span className="app-dots"><i /><i /><i /></span>
-        <span className="app-title">Ebeveyn paneli</span>
-        <span className="app-live"><i />Koruma açık</span>
-      </div>
-      <div className="app-body">
-        <div className="app-week">
-          <div>
-            <span className="app-label">Bu hafta</span>
-            <b className="app-big">36</b>
-            <span className="app-label">riskli istek durduruldu</span>
-          </div>
-          <div className="app-bars">
-            {PREVIEW_WEEK.map((v, i) => (
-              <span key={i} className={i === PREVIEW_WEEK.length - 1 ? "is-today" : ""}>
-                <i style={{ height: `${(v / max) * 100}%` }} />
-                <em>{PREVIEW_DAYS[i]}</em>
-              </span>
-            ))}
-          </div>
-        </div>
-        <ul className="app-rows">
-          {PREVIEW_ROWS.map(([domain, cat, device, kind]) => (
-            <li key={domain}>
-              <code>{domain}</code>
-              <span className="app-cat">{cat} · {device}</span>
-              <span className={`app-pill app-pill-${kind}`}>{kind === "block" ? "Engellendi" : "Uyarı"}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-}
-
 function LiveDemo() {
   const [domain, setDomain] = useState("");
   const [result, setResult] = useState(null);
@@ -309,7 +261,6 @@ export default function Home() {
                 height="800"
               />
             </div>
-            <HeroPanel />
           </div>
         </div>
       </section>
