@@ -166,12 +166,18 @@ class ThreatSourceSerializer(serializers.ModelSerializer):
     def validate_domains(self, value):
         cleaned, invalid = [], []
         for line in value.splitlines():
-            if not line.strip():
+            parts = line.split()
+            if not parts:
                 continue
             try:
-                cleaned.append(clean_domain(line))
+                domain = clean_domain(parts[0])
+                if len(parts) > 2 or (len(parts) == 2 and parts[1].lower() not in CATEGORY_LABELS):
+                    raise serializers.ValidationError("Geçersiz kategori.")
             except serializers.ValidationError:
                 invalid.append(line.strip())
+                continue
+            # İsteğe bağlı kayda özel kategori: "ornek-bahis.com gambling"
+            cleaned.append(f"{domain} {parts[1].lower()}" if len(parts) == 2 else domain)
         if invalid:
             raise serializers.ValidationError(f"Geçersiz alan adları: {', '.join(invalid[:5])}")
         return "\n".join(dict.fromkeys(cleaned))

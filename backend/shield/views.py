@@ -407,7 +407,7 @@ class BlockedDomainsView(APIView):
     def _rows():
         rows = [(d, "gambling", OFFICIAL_SOURCE_NAME) for d in sorted(official_gambling_domains())]
         for source in ThreatSource.objects.filter(is_active=True):
-            rows.extend((d, source.category, source.name) for d in source.domain_list())
+            rows.extend((d, category, source.name) for d, category in source.domain_entries())
         return rows
 
     def get(self, request):
