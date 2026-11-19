@@ -7,3 +7,4 @@ drf-spectacular-sidecar>=2025.1
 scikit-learn>=1.9,<1.10
 joblib>=1.4
 tldextract>=5.1
+certifi>=2024.2

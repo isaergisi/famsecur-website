@@ -336,9 +336,9 @@ class ThreatSourceViewSet(viewsets.ModelViewSet):
         source = self.get_object()
         try:
             count = refresh_source(source)
-        except Exception as exc:
+        except Exception:
             return Response(
-                {"detail": f"Kaynak güncellenemedi, eski liste korundu. ({exc})", "errors": {}},
+                {"detail": f"Kaynak güncellenemedi, eski liste korundu. {source.last_fetch_error}", "errors": {}},
                 status=status.HTTP_502_BAD_GATEWAY,
             )
         data = self.get_serializer(source).data

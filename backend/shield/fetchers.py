@@ -12,8 +12,11 @@ Desteklenen adresler:
 
 import json
 import re
+import socket
+import ssl
 from datetime import timedelta
 from urllib.parse import urlencode, urlparse
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from django.utils import timezone
@@ -34,9 +37,19 @@ def hostname(address: str) -> str:
     return normalize_domain(parsed.hostname or "")
 
 
+def _ssl_context():
+    # Windows'ta Python'un sertifika deposu eksik olabildiğinden varsa certifi paketi kullanılır.
+    try:
+        import certifi
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context()
+
+
 def _get(url: str, timeout: int) -> bytes:
     request = Request(url, headers={"User-Agent": "FamSecur/1.0", "Accept": "*/*"})
-    with urlopen(request, timeout=timeout) as response:
+    with urlopen(request, timeout=timeout, context=_ssl_context()) as response:
         return response.read(MAX_BYTES)
 
 
@@ -83,6 +96,24 @@ def parse_list(text: str) -> set[str]:
     return domains
 
 
+def explain_error(exc: Exception) -> str:
+    """Hatayı panelde gösterilecek anlaşılır Türkçe bir cümleye çevirir (teknik ayrıntı parantez içinde)."""
+    reason = getattr(exc, "reason", exc)
+    if isinstance(exc, HTTPError):
+        text = f"Sunucu isteği reddetti (HTTP {exc.code})."
+    elif isinstance(reason, ssl.SSLCertVerificationError) or isinstance(exc, ssl.SSLError):
+        text = "Sitenin SSL sertifikası doğrulanamadı. Python'un sertifika deposu eksik olabilir: pip install -r requirements.txt"
+    elif isinstance(reason, (socket.timeout, TimeoutError)) or isinstance(exc, (socket.timeout, TimeoutError)):
+        text = "Sunucu zamanında yanıt vermedi (zaman aşımı)."
+    elif isinstance(exc, URLError):
+        text = "Sunucuya bağlanılamadı (internet bağlantısı, güvenlik duvarı veya site erişilemez)."
+    elif isinstance(exc, ValueError):
+        return str(exc)
+    else:
+        text = "Beklenmeyen hata."
+    return f"{text} ({type(exc).__name__}: {reason})"[:500]
+
+
 def refresh_source(source, timeout: int = 60) -> int:
     """Kaynağı adresinden günceller; gelen alan adı sayısını döndürür. Hata olursa eski liste korunur."""
     try:
@@ -94,12 +125,23 @@ def refresh_source(source, timeout: int = 60) -> int:
             known = {line.split()[0].lower() for line in existing if line.strip()}
             lines = [line for line in existing if line.strip()] + sorted(fetched - known)
         else:
-            fetched = parse_list(_get(source.source_url, timeout).decode("utf-8", errors="replace"))
+            url = source.source_url
+            parsed = urlparse(url)
+            if parsed.hostname in ("hazard.mf.gov.pl", "www.hazard.mf.gov.pl") and parsed.path in ("", "/"):
+                # Sitenin ana sayfası verilmişse sicilin indirme adresi kullanılır.
+                url = "https://hazard.mf.gov.pl/api/Register"
+            text = _get(url, timeout).decode("utf-8", errors="replace")
+            if text.lstrip()[:200].lower().startswith(("<!doctype html", "<html")):
+                raise ValueError(
+                    "Adres bir web sayfası döndürdü, alan adı listesi değil. Kaynak adresine listenin kendisini "
+                    "yazın (resmî kumar havuzu için: https://hazard.mf.gov.pl/api/Register)."
+                )
+            fetched = parse_list(text)
             if not fetched:
                 raise ValueError("Adresten okunabilir alan adı gelmedi; liste değiştirilmedi.")
             lines = sorted(fetched)
     except Exception as exc:  # ağ, zaman aşımı, biçim hatası: eski liste kalır
-        source.last_fetch_error = f"{type(exc).__name__}: {exc}"[:500]
+        source.last_fetch_error = explain_error(exc)
         source.save(update_fields=["last_fetch_error"])
         raise
     source.domains = "\n".join(lines)

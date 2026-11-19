@@ -290,6 +290,10 @@ class PublicAndAdminTests(BaseAPITest):
         official.refresh_from_db()
         self.assertEqual(official.domain_list(), ["yeni-kasyno.pl"])
         self.assertIn("bağlantı yok", official.last_fetch_error)
+        with mock.patch("shield.fetchers._get", return_value=b"<!DOCTYPE html><html><body>Rejestr</body></html>"):
+            response = self.client.post(f"/api/threat-sources/{official.id}/refresh/")
+        self.assertEqual(response.status_code, 502)
+        self.assertIn("web sayfası", response.data["detail"])
         with mock.patch("shield.fetchers._get", fake_get):
             response = self.client.post(f"/api/threat-sources/{official.id}/refresh/")
         self.assertEqual(response.status_code, 200)
