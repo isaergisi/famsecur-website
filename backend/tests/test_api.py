@@ -196,6 +196,14 @@ class PublicAndAdminTests(BaseAPITest):
         self.assertTrue(Family.objects.filter(owner__email="yeni@example.com").exists())
         user_id = response.data["id"]
         self.assertEqual(self.client.patch(f"/api/admin/users/{user_id}/", {"is_active": False}, format="json").status_code, 200)
+        self.assertFalse(User.objects.get(pk=user_id).is_active)
+        # Yönetici e-posta, şifre veya rol değiştiremez; PUT kapalı.
+        for field, value in [("email", "baska@example.com"), ("password", "Baska.Sifre123"), ("role", "admin")]:
+            response = self.client.patch(f"/api/admin/users/{user_id}/", {field: value}, format="json")
+            self.assertEqual(response.status_code, 400, field)
+            self.assertIn(field, response.data["errors"])
+        self.assertTrue(User.objects.get(pk=user_id).check_password("Guclu.Sifre123"))
+        self.assertEqual(self.client.put(f"/api/admin/users/{user_id}/", {"is_active": True}, format="json").status_code, 405)
         self.assertEqual(self.client.delete(f"/api/admin/users/{user_id}/").status_code, 204)
         self.assertEqual(self.client.delete(f"/api/admin/users/{self.admin.id}/").status_code, 400)
         self.assertEqual(self.client.get("/api/admin/stats/").data["users"], 2)

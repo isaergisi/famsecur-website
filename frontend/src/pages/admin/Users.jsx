@@ -13,7 +13,38 @@ import { confirmAction, formatDate } from "../../utils";
 
 const EMPTY = { email: "", first_name: "", last_name: "", role: "parent", is_active: true, password: "" };
 
-function UserForm({ initial, onClose, onSaved }) {
+// Var olan hesapta yönetici yalnızca aktiflik durumunu değiştirebilir.
+function StatusForm({ user, onClose, onSaved }) {
+  const [isActive, setIsActive] = useState(user.is_active);
+  const [error, setError] = useState("");
+
+  async function submit(e) {
+    e.preventDefault();
+    try {
+      onSaved(await api.patch(`/admin/users/${user.id}/`, { is_active: isActive }), true);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  return (
+    <Modal title="Hesap durumu" onClose={onClose}>
+      <form className="form" onSubmit={submit} noValidate>
+        <Alert>{error}</Alert>
+        <p><b>{user.first_name} {user.last_name}</b><br /><span className="muted small">{user.email}</span></p>
+        <label className="switch"><input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} /><span>Hesap aktif</span></label>
+        <p className="muted small">Pasif hesap giriş yapamaz. E-posta, ad ve şifreyi yalnızca kullanıcının kendisi değiştirebilir.</p>
+        <div className="modal-actions">
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Vazgeç</button>
+          <button className="btn btn-primary">Kaydet</button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+function UserForm({ onClose, onSaved }) {
+  const initial = null;
   const [form, setForm] = useState(initial ? { ...initial, password: "" } : EMPTY);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
@@ -112,7 +143,7 @@ export default function Users() {
                   <td><span className={`pill ${u.is_active ? "pill-on" : "pill-off"}`}>{u.is_active ? "Aktif" : "Pasif"}</span></td>
                   <td className="muted small">{formatDate(u.date_joined)}</td>
                   <td className="row-actions">
-                    <button className="btn btn-ghost btn-sm" onClick={() => setEditing(u)}>Düzenle</button>
+                    {u.id !== me.id && <button className="btn btn-ghost btn-sm" onClick={() => setEditing(u)}>Durum</button>}
                     {u.id !== me.id && <button className="btn btn-danger btn-sm" onClick={() => remove(u)}>Sil</button>}
                   </td>
                 </tr>
@@ -123,9 +154,19 @@ export default function Users() {
       )}
       {!loading && users.length === 0 && <div className="card empty">Kullanıcı bulunamadı.</div>}
       <Pagination data={data} page={page} setPage={setPage} />
-      {editing && (
+      {editing?.id && (
+        <StatusForm
+          user={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            notify("Hesap durumu güncellendi.");
+            setEditing(null);
+            reload();
+          }}
+        />
+      )}
+      {editing && !editing.id && (
         <UserForm
-          initial={editing.id ? editing : null}
           onClose={() => setEditing(null)}
           onSaved={(_, updated) => {
             notify(updated ? "Kullanıcı güncellendi." : "Kullanıcı oluşturuldu.");

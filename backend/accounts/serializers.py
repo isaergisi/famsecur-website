@@ -100,6 +100,14 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
+        if self.instance:
+            # Yönetici var olan bir hesapta yalnızca aktiflik durumunu değiştirebilir;
+            # e-posta, ad, rol ve şifre kullanıcının kendisine aittir.
+            locked = sorted(set(self.initial_data) - {"is_active"})
+            if locked:
+                raise serializers.ValidationError(
+                    {key: ["Yönetici bu alanı değiştiremez; yalnızca hesabın aktiflik durumu değiştirilebilir."] for key in locked}
+                )
         if not self.instance and not attrs.get("password"):
             raise serializers.ValidationError({"password": ["Yeni kullanıcı için şifre zorunludur."]})
         if attrs.get("password"):

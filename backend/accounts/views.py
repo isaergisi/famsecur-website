@@ -117,8 +117,7 @@ class ChangePasswordView(APIView):
     list=extend_schema(summary="Kullanıcıları listele", description="`?search=` ile e-posta/ad araması, `?role=parent|admin` ile rol filtresi."),
     create=extend_schema(summary="Kullanıcı oluştur", responses={201: AdminUserSerializer, 400: E400, **AUTH_ERRORS}),
     retrieve=extend_schema(summary="Kullanıcı ayrıntısı", responses={200: AdminUserSerializer, 404: E404, **AUTH_ERRORS}),
-    update=extend_schema(summary="Kullanıcıyı güncelle", responses={200: AdminUserSerializer, 400: E400, 404: E404, **AUTH_ERRORS}),
-    partial_update=extend_schema(summary="Kullanıcıyı kısmen güncelle", responses={200: AdminUserSerializer, 400: E400, 404: E404, **AUTH_ERRORS}),
+    partial_update=extend_schema(summary="Hesabı aktif/pasif yap", description="Yönetici yalnızca `is_active` alanını değiştirebilir; diğer alanlar 400 döner.", responses={200: AdminUserSerializer, 400: E400, 404: E404, **AUTH_ERRORS}),
     destroy=extend_schema(summary="Kullanıcıyı sil", description="Yönetici kendi hesabını silemez (400).", responses={204: None, 400: E400, 404: E404, **AUTH_ERRORS}),
 )
 @extend_schema(tags=["Yönetim"])
@@ -127,6 +126,8 @@ class AdminUserViewSet(viewsets.ModelViewSet):
 
     serializer_class = AdminUserSerializer
     permission_classes = [IsAdminRole]
+    # Var olan hesapta yalnızca aktiflik değişir (PATCH); tüm alanları değiştiren PUT kapalı.
+    http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def get_queryset(self):
         qs = User.objects.select_related("family").all()
