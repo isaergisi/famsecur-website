@@ -284,6 +284,18 @@ class PublicAndAdminTests(BaseAPITest):
 
         # Panel düğmesi: başarısız çekmede eski liste korunur, hata kaydedilir
         self.login_as("admin@example.com")
+        # Zaman aşımında bir kez yeniden dener
+        calls = []
+
+        def flaky(url, timeout):
+            calls.append(url)
+            if len(calls) == 1:
+                raise TimeoutError("The read operation timed out")
+            return register.encode()
+
+        with mock.patch("shield.fetchers._download", flaky), mock.patch("shield.fetchers.RETRY_DELAY", 0):
+            self.assertEqual(self.client.post(f"/api/threat-sources/{official.id}/refresh/").status_code, 200)
+        self.assertEqual(len(calls), 2)
         with mock.patch("shield.fetchers._get", side_effect=OSError("bağlantı yok")):
             response = self.client.post(f"/api/threat-sources/{official.id}/refresh/")
         self.assertEqual(response.status_code, 502)

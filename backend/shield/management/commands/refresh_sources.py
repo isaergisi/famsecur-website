@@ -8,7 +8,7 @@ Görev Zamanlayıcı'ya veya cron'a eklenebilir.
 
 from django.core.management.base import BaseCommand
 
-from shield.fetchers import refresh_source
+from shield.fetchers import DEFAULT_TIMEOUT, refresh_source
 from shield.models import ThreatSource
 
 
@@ -16,7 +16,7 @@ class Command(BaseCommand):
     help = "Otomatik güncellenen tehdit kaynaklarını kaynak adreslerinden yeniler."
 
     def add_arguments(self, parser):
-        parser.add_argument("--timeout", type=int, default=60, help="İstek başına zaman aşımı, saniye")
+        parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="İstek başına zaman aşımı, saniye")
 
     def handle(self, *args, timeout, **options):
         sources = ThreatSource.objects.filter(is_active=True, auto_update=True)

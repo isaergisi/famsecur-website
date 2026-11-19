@@ -14,6 +14,7 @@ import json
 import re
 import socket
 import ssl
+import time
 from datetime import timedelta
 from urllib.parse import urlencode, urlparse
 from urllib.error import HTTPError, URLError
@@ -29,6 +30,9 @@ USOM_CODES = {"phishing": {"PH", "BP"}, "malware": {"MD", "MU", "MC"}}
 DOMAIN_RE = re.compile(r"^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$")
 XML_DOMAIN_RE = re.compile(r"<AdresDomeny>\s*([^<\s]+)\s*</AdresDomeny>", re.IGNORECASE)
 MAX_BYTES = 50 * 1024 * 1024
+# Resmî kumar sicili ~60.000 kayıtlık büyük bir XML; yavaş yanıt verebilir.
+DEFAULT_TIMEOUT = 180
+RETRY_DELAY = 5
 
 
 def hostname(address: str) -> str:
@@ -47,13 +51,24 @@ def _ssl_context():
         return ssl.create_default_context()
 
 
-def _get(url: str, timeout: int) -> bytes:
+def _download(url: str, timeout: int) -> bytes:
     request = Request(url, headers={"User-Agent": "FamSecur/1.0", "Accept": "*/*"})
     with urlopen(request, timeout=timeout, context=_ssl_context()) as response:
         return response.read(MAX_BYTES)
 
 
-def fetch_usom(category: str, days: int = 30, max_criticality: int = 4, timeout: int = 60) -> set[str]:
+def _get(url: str, timeout: int) -> bytes:
+    """İndirir; zaman aşımı veya bağlantı hatasında bir kez daha dener (HTTP hata kodlarında denemez)."""
+    try:
+        return _download(url, timeout)
+    except HTTPError:
+        raise
+    except (URLError, TimeoutError, socket.timeout, ConnectionError):
+        time.sleep(RETRY_DELAY)
+        return _download(url, timeout)
+
+
+def fetch_usom(category: str, days: int = 30, max_criticality: int = 4, timeout: int = DEFAULT_TIMEOUT) -> set[str]:
     """USOM API'sinden kategoriye uyan kayıtların alan adlarını sayfa sayfa okur."""
     codes = USOM_CODES.get(category)
     if not codes:
@@ -104,7 +119,7 @@ def explain_error(exc: Exception) -> str:
     elif isinstance(reason, ssl.SSLCertVerificationError) or isinstance(exc, ssl.SSLError):
         text = "Sitenin SSL sertifikası doğrulanamadı. Python'un sertifika deposu eksik olabilir: pip install -r requirements.txt"
     elif isinstance(reason, (socket.timeout, TimeoutError)) or isinstance(exc, (socket.timeout, TimeoutError)):
-        text = "Sunucu zamanında yanıt vermedi (zaman aşımı)."
+        text = "Sunucu zamanında yanıt vermedi (iki deneme de zaman aşımına uğradı). Biraz sonra tekrar deneyin."
     elif isinstance(exc, URLError):
         text = "Sunucuya bağlanılamadı (internet bağlantısı, güvenlik duvarı veya site erişilemez)."
     elif isinstance(exc, ValueError):
@@ -114,7 +129,7 @@ def explain_error(exc: Exception) -> str:
     return f"{text} ({type(exc).__name__}: {reason})"[:500]
 
 
-def refresh_source(source, timeout: int = 60) -> int:
+def refresh_source(source, timeout: int = DEFAULT_TIMEOUT) -> int:
     """Kaynağı adresinden günceller; gelen alan adı sayısını döndürür. Hata olursa eski liste korunur."""
     try:
         if not source.source_url:

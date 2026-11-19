@@ -127,7 +127,7 @@ export default function ThreatSources() {
                   <td className="row-actions">
                     {s.auto_update && (
                       <button className="btn btn-ghost btn-sm" disabled={refreshing === s.id} onClick={() => refresh(s)}>
-                        {refreshing === s.id ? "Güncelleniyor…" : "Şimdi güncelle"}
+                        {refreshing === s.id ? "Güncelleniyor (1-2 dk sürebilir)…" : "Şimdi güncelle"}
                       </button>
                     )}
                     <button className="btn btn-ghost btn-sm" onClick={() => setEditing(s)}>Düzenle</button>
