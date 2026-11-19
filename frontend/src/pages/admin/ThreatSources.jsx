@@ -115,7 +115,12 @@ export default function ThreatSources() {
                         {s.last_fetched_at
                           ? <div>{formatDate(s.last_fetched_at)} · {s.last_fetch_count?.toLocaleString("tr-TR")} alan adı</div>
                           : <div className="muted">Henüz güncellenmedi</div>}
-                        {s.last_fetch_error && <div className="text-danger" title={s.last_fetch_error}>Son deneme başarısız, eski liste kullanılıyor</div>}
+                        {s.last_fetch_error && (
+                          <div className="text-danger">
+                            Son deneme başarısız, eski liste kullanılıyor:
+                            <div className="small">{s.last_fetch_error}</div>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <span className="muted">Elle yönetiliyor</span>

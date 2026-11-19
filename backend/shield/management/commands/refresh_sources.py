@@ -30,6 +30,6 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f"✓ {source.name}: {count} alan adı alındı"))
             except Exception as exc:
                 failed += 1
-                self.stdout.write(self.style.ERROR(f"✗ {source.name}: güncellenemedi, eski liste korundu ({exc})"))
+                self.stdout.write(self.style.ERROR(f"✗ {source.name}: güncellenemedi, eski liste korundu. {source.last_fetch_error}"))
         if failed:
             self.stdout.write(self.style.WARNING(f"{failed} kaynak güncellenemedi."))
