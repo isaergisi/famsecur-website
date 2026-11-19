@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  BellOff, Database, EyeOff, FileSearch, Gauge, ListChecks, Router, ShieldCheck, SlidersHorizontal, Sparkles, Wifi,
+  BellOff, Check, Database, EyeOff, FileSearch, Gauge, ListChecks, Router, ShieldCheck, SlidersHorizontal, Sparkles, Wifi,
 } from "lucide-react";
 import { api, asList } from "../../api";
 import Alert from "../../components/Alert";
@@ -128,7 +128,7 @@ function listSummary(sources) {
 function SectionHead({ eyebrow, title, children }) {
   return (
     <>
-      <span className="eyebrow">{eyebrow}</span>
+      {eyebrow && <span className="kicker">{eyebrow}</span>}
       <h2>{title}</h2>
       {children && <p className="muted section-lead">{children}</p>}
     </>
@@ -197,7 +197,12 @@ function LiveDemo() {
           {result ? (
             <DecisionResult decision={result} ai={result.ai} />
           ) : (
-            !error && <div className="decision decision-empty">Sonuç burada görünecek.</div>
+            !error && (
+              <div className="decision decision-empty">
+                <ShieldCheck aria-hidden strokeWidth={1.5} />
+                Sonuç burada görünecek.
+              </div>
+            )
           )}
         </div>
       </div>
@@ -213,8 +218,8 @@ export default function Home() {
     <>
       <section className="hero">
         <div className="container hero-grid">
-          <div>
-            <span className="eyebrow hero-eyebrow">Yapay zekâ destekli, gizlilik odaklı aile internet kalkanı</span>
+          <div className="hero-copy" data-enter>
+            <span className="hero-eyebrow">Yapay zekâ destekli, gizlilik odaklı aile internet kalkanı</span>
             <h1>
               Müdahale etmeden <span className="lime">aileni koru.</span>
             </h1>
@@ -247,20 +252,14 @@ export default function Home() {
               </li>
             </ul>
           </div>
-          <div className="hero-visual">
-            <img
-              className="hero-photo"
-              src="/images/aile-kanepe.webp"
-              alt="Evde kanepede birlikte gülümseyen dört kişilik aile"
-              width="1200"
-              height="800"
-            />
-            <div className="hero-badge">
-              <img src="/famsecur-logo.jpg" alt="" width="44" height="44" />
-              <div>
-                <b>Ev ağınız korunuyor</b>
-                <span>Yalnızca zararlı istekler engellenir</span>
-              </div>
+          <div className="hero-visual" data-enter>
+            <div className="photo-frame hero-photo">
+              <img
+                src="/images/aile-kanepe.webp"
+                alt="Evde kanepede birlikte gülümseyen dört kişilik aile"
+                width="1200"
+                height="800"
+              />
             </div>
           </div>
         </div>
@@ -304,7 +303,7 @@ export default function Home() {
       <section className="section" id="ozellikler">
         <div className="container">
           <SectionHead eyebrow="Özellikler" title="Günlük hayatta işinize yarayan özellikler" />
-          <div className="card-grid">
+          <div className="feature-grid">
             {FEATURES.map(({ icon: Icon, title, text, example }) => (
               <article className="card feature" key={title}>
                 <Icon className="feature-icon" aria-hidden strokeWidth={1.8} />
@@ -318,10 +317,12 @@ export default function Home() {
       </section>
 
       <section className="section alt" id="koruma-yaklasimi">
-        <div className="container">
-          <SectionHead eyebrow="Koruma yaklaşımı" title="FamSecur'un koruma yaklaşımı">
-            FamSecur'un neyi nasıl yaptığını ve nerede yetersiz kaldığını açıkça paylaşıyoruz.
-          </SectionHead>
+        <div className="container split">
+          <div>
+            <SectionHead title="FamSecur'un koruma yaklaşımı">
+              FamSecur'un neyi nasıl yaptığını ve nerede yetersiz kaldığını açıkça paylaşıyoruz.
+            </SectionHead>
+          </div>
           <div className="card table-wrap approach-wrap">
             <table className="approach">
               <tbody>
@@ -379,7 +380,9 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <h3 className="ai-errors-title">Hata örnekleri</h3>
+            </div>
+            <div className="card">
+              <h3>Hata örnekleri</h3>
               <ul className="ai-examples">
                 {AI_ERRORS.map(([name, risk, warn, note]) => (
                   <li key={name}>
@@ -396,9 +399,10 @@ export default function Home() {
       <LiveDemo />
 
       <section className="section alt" id="gizlilik">
-        <div className="container privacy">
+        <div className="container">
+          <SectionHead eyebrow="Gizlilik" title="Neleri işliyoruz, neleri asla işlemiyoruz" />
+          <div className="privacy">
           <div>
-            <SectionHead eyebrow="Gizlilik" title="Neleri işliyoruz, neleri asla işlemiyoruz" />
             <div className="card table-wrap">
               <table className="data-table">
                 <thead><tr><th>İşlenen veri</th><th>Saklama süresi</th></tr></thead>
@@ -419,18 +423,20 @@ export default function Home() {
             </p>
           </div>
           <div>
-            <img
-              className="section-photo"
-              src="/images/ebeveyn-cocuk-bilgisayar.webp"
-              alt="Mutfak masasında dizüstü bilgisayara birlikte bakan baba ve oğul"
-              width="1100"
-              height="743"
-              loading="lazy"
-            />
+            <div className="photo-frame section-photo">
+              <img
+                src="/images/ebeveyn-cocuk-bilgisayar.webp"
+                alt="Mutfak masasında dizüstü bilgisayara birlikte bakan baba ve oğul"
+                width="1100"
+                height="743"
+                loading="lazy"
+              />
+            </div>
             <h3>Asla işlenmeyenler</h3>
             <ul className="check-list">
               {DATA_NEVER.map((item) => <li className="no" key={item}>{item}</li>)}
             </ul>
+          </div>
           </div>
         </div>
       </section>
@@ -456,9 +462,22 @@ export default function Home() {
 
       <section className="section" id="fiyatlar">
         <div className="container pricing">
-          <SectionHead eyebrow="Fiyatlandırma" title="Tek paket, tüm özellikler dâhil">
-            Paket bir ev ağını kapsar; cihaz sayısında sınır yoktur.
-          </SectionHead>
+          <div className="pricing-copy">
+            <SectionHead eyebrow="Fiyatlandırma" title="Tek paket, tüm özellikler dâhil">
+              Paket bir ev ağını kapsar; cihaz sayısında sınır yoktur.
+            </SectionHead>
+            <ul className="plan-list">
+              {PLAN_FEATURES.map((f) => (
+                <li key={f}><Check aria-hidden strokeWidth={2.5} />{f}</li>
+              ))}
+            </ul>
+            <div className="trial-terms">
+              <h4>Deneme ve ödeme koşulları</h4>
+              <ul>
+                {TRIAL_TERMS.map((t) => <li key={t}>{t}</li>)}
+              </ul>
+            </div>
+          </div>
           <article className="card price-card">
             <h3>Aile paketi</h3>
             <div className="price-options">
@@ -473,25 +492,14 @@ export default function Home() {
                 <span className="muted">Aylık ödemeye göre yılda {TL(PRICES.monthly * 12 - PRICES.yearly)} TL daha az</span>
               </div>
             </div>
-            <ul className="check-list">
-              {PLAN_FEATURES.map((f) => (
-                <li className="yes" key={f}>{f}</li>
-              ))}
-            </ul>
             <Link to="/kayit" className="btn btn-primary">7 gün ücretsiz deneyin</Link>
-            <div className="trial-terms">
-              <h4>Deneme ve ödeme koşulları</h4>
-              <ul>
-                {TRIAL_TERMS.map((t) => <li key={t}>{t}</li>)}
-              </ul>
-            </div>
           </article>
         </div>
       </section>
 
       <section className="section" id="gelistirici">
         <div className="container maker">
-          <SectionHead eyebrow="Türkiye'de geliştirildi" title="Türkiye'deki aileler için geliştirildi" />
+          <SectionHead title="Türkiye'deki aileler için geliştirildi" />
           <p className="lead">
             FamSecur, yazılım mühendisi <b>İsa Ergişi</b> tarafından geliştirildi.
           </p>
@@ -512,14 +520,15 @@ export default function Home() {
 
       <section className="section cta">
         <div className="container cta-box">
-          <img
-            className="cta-photo"
-            src="/images/aile-disarida.webp"
-            alt="Dışarıda kol kola poz veren mutlu dört kişilik aile"
-            width="1100"
-            height="733"
-            loading="lazy"
-          />
+          <div className="photo-frame cta-photo">
+            <img
+              src="/images/aile-disarida.webp"
+              alt="Dışarıda kol kola poz veren mutlu dört kişilik aile"
+              width="1100"
+              height="733"
+              loading="lazy"
+            />
+          </div>
           <div className="cta-text">
             <h2>Ailenizi bugün koruma altına alın</h2>
             <p>Hesabınızı oluşturun, cihazlarınızı ekleyin ve koruma ayarlarınızı birkaç dakika içinde belirleyin.</p>
