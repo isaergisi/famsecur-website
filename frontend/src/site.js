@@ -47,9 +47,8 @@ export const PLANS = {
 export const DEFAULT_PLAN = "tam";
 export const planFromQuery = (value) => (value in PLANS ? value : DEFAULT_PLAN);
 export const TL = (n) => n.toLocaleString("tr-TR");
-// Yıllık ödemenin kazancı: tam 2 ay bedavaysa öyle söylenir, değilse kazanılan tutar yazılır.
-export const yearlySaving = (plan) =>
-  plan.yearly === plan.monthly * 10 ? "2 ay ücretsiz" : `yılda ${TL(plan.monthly * 12 - plan.yearly)} TL daha az`;
+// Yıllık ödeme tam 2 ay bedavaya denk geliyorsa bu söylenir; değilse yalnızca yıllık fiyat yazılır.
+export const yearlySaving = (plan) => (plan.yearly === plan.monthly * 10 ? "2 ay ücretsiz" : null);
 
 export const TRIAL_TERMS = [
   "İki pakette de ilk 7 gün ücretsizdir; seçtiğiniz paketin tüm özellikleri açıktır.",

@@ -137,7 +137,7 @@ function PlanCard({ plan, featured = false }) {
       <b className="price">{TL(plan.monthly)} TL<small>/ay</small></b>
       <p className="muted plan-price-note">
         {plan.perDayNote && <>{plan.perDayNote} </>}
-        Yıllık ödemede {TL(plan.yearly)} TL ({yearlySaving(plan)}).
+        Yıllık ödemede {TL(plan.yearly)} TL{yearlySaving(plan) && <> ({yearlySaving(plan)})</>}.
       </p>
       <Link to={`/kayit?paket=${plan.id}`} className={`btn ${featured ? "btn-primary" : "btn-ghost"}`}>
         7 gün ücretsiz deneyin
