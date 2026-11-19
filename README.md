@@ -124,7 +124,7 @@ internet bağlantısı olmadan da açılır.
 | GET / POST, PUT, PATCH, DELETE | `/api/faqs/` | Herkes / Yönetici | SSS |
 | POST / GET, PUT, PATCH, DELETE | `/api/contact-requests/` | Herkes / Yönetici | İletişim talepleri |
 | GET / POST, PUT, PATCH, DELETE | `/api/threat-sources/` | Herkes / Yönetici | Tehdit kaynakları |
-| GET, POST, PUT, PATCH, DELETE | `/api/admin/users/` | Yönetici | Kullanıcı yönetimi |
+| GET, POST, PATCH, DELETE | `/api/admin/users/` | Yönetici | Kullanıcı yönetimi (var olan hesapta yalnızca aktif/pasif) |
 | GET | `/api/admin/stats/` | Yönetici | Platform istatistikleri |
 
 ## Yapay zeka risk modeli
