@@ -53,6 +53,20 @@ SOURCES = [
         "source_url": "https://hazard.mf.gov.pl/api/Register",
         "auto_update": True,
         "domains": "",
+    },    {
+        "name": "UT1 Kara Listeleri (Toulouse Capitole Üniversitesi)",
+        "category": "gambling",
+        "description": "Toulouse Capitole Üniversitesi'nin 1990'lardan beri güncellenen açık kara listeleri: kumar, "
+                       "uyuşturucu, oltalama ve zararlı yazılım alt listeleri. Her kayıt kendi kategorisiyle alınır.",
+        "source_url": "https://dsi.ut-capitole.fr/blacklists/",
+        "auto_update": True,
+    },
+    {
+        "name": "URLhaus (abuse.ch)",
+        "category": "malware",
+        "description": "abuse.ch'nin topluluk destekli, sürekli güncellenen zararlı yazılım dağıtan alan adları listesi.",
+        "source_url": "https://urlhaus.abuse.ch/downloads/hostfile/",
+        "auto_update": True,
     },
 ]
 
