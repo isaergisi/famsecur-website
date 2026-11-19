@@ -16,6 +16,7 @@ from content.views import ContactRequestViewSet, FAQViewSet
 from shield.views import (
     AdminStatsView,
     BlockedDomainsView,
+    ParentBlockedDomainsView,
     BlockEventViewSet,
     CheckDomainView,
     DeviceViewSet,
@@ -53,6 +54,7 @@ urlpatterns = [
     path("api/analyze/", PublicAnalyzeView.as_view(), name="analyze"),
     path("api/admin/stats/", AdminStatsView.as_view(), name="admin-stats"),
     path("api/admin/blocked-domains/", BlockedDomainsView.as_view(), name="blocked-domains"),
+    path("api/blocked-domains/", ParentBlockedDomainsView.as_view(), name="parent-blocked-domains"),
     path("api/", include(router.urls)),
     # API belgesi: koddan otomatik üretilen OpenAPI şeması ve arayüzleri
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

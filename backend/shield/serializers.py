@@ -190,4 +190,7 @@ class ThreatSourceSerializer(serializers.ModelSerializer):
             # Alan adı listesi yalnızca yöneticilere ve tek kayıt isteğinde gösterilir; on binlerce satırlık
             # listeler kaynak listesini ağırlaştırmasın (hepsi "Engellenen alan adları" sayfasında görünür).
             data.pop("domains")
+        if not (user.is_authenticated and user.is_admin):
+            # Teknik hata ayrıntıları yalnızca yöneticiye gösterilir.
+            data.pop("last_fetch_error")
         return data
