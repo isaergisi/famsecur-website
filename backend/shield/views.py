@@ -37,6 +37,10 @@ def decision_fields() -> dict:
         "category_label": serializers.CharField(allow_null=True),
         "score": serializers.IntegerField(help_text="0-100 risk puanı"),
         "reasons": serializers.ListField(child=serializers.CharField(), help_text="Kararın gerekçeleri"),
+        "source": serializers.ChoiceField(
+            choices=["threat_list", "official_list", "signals", "whitelist", "none", "device_off"],
+            help_text="Kararın dayanağı: tehdit listesi, resmî kumar sicili, alan adı işaretleri, beyaz liste",
+        ),
     }
 
 

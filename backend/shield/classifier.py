@@ -130,6 +130,8 @@ class Decision:
     category_label: str | None
     score: int
     reasons: list[str] = field(default_factory=list)
+    # Kararın dayanağı: threat_list, official_list, signals, whitelist, none veya device_off.
+    source: str = "none"
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)
@@ -168,7 +170,7 @@ def analyze_domain(
     if not domain or "." not in domain:
         return Decision(domain, "allow", None, None, 0, ["geçerli bir alan adı bulunamadı"])
     if whitelist and matches_any(domain, whitelist):
-        return Decision(domain, "allow", None, None, 0, ["beyaz listenizde izinli"])
+        return Decision(domain, "allow", None, None, 0, ["beyaz listenizde izinli"], "whitelist")
 
     if blocked_domains:
         for suffix in domain_suffixes(domain):
@@ -176,13 +178,13 @@ def analyze_domain(
             if category and category in enabled_categories:
                 return Decision(
                     domain, "block", category, CATEGORY_LABELS[category], 100,
-                    [f"güvenilir bir tehdit listesinde kayıtlı ({suffix})"],
+                    [f"güvenilir bir tehdit listesinde kayıtlı ({suffix})"], "threat_list",
                 )
 
     if "gambling" in enabled_categories and matches_any(domain, official_gambling_domains()):
         return Decision(
             domain, "block", "gambling", CATEGORY_LABELS["gambling"], 100,
-            ["resmî yasa dışı kumar sicilinde kayıtlı"],
+            ["resmî yasa dışı kumar sicilinde kayıtlı"], "official_list",
         )
 
     labels = domain.replace("-", ".").replace("_", ".").split(".")
@@ -229,4 +231,4 @@ def analyze_domain(
         reasons = reasons + ["bu kategori koruma ayarlarınızda kapalı"]
     elif action == "allow":
         reasons = reasons + [f"risk puanı koruma seviyenizin altında ({score} < {threshold})"]
-    return Decision(domain, action, category, CATEGORY_LABELS[category], score, reasons)
+    return Decision(domain, action, category, CATEGORY_LABELS[category], score, reasons, "signals")

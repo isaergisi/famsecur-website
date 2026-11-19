@@ -1,6 +1,16 @@
+const SOURCE_LABELS = {
+  threat_list: "Güvenilir bir tehdit listesinde eşleşme bulundu.",
+  official_list: "Resmî yasa dışı kumar sicilinde eşleşme bulundu.",
+  signals: "Listelerde eşleşme yok; karar alan adındaki risk işaretlerine göre verildi.",
+  whitelist: "Site beyaz listenizde.",
+  none: "Listelerde eşleşme yok; adında risk işareti de bulunmadı.",
+  device_off: "Bu cihazda koruma kapalı.",
+};
+
 export default function DecisionResult({ decision, message, ai }) {
   if (!decision) return null;
   const blocked = decision.action === "block";
+  const listed = decision.source === "threat_list" || decision.source === "official_list";
   return (
     <div className={`decision ${blocked ? "decision-block" : "decision-allow"}`}>
       <div className="decision-head">
@@ -15,11 +25,17 @@ export default function DecisionResult({ decision, message, ai }) {
           Risk puanı <b>{decision.score}</b>/100
         </span>
       </div>
-      {decision.category_label && (
-        <p>
-          Kategori: <b>{decision.category_label}</b>
-        </p>
-      )}
+      <dl className="decision-facts">
+        <div><dt>Sonuç</dt><dd>{blocked ? "Engellenir, site açılmaz." : "İzin verilir, site açılır."}</dd></div>
+        {decision.category_label && <div><dt>Kategori</dt><dd><b>{decision.category_label}</b></dd></div>}
+        {SOURCE_LABELS[decision.source] && <div><dt>Karar kaynağı</dt><dd>{SOURCE_LABELS[decision.source]}</dd></div>}
+        {(ai || listed) && (
+          <div>
+            <dt>Yapay zekâ</dt>
+            <dd>{ai ? "Değerlendirildi (aşağıda). Yapay zekâ yalnızca uyarır, engellemez." : "Değerlendirilmedi; site bir listede yer aldığı için karar kesindir."}</dd>
+          </div>
+        )}
+      </dl>
       <p className="muted small">Neden?</p>
       <ul className="reasons">
         {decision.reasons.map((r) => (

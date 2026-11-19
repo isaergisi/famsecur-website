@@ -435,3 +435,26 @@ a.contact-channel:hover { border-color: var(--lime); }
 .hero-stats li { max-width: none; }
 .hero-stats b { font-size: 1.45rem; }
 @media (max-width: 600px) { .hero-stats { grid-template-columns: 1fr; gap: 14px; } }
+
+/* Yapay zekâ yöntemi */
+.ai-method { margin-top: 14px; }
+.ai-method dl { margin: 0; display: grid; gap: 12px; }
+.ai-method dl > div { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 16px; }
+.ai-method dt { font-weight: 600; }
+.ai-method dd { margin: 0; font-size: 0.92rem; }
+.ai-errors-title { margin-top: 18px; }
+.ai-note { display: block; }
+@media (max-width: 600px) {
+  .ai-method dl > div { grid-template-columns: 1fr; gap: 2px; }
+  /* Mobilde veri tabloları kart görünümüne geçer */
+  .data-table { min-width: 0; }
+  .data-table thead { display: none; }
+  .data-table tr { display: block; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .data-table tr:last-child { border-bottom: 0; }
+  .data-table td { display: block; border: 0; padding: 3px 0; }
+  .data-table td[data-label]::before { content: attr(data-label); display: block; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+}
+.decision-facts { margin: 4px 0 12px; display: grid; gap: 6px; font-size: 0.92rem; }
+.decision-facts > div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 10px; }
+.decision-facts dt { color: var(--muted); }
+.decision-facts dd { margin: 0; }

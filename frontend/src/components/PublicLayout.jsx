@@ -12,10 +12,10 @@ export default function PublicLayout() {
       <header className="site-header">
         <div className="container nav">
           <Logo />
-          <button className="nav-toggle" onClick={() => setOpen(!open)} aria-label="Menüyü aç/kapat">
+          <button className="nav-toggle" onClick={() => setOpen(!open)} aria-label="Menüyü aç/kapat" aria-expanded={open} aria-controls="site-menu">
             ☰
           </button>
-          <nav className={open ? "nav-links open" : "nav-links"} onClick={() => setOpen(false)}>
+          <nav id="site-menu" aria-label="Ana menü" className={open ? "nav-links open" : "nav-links"} onClick={() => setOpen(false)}>
             <a href="/#neden-famsecur">Neden FamSecur?</a>
             <a href="/#nasil-calisir">Nasıl çalışır?</a>
             <a href="/#demo">Canlı demo</a>

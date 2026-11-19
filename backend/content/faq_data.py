@@ -7,8 +7,8 @@ FAQS = [
      "riskli görünüyorsa site açılmaz. Sayfaların içeriğine, mesajlara veya ekrana hiçbir zaman bakılmaz."),
     ("FamSecur çocuğumun mesajlarını veya geçmişini okuyor mu?",
      "Hayır. FamSecur yalnızca açılmak istenen sitenin adına bakarak karar verir. Mesajlar, ekran görüntüleri, arama "
-     "ve izleme geçmişi toplanmaz. İzin verilen istekler hiçbir yerde kaydedilmez; panelinizde yalnızca engellenen "
-     "siteler, kategorisi ve gerekçesiyle birlikte görünür."),
+     "ve izleme geçmişi toplanmaz. Ziyaret edilen ve engellenmeyen siteler kaydedilmez; panelinizde yalnızca "
+     "engellenen siteler, kategorisi ve gerekçesiyle birlikte görünür."),
     ("Hangi içerikleri engelliyor?",
      "Kumar ve bahis, yetişkin içerik, uyuşturucu, oltalama (phishing) ve zararlı yazılım. Oltalama verisi T.C. "
      "Siber Güvenlik Başkanlığı'nın USOM listesinden, yasa dışı kumar alan adları Polonya Maliye Bakanlığı'nın resmî "
@@ -26,9 +26,10 @@ FAQS = [
      "tarayıcının kendi güvenli DNS ayarıyla bağlanan bir cihaz bu korumanın dışında kalabilir. Çocuğunuzun "
      "cihazında VPN uygulamalarını ve tarayıcıdaki güvenli DNS ayarını kontrol etmenizi öneririz."),
     ("Hangi verileri saklıyorsunuz?",
-     "Yalnızca engellenen istekleri (alan adı, kategori, risk puanı, gerekçe ve zaman) varsayılan olarak 30 gün "
-     "saklarız; bu süreyi panelden 1 ile 365 gün arasında değiştirebilirsiniz. İzin verilen siteler, mesajlar, ekran "
-     "görüntüleri ve arama geçmişi hiçbir zaman kaydedilmez. Ayrıntılar Gizlilik Politikası'nda yer alır."),
+     "Hesabınız, aile ve cihaz bilgileriniz ile beyaz listeniz dışında yalnızca engellenen istekleri (alan adı, "
+     "kategori, risk puanı, gerekçe, isteği yapan cihaz ve zaman) saklarız. Engel kayıtları varsayılan olarak 30 gün "
+     "tutulur; bu süreyi panelden 1 ile 365 gün arasında değiştirebilirsiniz. Ziyaret edilen ve engellenmeyen "
+     "siteler, mesajlar, ekran görüntüleri ve arama geçmişi kaydedilmez. Ayrıntılar Gizlilik Politikası'nda yer alır."),
     ("Bir site yanlışlıkla engellenirse ne olur?",
      "Panelde her engelin nedenini görürsünüz. Yanlışlıkla engellenen siteyi tek tıkla beyaz listeye ekleyebilirsiniz; "
      "sitenin alt adresleri de otomatik olarak açılır."),
@@ -52,5 +53,16 @@ FAQS = [
      "kartınızdan otomatik olarak tahsil edilir."),
     ("Aboneliğimi nasıl iptal ederim?",
      "Aboneliğinizi dilediğiniz zaman WhatsApp hattımızdan veya destek e-postamızdan iptal edebilirsiniz. Deneme "
-     "süresi içinde iptal ederseniz hiçbir ücret alınmaz."),
+     "süresi içinde iptal ederseniz hiçbir ücret alınmaz. Ücretli dönemde iptal ettiğinizde korumanız ödemesi "
+     "yapılmış dönemin sonuna kadar devam eder; sonraki dönem için ücret alınmaz."),
+    ("Verilerimi nasıl silerim?",
+     "Engel kayıtlarını, cihazları ve beyaz liste kayıtlarını panelinizden dilediğiniz zaman silebilirsiniz. Hesabınızın "
+     "kapatılmasını ve tüm verilerinizin silinmesini WhatsApp hattımızdan veya destek e-postamızdan isteyebilirsiniz; "
+     "talebiniz en geç 30 gün içinde yerine getirilir. Mevzuat gereği saklanması gereken ödeme kayıtları yasal süre "
+     "dolana kadar saklanır."),
+    ("Çocuğum cihazın DNS ayarını değiştirirse ne olur?",
+     "FamSecur modemin DNS ayarı üzerinden çalıştığı için cihazda elle farklı bir DNS sunucusu girilirse, tarayıcının "
+     "güvenli DNS özelliği açılırsa ya da bir VPN uygulaması kullanılırsa o cihaz korumanın dışında kalabilir. Bunu "
+     "önlemek için cihazlarda yönetici şifresi kullanmanızı, VPN uygulamalarının yüklenmesini ebeveyn denetimiyle "
+     "kısıtlamanızı ve modeminizin yönetim şifresini değiştirmenizi öneririz."),
 ]
