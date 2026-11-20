@@ -7,12 +7,21 @@ from content.models import FAQ, ContactRequest
 from shield.models import BlockEvent, Family, ThreatSource
 
 
+# Kayıtta zorunlu onaylar (Aile Plus için ayrıca plus_consent gerekir).
+REQUIRED_CONSENTS = {
+    "accept_contract": True,
+    "accept_privacy_notice": True,
+    "accept_trial_to_paid": True,
+    "household_ack": True,
+}
+
+
 class BaseAPITest(APITestCase):
     def setUp(self):
         cache.clear()
 
     def register(self, email="veli@example.com", password="Guclu.Sifre123", **extra):
-        payload = {"email": email, "password": password, "first_name": "Veli", **extra}
+        payload = {"email": email, "password": password, "first_name": "Veli", **REQUIRED_CONSENTS, **extra}
         return self.client.post("/api/auth/register/", payload, format="json")
 
     def login_as(self, email="veli@example.com", password="Guclu.Sifre123"):

@@ -18,7 +18,7 @@ function trend(total, previous) {
     : { text: `Geçen haftaya göre %${pct} az (${previous} → ${total}).`, tone: "down" };
 }
 
-export default function WeeklySummary({ weekly, categoryLabels }) {
+export default function WeeklySummary({ weekly, categoryLabels, autoBlocks = true }) {
   const { total, previous_total: previous, days, top_category: topCat, top_device: topDevice } = weekly;
   const max = Math.max(1, ...days.map((d) => d.count));
   const t = trend(total, previous);
@@ -32,7 +32,7 @@ export default function WeeklySummary({ weekly, categoryLabels }) {
           {total === 0 ? (
             "Bu hafta riskli bir istek olmadı."
           ) : (
-            <>Bu hafta <b>{total}</b> riskli istek durduruldu.</>
+            <>Bu hafta <b>{total}</b> riskli istek {autoBlocks ? "durduruldu" : "görüldü"}.</>
           )}
         </h3>
         <p className={`weekly-trend trend-${t.tone}`}>{t.text}</p>
@@ -41,10 +41,10 @@ export default function WeeklySummary({ weekly, categoryLabels }) {
             {topCat && (
               <li>En sık kategori: <b>{categoryLabels[topCat.category] || topCat.category}</b> ({topCat.count})</li>
             )}
-            {topDevice && <li>En çok engellenen cihaz: <b>{topDevice.name}</b> ({topDevice.count})</li>}
+            {topDevice && <li>En çok riskli istek yapan cihaz: <b>{topDevice.name}</b> ({topDevice.count})</li>}
           </ul>
         )}
-        <p className="muted small">Yalnızca engellenen istekler sayılır; izin verilen trafik kaydedilmez.</p>
+        <p className="muted small">Yalnızca riskli bulunan istekler sayılır.</p>
       </div>
       <figure className="week-chart" role="img" aria-label={`Son 7 günde engellenen istekler. ${label}`}>
         <div className="week-bars">

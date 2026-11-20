@@ -10,11 +10,15 @@ import Register from "./pages/public/Register";
 import NotFound from "./pages/public/NotFound";
 import Privacy from "./pages/public/Privacy";
 import Terms from "./pages/public/Terms";
+import DistanceSales from "./pages/public/DistanceSales";
+import ExplicitConsent from "./pages/public/ExplicitConsent";
 import PanelLayout from "./pages/panel/PanelLayout";
 import Overview from "./pages/panel/Overview";
 import Devices from "./pages/panel/Devices";
 import PolicyPage from "./pages/panel/Policy";
 import Whitelist from "./pages/panel/Whitelist";
+import Blocklist from "./pages/panel/Blocklist";
+import DailySummary from "./pages/panel/DailySummary";
 import Events from "./pages/panel/Events";
 import TestDomain from "./pages/panel/TestDomain";
 import Account from "./pages/panel/Account";
@@ -46,6 +50,8 @@ export default function App() {
         <Route path="kayit" element={<Register />} />
         <Route path="gizlilik" element={<Privacy />} />
         <Route path="kullanim-kosullari" element={<Terms />} />
+        <Route path="mesafeli-satis" element={<DistanceSales />} />
+        <Route path="acik-riza" element={<ExplicitConsent />} />
         <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="panel" element={<RequireAuth><PanelLayout /></RequireAuth>}>
@@ -53,6 +59,8 @@ export default function App() {
         <Route path="cihazlar" element={<Devices />} />
         <Route path="politika" element={<PolicyPage />} />
         <Route path="beyaz-liste" element={<Whitelist />} />
+        <Route path="engel-listesi" element={<Blocklist />} />
+        <Route path="gunluk-ozet" element={<DailySummary />} />
         <Route path="olaylar" element={<Events />} />
         <Route path="test" element={<TestDomain />} />
         <Route path="koruma-listeleri" element={<ProtectionLists />} />

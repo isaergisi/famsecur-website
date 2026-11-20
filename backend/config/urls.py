@@ -18,7 +18,11 @@ from shield.views import (
     BlockedDomainsView,
     ParentBlockedDomainsView,
     BlockEventViewSet,
+    BlockListViewSet,
     CheckDomainView,
+    ConsentView,
+    DailySummaryView,
+    SubscriptionCancelView,
     DeviceViewSet,
     FamilyView,
     PolicyView,
@@ -30,6 +34,7 @@ from shield.views import (
 router = DefaultRouter()
 router.register("devices", DeviceViewSet, basename="device")
 router.register("whitelist", WhitelistViewSet, basename="whitelist")
+router.register("blocklist", BlockListViewSet, basename="blocklist")
 router.register("events", BlockEventViewSet, basename="event")
 router.register("threat-sources", ThreatSourceViewSet, basename="threat-source")
 router.register("faqs", FAQViewSet, basename="faq")
@@ -51,6 +56,9 @@ urlpatterns = [
     path("api/family/", FamilyView.as_view(), name="family"),
     path("api/policy/", PolicyView.as_view(), name="policy"),
     path("api/check/", CheckDomainView.as_view(), name="check-domain"),
+    path("api/consents/", ConsentView.as_view(), name="consents"),
+    path("api/subscription/cancel/", SubscriptionCancelView.as_view(), name="subscription-cancel"),
+    path("api/daily-summary/", DailySummaryView.as_view(), name="daily-summary"),
     path("api/analyze/", PublicAnalyzeView.as_view(), name="analyze"),
     path("api/admin/stats/", AdminStatsView.as_view(), name="admin-stats"),
     path("api/admin/blocked-domains/", BlockedDomainsView.as_view(), name="blocked-domains"),

@@ -3,6 +3,8 @@ const SOURCE_LABELS = {
   official_list: "Resmî yasa dışı kumar sicilinde eşleşme bulundu.",
   signals: "Listelerde eşleşme yok; karar alan adındaki risk işaretlerine göre verildi.",
   whitelist: "Site beyaz listenizde.",
+  manual_list: "Site engel listenizde.",
+  ai: "Listelerde eşleşme yok; yapay zekâ risk tahmini çok yüksek ve otomatik engel ayarınız açık.",
   none: "Listelerde eşleşme yok; adında risk işareti de bulunmadı.",
   device_off: "Bu cihazda koruma kapalı.",
 };
@@ -10,7 +12,7 @@ const SOURCE_LABELS = {
 export default function DecisionResult({ decision, message, ai }) {
   if (!decision) return null;
   const blocked = decision.action === "block";
-  const listed = decision.source === "threat_list" || decision.source === "official_list";
+  const listed = ["threat_list", "official_list", "manual_list"].includes(decision.source);
   return (
     <div className={`decision ${blocked ? "decision-block" : "decision-allow"}`}>
       <div className="decision-head">
@@ -32,7 +34,13 @@ export default function DecisionResult({ decision, message, ai }) {
         {(ai || listed) && (
           <div>
             <dt>Yapay zekâ</dt>
-            <dd>{ai ? "Değerlendirildi (aşağıda). Yapay zekâ yalnızca uyarır, engellemez." : "Değerlendirilmedi; site bir listede yer aldığı için karar kesindir."}</dd>
+            <dd>
+              {decision.source === "ai"
+                ? "Tahmin çok yüksek ve yapay zekâ ile otomatik engel ayarınız açık olduğu için site engellendi."
+                : ai
+                  ? "Değerlendirildi (aşağıda). Otomatik engel ayarı açık değilse yapay zekâ yalnızca uyarır."
+                  : "Değerlendirilmedi; site bir listede yer aldığı için karar kesindir."}
+            </dd>
           </div>
         )}
       </dl>
@@ -43,14 +51,14 @@ export default function DecisionResult({ decision, message, ai }) {
         ))}
       </ul>
       {message && <p className="small">{message}</p>}
-      {ai && <AiRisk ai={ai} />}
+      {ai && <AiRisk ai={ai} blocked={blocked} />}
     </div>
   );
 }
 
 // Eğitilmiş yapay zekâ modelinin tahmini. Yalnızca hiçbir listede olmayan alan
 // adları için gelir; engel kararını değiştirmez, ebeveyne ek bir uyarıdır.
-function AiRisk({ ai }) {
+function AiRisk({ ai, blocked = false }) {
   return (
     <div className={`ai-risk ${ai.warning ? "ai-risk-warn" : ""}`}>
       <div className="score">
@@ -63,7 +71,7 @@ function AiRisk({ ai }) {
       </div>
       <p className="small">
         {ai.warning
-          ? `Dikkat: Bu alan adı hiçbir listede yok ama adı ${ai.category_label ? ai.category_label.toLocaleLowerCase("tr-TR") + " sitelerine" : "riskli sitelere"} benziyor. Engellenmedi; isterseniz kontrol edin.`
+          ? `Dikkat: Bu alan adı hiçbir listede yok ama adı ${ai.category_label ? ai.category_label.toLocaleLowerCase("tr-TR") + " sitelerine" : "riskli sitelere"} benziyor. ${blocked ? "Engellendi." : "Engellenmedi; isterseniz kontrol edin."}`
           : "Bu alan adı hiçbir listede yok; yapay zekâ modeli de adında belirgin bir risk görmedi."}
       </p>
       <p className="muted small">Model yalnızca alan adının harflerine bakar, sitenin içeriğini görmez. Tahmin yanılabilir.</p>

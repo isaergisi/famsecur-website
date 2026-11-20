@@ -15,9 +15,11 @@ from config.schema import AUTH_ERRORS, E400, E404, E429
 
 from .classifier import CATEGORY_LABELS, OFFICIAL_SOURCE_NAME, analyze_domain, official_gambling_domains
 from .fetchers import refresh_source, uses_file_feed
-from .models import BlockEvent, Device, Family, ThreatSource
+from .models import BlockEvent, ConsentRecord, Device, Family, ThreatSource
 from .serializers import (
+    BlockEntrySerializer,
     BlockEventSerializer,
+    ConsentSerializer,
     CheckDomainSerializer,
     DeviceSerializer,
     FamilySerializer,
@@ -27,6 +29,7 @@ from .serializers import (
     WhitelistEntrySerializer,
 )
 from .services import ai_prediction, check_domain
+from .summary import build_summary
 
 
 def decision_fields() -> dict:
@@ -154,10 +157,32 @@ class WhitelistViewSet(FamilyScopedMixin, viewsets.ModelViewSet):
 
 
 @extend_schema_view(
+    list=extend_schema(summary="Engel listemi getir", parameters=[OpenApiParameter("search", str, description="Alan adında arama")]),
+    create=extend_schema(summary="Engel listesine site ekle", responses={201: BlockEntrySerializer, 400: E400, **AUTH_ERRORS}),
+    retrieve=extend_schema(summary="Engel listesi kaydı ayrıntısı", responses={200: BlockEntrySerializer, 404: E404, **AUTH_ERRORS}),
+    update=extend_schema(summary="Engel listesi kaydı güncelle", responses={200: BlockEntrySerializer, 400: E400, 404: E404, **AUTH_ERRORS}),
+    partial_update=extend_schema(summary="Engel listesi kaydı kısmen güncelle", responses={200: BlockEntrySerializer, 400: E400, 404: E404, **AUTH_ERRORS}),
+    destroy=extend_schema(summary="Engel listesinden çıkar", responses={204: None, 404: E404, **AUTH_ERRORS}),
+)
+@extend_schema(tags=["Engel listesi"])
+class BlockListViewSet(FamilyScopedMixin, viewsets.ModelViewSet):
+    """Ailenin elle engellediği siteler. Her pakette çalışır; beyaz liste her zaman önceliklidir."""
+
+    serializer_class = BlockEntrySerializer
+    related_name = "blocklist"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        search = self.request.query_params.get("search")
+        return qs.filter(domain__icontains=search) if search else qs
+
+
+@extend_schema_view(
     list=extend_schema(
         summary="Engel olaylarını listele",
         parameters=[
-            OpenApiParameter("category", str, description="Kategori (ör. gambling, adult, phishing)"),
+            OpenApiParameter("category", str, description="Kategori (ör. gambling, adult, phishing, manual)"),
+            OpenApiParameter("action", str, description="blocked (engellendi) veya observed (Başlangıç paketinde kaydedildi)"),
             OpenApiParameter("device", int, description="Cihaz kimliği"),
             OpenApiParameter("search", str, description="Alan adında arama"),
         ],
@@ -201,6 +226,8 @@ class BlockEventViewSet(
         params = self.request.query_params
         if params.get("category"):
             qs = qs.filter(category=params["category"])
+        if params.get("action"):
+            qs = qs.filter(action=params["action"])
         if params.get("device"):
             qs = qs.filter(device_id=params["device"])
         if params.get("search"):
@@ -486,3 +513,92 @@ class ParentBlockedDomainsView(BlockedDomainsView):
 
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ["get", "head", "options"]
+
+
+# Kullanıcının panelden verip geri alabildiği onaylar. Sözleşme ve aydınlatma kayıtları geri alınamaz
+# (bunlar bir rıza değil, bilgilendirme ve sözleşme kanıtıdır).
+REVOCABLE_CONSENTS = {ConsentRecord.Kind.PLUS_SUMMARY, ConsentRecord.Kind.MARKETING}
+
+
+@extend_schema(tags=["Abonelik ve onaylar"])
+class ConsentView(APIView):
+    """GET /api/consents/ — onay geçmişi. POST {kind, give: true|false} — açık rızayı ver veya geri al."""
+
+    @extend_schema(summary="Onaylarımı listele", responses={200: ConsentSerializer(many=True), **AUTH_ERRORS})
+    def get(self, request):
+        return Response(ConsentSerializer(request.user.consents.all(), many=True).data)
+
+    @extend_schema(
+        summary="Açık rıza ver veya geri al",
+        description="Yalnızca `plus_ozet` (Aile Plus günlük özeti) ve `ticari_ileti` değiştirilebilir. "
+                    "Günlük özet rızası geri alınınca o ana kadarki özet verileri hemen silinir.",
+        request=inline_serializer("OnayIstegi", {"kind": serializers.CharField(), "give": serializers.BooleanField()}),
+        responses={200: ConsentSerializer(many=True), 400: E400, **AUTH_ERRORS},
+    )
+    def post(self, request):
+        from accounts.serializers import LEGAL_VERSION
+
+        kind = request.data.get("kind")
+        give = bool(request.data.get("give"))
+        if kind not in REVOCABLE_CONSENTS:
+            return Response({"detail": "Bu onay panelden değiştirilemez."}, status=status.HTTP_400_BAD_REQUEST)
+        family = family_of(request.user)
+        active = request.user.consents.filter(kind=kind, withdrawn_at__isnull=True)
+        if give:
+            if kind == ConsentRecord.Kind.PLUS_SUMMARY and family.plan != Family.Plan.PLUS:
+                return Response({"detail": "Günlük özet yalnızca Aile Plus paketinde vardır."}, status=status.HTTP_400_BAD_REQUEST)
+            if not active.exists():
+                ConsentRecord.objects.create(user=request.user, kind=kind, version=LEGAL_VERSION)
+        else:
+            active.update(withdrawn_at=timezone.now())
+            if kind == ConsentRecord.Kind.PLUS_SUMMARY:
+                # Rıza geri alınınca işleme durur ve o ana kadar toplanan özet verileri silinir.
+                family.daily_stats.all().delete()
+        return Response(ConsentSerializer(request.user.consents.all(), many=True).data)
+
+
+@extend_schema(tags=["Abonelik ve onaylar"])
+class SubscriptionCancelView(APIView):
+    """Aboneliği panelden iptal et (kaydolduğu kadar kolay). Hizmet ödenmiş dönemin sonuna kadar sürer."""
+
+    @extend_schema(summary="Aboneliği iptal et", request=None, responses={200: FamilySerializer, **AUTH_ERRORS})
+    def post(self, request):
+        family = family_of(request.user)
+        if family.cancel_requested_at is None:
+            family.cancel_requested_at = timezone.now()
+            family.save(update_fields=["cancel_requested_at"])
+        return Response(FamilySerializer(family).data)
+
+    @extend_schema(summary="İptal talebini geri al", request=None, responses={200: FamilySerializer, **AUTH_ERRORS})
+    def delete(self, request):
+        family = family_of(request.user)
+        family.cancel_requested_at = None
+        family.save(update_fields=["cancel_requested_at"])
+        return Response(FamilySerializer(family).data)
+
+
+@extend_schema(
+    tags=["Günlük özet"],
+    summary="Aile Plus günlük özeti",
+    description="Seçilen günün (varsayılan: bugün) en çok girilen siteleri, kategori ve cihaz dağılımı, gece kullanımı "
+                "ve ilk kez görülen siteler. Yalnızca Aile Plus paketinde ve açık rıza verilmişse döner; aksi hâlde 403.",
+    parameters=[OpenApiParameter("day", str, description="YYYY-AA-GG")],
+    responses={200: inline_serializer("GunlukOzet", {"day": serializers.CharField(), "top_sites": serializers.ListField()}), **AUTH_ERRORS},
+)
+class DailySummaryView(APIView):
+    def get(self, request):
+        from datetime import date
+
+        family = family_of(request.user)
+        if family.plan != Family.Plan.PLUS:
+            return Response({"detail": "Günlük özet Aile Plus paketinde vardır.", "code": "plan"}, status=status.HTTP_403_FORBIDDEN)
+        if not family.daily_summary_enabled:
+            return Response(
+                {"detail": "Günlük özet için açık rızanız yok veya geri alındı. Hesabım sayfasından yeniden verebilirsiniz.", "code": "consent"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        try:
+            day = date.fromisoformat(request.query_params["day"]) if request.query_params.get("day") else timezone.localdate()
+        except ValueError:
+            return Response({"detail": "Tarih YYYY-AA-GG biçiminde olmalı."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(build_summary(family, day))

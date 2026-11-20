@@ -8,7 +8,7 @@ import Spinner from "../../components/Spinner";
 import { useToast } from "../../components/Toast";
 import useFetch from "../../components/useFetch";
 import WeeklySummary from "../../components/WeeklySummary";
-import { CATEGORY_COLORS, formatDate } from "../../utils";
+import { CATEGORY_COLORS, EVENT_CATEGORY_LABELS, formatDate } from "../../utils";
 
 export default function Overview() {
   const notify = useToast();
@@ -42,7 +42,7 @@ export default function Overview() {
 
   return (
     <>
-      <PageHead title={f.name} desc={`${PLANS[f.plan]?.name ?? PLANS.tam.name} paketi · Ailenizin koruma durumuna genel bakış.`}>
+      <PageHead title={f.name} desc={`${f.plan_label ?? PLANS[f.plan]?.name} paketi · Ailenizin koruma durumuna genel bakış.`}>
         {editing ? (
           <form onSubmit={saveName} className="inline-form">
             <input value={name} onChange={(e) => setName(e.target.value)} aria-label="Aile adı" required />
@@ -58,17 +58,17 @@ export default function Overview() {
         <div className="card first-steps">
           <h3>Hoş geldiniz! Korumaya üç adımda başlayın</h3>
           <ol className="muted">
-            <li><Link to="/panel/cihazlar">Cihazlarınızı ekleyin</Link>; böylece engellerin hangi cihazdan geldiğini görebilirsiniz.</li>
+            <li><Link to="/panel/cihazlar">Cihazlarınızı ekleyin</Link>{f.shows_devices ? "; böylece olayların hangi cihazdan geldiğini görebilirsiniz." : "."}</li>
             <li><Link to="/panel/politika">Koruma ayarlarınızı seçin</Link>: risk eşiği, engelleme biçimi ve kategoriler.</li>
             <li>Modeminizin DNS ayarını FamSecur'a yönlendirin. Takıldığınız adımda <Link to="/iletisim">destek ekibimize</Link> ulaşabilirsiniz.</li>
           </ol>
         </div>
       )}
-      {s.weekly && <WeeklySummary weekly={s.weekly} categoryLabels={f.policy.category_labels} />}
+      {s.weekly && <WeeklySummary weekly={s.weekly} categoryLabels={EVENT_CATEGORY_LABELS} autoBlocks={f.auto_blocks} />}
 
       <div className="stat-grid">
         <div className="card stat"><span>Korunan cihaz</span><b>{f.device_count}</b></div>
-        <div className="card stat"><span>Toplam engel</span><b>{s.total}</b></div>
+        <div className="card stat"><span>{f.auto_blocks ? "Toplam olay" : "Riskli istek"}</span><b>{s.total}</b></div>
         <div className="card stat"><span>Son 7 gün</span><b>{s.last_7_days}</b></div>
         <div className="card stat">
           <span>Politika</span>
@@ -78,18 +78,18 @@ export default function Overview() {
 
       <div className="two-col">
         <div className="card">
-          <h3>Kategoriye göre engeller</h3>
+          <h3>Kategoriye göre olaylar</h3>
           {s.by_category.length === 0 && <p className="muted">Henüz engellenen bir istek yok.</p>}
           {s.by_category.map((c) => (
             <div key={c.category} className="bar-row">
-              <span>{f.policy.category_labels[c.category]}</span>
+              <span>{EVENT_CATEGORY_LABELS[c.category] || c.category}</span>
               <div className="bar"><span style={{ width: `${(c.count / max) * 100}%`, background: CATEGORY_COLORS[c.category] }} /></div>
               <b>{c.count}</b>
             </div>
           ))}
         </div>
         <div className="card">
-          <h3>En çok engellenen alan adları</h3>
+          <h3>En sık görülen riskli alan adları</h3>
           {s.top_domains.length === 0 && <p className="muted">Kayıt yok.</p>}
           <ul className="simple-list">
             {s.top_domains.map((d) => (
@@ -101,14 +101,14 @@ export default function Overview() {
 
       <div className="card">
         <div className="card-head">
-          <h3>Son engeller</h3>
+          <h3>Son olaylar</h3>
           <Link to="/panel/olaylar" className="small">Tümünü gör →</Link>
         </div>
         <ul className="simple-list">
           {asList(recent.data).slice(0, 5).map((e) => (
             <li key={e.id}>
               <span><code>{e.domain}</code> <span className="tag">{e.category_label}</span></span>
-              <span className="muted small">{e.device_name || "Bilinmeyen cihaz"} · {formatDate(e.created_at)}</span>
+              <span className="muted small">{e.device_name || (f.shows_devices ? "Bilinmeyen cihaz" : "Cihaz gösterilmez")} · {formatDate(e.created_at)}</span>
             </li>
           ))}
           {asList(recent.data).length === 0 && <li className="muted">Henüz olay yok.</li>}
