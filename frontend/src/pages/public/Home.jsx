@@ -503,7 +503,6 @@ export default function Home() {
 
       <section className="section" id="gelistirici">
         <div className="container maker">
-          <SectionHead eyebrow="Geliştirici" title="FamSecur'un arkasındaki isim" />
           <p className="lead">
             FamSecur, bilgisayar mühendisi ve siber güvenlik alanında çalışmalar yürüten <b>İsa Ergişi</b> tarafından
             geliştirildi.
