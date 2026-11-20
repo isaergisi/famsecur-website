@@ -516,7 +516,7 @@ export default function Home() {
             Amacım basit: Çocuğunuza, farkına bile varmadan ihtiyaç duyduğu dijital güvenliği sağlamak.
           </blockquote>
           <p className="maker-sign">
-            <b>İsa Ergişi</b>, FamSecur'un geliştiricisi
+            <b>İsa Ergişi</b>, FamSecur geliştiricisi
           </p>
           <p className="muted small">
             Bize ulaşın: <a href={`mailto:${SUPPORT.email}`}>{SUPPORT.email}</a>
