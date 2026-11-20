@@ -630,3 +630,6 @@ svg.feature-icon { width: 26px; height: 26px; margin-bottom: 18px; }
 .consent-history { margin-top: 12px; }
 .consent-history summary { cursor: pointer; color: var(--muted); }
 .legal-quote { margin: 12px 0; padding: 14px 18px; border-left: 3px solid var(--lime); background: var(--surface-2); border-radius: 0 12px 12px 0; }
+
+/* Yapışkan üst menü, menüden gidilen bölümlerin başını örtmesin */
+html { scroll-padding-top: 96px; }
