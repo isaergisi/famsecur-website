@@ -4,13 +4,16 @@ Bir yönetici, bir demo ebeveyn hesabı, cihazlar, beyaz liste, örnek engel
 olayları, SSS ve tehdit kaynakları oluşturur. Tekrar çalıştırmak güvenlidir.
 """
 
+from datetime import timedelta
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils import timezone
 
 from accounts.models import User
 from content.faq_data import FAQS
 from content.models import FAQ
-from shield.models import Device, Family, ThreatSource
+from shield.models import ConsentRecord, DailyDomainStat, Device, Family, ThreatSource
 from shield.services import check_domain
 
 OFFICIAL_POOL_DESCRIPTION = (
@@ -85,8 +88,51 @@ class Command(BaseCommand):
             ]:
                 check_domain(family, domain, device)
 
+        self.seed_plus_family()
+
         self.stdout.write(self.style.SUCCESS(
             "Demo verisi hazır.\n"
-            "  Yönetici: admin@famsecur.com / Admin.12345\n"
-            "  Ebeveyn : ebeveyn@famsecur.com / Ebeveyn.12345"
+            "  Yönetici : admin@famsecur.com / Admin.12345\n"
+            "  Ebeveyn  : ebeveyn@famsecur.com / Ebeveyn.12345\n"
+            "  Aile Plus: plus@famsecur.com / Plus.12345"
         ))
+
+    def seed_plus_family(self):
+        """Aile Plus örneği: son 7 günün günlük özet sayıları (ev ajanı bağlanana kadar örnek veri)."""
+        from accounts.serializers import LEGAL_VERSION
+
+        parent, created = User.objects.get_or_create(
+            email="plus@famsecur.com", defaults={"first_name": "Murat", "last_name": "Aksoy"}
+        )
+        if not created:
+            return
+        parent.set_password("Plus.12345")
+        parent.save()
+        family = Family.create_with_defaults(owner=parent, name="Aksoy Ailesi", plan=Family.Plan.PLUS)
+        for kind in (ConsentRecord.Kind.CONTRACT, ConsentRecord.Kind.PRIVACY_NOTICE, ConsentRecord.Kind.TRIAL_TO_PAID,
+                     ConsentRecord.Kind.HOUSEHOLD, ConsentRecord.Kind.PLUS_SUMMARY):
+            ConsentRecord.objects.create(user=parent, kind=kind, version=LEGAL_VERSION)
+        deniz = Device.objects.create(family=family, name="Deniz'in telefonu", device_type="phone", member_name="Deniz")
+        ada = Device.objects.create(family=family, name="Ada'nın tableti", device_type="tablet", member_name="Ada")
+        Device.objects.create(family=family, name="Babanın bilgisayarı", device_type="computer", in_daily_summary=False)
+        # (cihaz, alan adı, günlük sorgu, gece sorgusu)
+        pattern = [
+            (deniz, "instagram.com", 180, 22), (deniz, "tiktok.com", 240, 35), (deniz, "youtube.com", 120, 8),
+            (deniz, "whatsapp.com", 90, 4), (deniz, "eba.gov.tr", 25, 0), (deniz, "google.com", 60, 2),
+            (deniz, "spotify.com", 40, 6), (ada, "youtube.com", 150, 0), (ada, "roblox.com", 110, 0),
+            (ada, "khanacademy.org", 30, 0), (ada, "duolingo.com", 18, 0), (ada, "google.com", 20, 0),
+        ]
+        today = timezone.localdate()
+        rows = []
+        for offset in range(7):
+            day = today - timedelta(days=offset)
+            scale = 1 - offset * 0.07
+            for device, domain, count, night in pattern:
+                rows.append(DailyDomainStat(family=family, device=device, day=day, domain=domain,
+                                            count=int(count * scale), night_count=int(night * scale)))
+        rows += [
+            DailyDomainStat(family=family, device=deniz, day=today, domain="discord.com", count=45, night_count=12),
+            DailyDomainStat(family=family, device=ada, day=today, domain="minecraft.net", count=28),
+        ]
+        DailyDomainStat.objects.bulk_create(rows)
+        check_domain(family, "casino777.xyz", deniz)

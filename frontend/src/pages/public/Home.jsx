@@ -12,7 +12,7 @@ import { AI_METRICS, DATA_INVENTORY, DATA_NEVER, PLANS, SUPPORT, TL, TRIAL_TERMS
 import { CATEGORY_LABELS, formatDate } from "../../utils";
 
 const WHY = [
-  { icon: EyeOff, title: "Çocuğunuzun özel alanına saygı", text: "Yalnızca açılmak istenen sitenin adına bakılır. Mesajlar, ekran görüntüleri ve gezinme geçmişi hiçbir zaman toplanmaz." },
+  { icon: EyeOff, title: "Çocuğunuzun özel alanına saygı", text: "Yalnızca açılmak istenen sitenin adına bakılır. Mesajlar, ekran görüntüleri ve sayfa içerikleri hiçbir zaman toplanmaz." },
   { icon: ShieldCheck, title: "Zararlı siteler açılmadan durur", text: "Yasa dışı bahis, yetişkin içerik, dolandırıcılık ve zararlı yazılım siteleri sayfa yüklenmeden engellenir." },
   { icon: Router, title: "Bir kez kurulur, tüm ev korunur", text: "Telefon, tablet, bilgisayar, oyun konsolu ve akıllı TV için ayrı ayrı uygulama kurmanız gerekmez." },
   { icon: SlidersHorizontal, title: "Kontrol her zaman sizde", text: "Neyin neden engellendiğini görür, yanlışlıkla engellenen bir siteye tek tıkla izin verirsiniz." },
@@ -64,7 +64,7 @@ const FEATURES = [
 const STEPS = [
   ["Modeminize bağlayın", "Modeminizin DNS ayarını FamSecur'a yönlendirin. Çocuğunuzun cihazına uygulama kurmanıza gerek yok."],
   ["Koruma ayarlarınızı seçin", "Hangi kategorilerin hangi seviyede engelleneceğini ebeveyn panelinden belirleyin."],
-  ["FamSecur arka planda çalışsın", "Zararlı siteler açılmadan engellenir; panelinizde yalnızca engellenen istekler görünür."],
+  ["FamSecur arka planda çalışsın", "Riskli siteler panelinize düşer; isterseniz otomatik, isterseniz tek tek engellersiniz."],
 ];
 
 const APPROACH = [
@@ -72,7 +72,7 @@ const APPROACH = [
   ["Cihaza kurulum", "Gerekmez"],
   ["Neye bakar", "Yalnızca açılmak istenen sitenin adına"],
   ["Neye bakmaz", "Mesajlar, ekran, sayfa içerikleri, arama geçmişi"],
-  ["Ne kaydeder", "Engellenen istekler (varsayılan 30 gün) ile sizin girdiğiniz hesap, cihaz ve beyaz liste bilgileri"],
+  ["Ne kaydeder", "Riskli bulunan istekler (varsayılan 30 gün), sizin girdiğiniz hesap, cihaz ve liste bilgileri; Aile Plus'ta açık rızanızla günlük site sayıları"],
   ["Yeni siteler", "Listede yoksa yapay zekâ sizi uyarır, karar sizindir"],
   ["Nerede korumaz", "Mobil veri, VPN, tarayıcıdaki güvenli DNS ayarı veya cihazın DNS ayarı değiştirildiğinde"],
 ];
@@ -150,6 +150,7 @@ function PlanCard({ plan, featured = false }) {
           <li key={f} className="plan-limit"><Minus aria-hidden strokeWidth={2.5} />{f}</li>
         ))}
       </ul>
+      {plan.note && <p className="muted small plan-note">{plan.note}</p>}
     </article>
   );
 }
@@ -244,7 +245,7 @@ export default function Home() {
             </h1>
             <p className="lead">
               FamSecur, ev internetinize bağlanan her cihazda zararlı siteleri açılmadan engeller. Bir takip uygulaması
-              değildir: Mesajları, ekranı ve gezinme geçmişini görmez.
+              değildir: Mesajları, ekranı ve sayfa içeriklerini görmez.
             </p>
             <p className="hero-sub">
               Koruma, modeminizin DNS ayarı üzerinden çalışır; çocuğunuzun cihazına uygulama kurulmaz.
@@ -266,8 +267,8 @@ export default function Home() {
                 <span>çocuğun cihazına uygulama yüklenmez</span>
               </li>
               <li>
-                <b>Geçmiş tutulmaz</b>
-                <span>yalnızca engellenen istekler kaydedilir</span>
+                <b>İçerik okunmaz</b>
+                <span>yalnızca sitenin adına bakılır</span>
               </li>
             </ul>
           </div>
@@ -436,7 +437,7 @@ export default function Home() {
               </table>
             </div>
             <p className="muted small privacy-note">
-              Ziyaret edilen sitelerin geçmişi tutulmaz; yalnızca riskli bulunan istekler kaydedilir. Ancak sitenin açılabilmesi için istek, yanıtı veren DNS sunucusuna
+              Başlangıç ve Ebeveyn paketlerinde ziyaret edilen sitelerin geçmişi tutulmaz; yalnızca riskli bulunan istekler kaydedilir. Aile Plus'ta, yalnızca açık rızanızla, günlük site sayıları 30 gün saklanır. Sitenin açılabilmesi için istek, yanıtı veren DNS sunucusuna
               (varsayılan olarak Cloudflare 1.1.1.1) iletilir. FamSecur HTTPS trafiğini açmaz ve sayfa içeriklerini
               okumaz. Ayrıntılar için <Link to="/gizlilik">Gizlilik Politikası</Link>'na bakabilirsiniz.
             </p>
@@ -482,13 +483,14 @@ export default function Home() {
       <section className="section" id="fiyatlar">
         <div className="container pricing">
           <div className="pricing-head">
-            <SectionHead eyebrow="Fiyatlandırma" title="İki paket, ihtiyacınıza göre">
-              İki paket de bir ev ağını kapsar, cihaz sayısında sınır yoktur ve 7 gün ücretsiz denenir.
+            <SectionHead eyebrow="Fiyatlandırma" title="Üç paket, ihtiyacınıza göre">
+              Tüm paketler bir ev ağını kapsar, cihaz sayısında sınır yoktur ve 7 gün ücretsiz denenir.
             </SectionHead>
           </div>
           <div className="plans">
             <PlanCard plan={PLANS.izleme} />
             <PlanCard plan={PLANS.tam} featured />
+            <PlanCard plan={PLANS.plus} />
           </div>
           <div className="trial-terms">
             <h4>Deneme ve ödeme koşulları</h4>

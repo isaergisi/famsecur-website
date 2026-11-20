@@ -9,7 +9,7 @@ from .classifier import (
     normalize_domain,
     official_gambling_domains,
 )
-from .models import BlockEvent, Device, Family, Policy, ThreatSource, WhitelistEntry
+from .models import BlockEntry, BlockEvent, ConsentRecord, Device, Family, Policy, ThreatSource, WhitelistEntry
 
 DOMAIN_RE = re.compile(r"^(?=.{3,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{0,62}$")
 MAC_RE = re.compile(r"^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$")
@@ -30,7 +30,10 @@ class PolicySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Policy
-        fields = ["risk_threshold", "enforcement_mode", "enabled_categories", "retention_days", "updated_at", "category_labels"]
+        fields = [
+            "risk_threshold", "enforcement_mode", "enabled_categories", "retention_days", "ai_auto_block",
+            "updated_at", "category_labels",
+        ]
         read_only_fields = ["updated_at"]
         extra_kwargs = {
             "risk_threshold": {"error_messages": {
@@ -41,6 +44,13 @@ class PolicySerializer(serializers.ModelSerializer):
 
     def get_category_labels(self, obj) -> dict[str, str]:
         return CATEGORY_LABELS
+
+    def validate_ai_auto_block(self, value):
+        if value and self.instance is not None and not self.instance.family.auto_blocks:
+            raise serializers.ValidationError(
+                "Başlangıç paketinde otomatik engel yoktur. Bu özellik Ebeveyn ve Aile Plus paketlerindedir."
+            )
+        return value
 
     def validate_enabled_categories(self, value):
         value = list(dict.fromkeys(value))
@@ -57,11 +67,20 @@ class FamilySerializer(serializers.ModelSerializer):
     policy = PolicySerializer(read_only=True)
     device_count = serializers.IntegerField(source="devices.count", read_only=True)
     whitelist_count = serializers.IntegerField(source="whitelist.count", read_only=True)
+    blocklist_count = serializers.IntegerField(source="blocklist.count", read_only=True)
+    plan_label = serializers.CharField(source="get_plan_display", read_only=True)
+    auto_blocks = serializers.BooleanField(read_only=True)
+    shows_devices = serializers.BooleanField(read_only=True)
+    daily_summary_enabled = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Family
-        fields = ["id", "name", "plan", "created_at", "policy", "device_count", "whitelist_count"]
-        read_only_fields = ["id", "plan", "created_at"]
+        fields = [
+            "id", "name", "plan", "plan_label", "billing_period", "cancel_requested_at", "created_at", "policy",
+            "device_count", "whitelist_count", "blocklist_count", "auto_blocks", "shows_devices",
+            "daily_summary_enabled",
+        ]
+        read_only_fields = ["id", "plan", "billing_period", "cancel_requested_at", "created_at"]
 
 
 class DeviceSerializer(serializers.ModelSerializer):
@@ -72,7 +91,7 @@ class DeviceSerializer(serializers.ModelSerializer):
         model = Device
         fields = [
             "id", "name", "device_type", "device_type_label", "member_name",
-            "mac_address", "is_protected", "created_at", "block_count",
+            "mac_address", "is_protected", "in_daily_summary", "created_at", "block_count",
         ]
         read_only_fields = ["id", "created_at"]
 
@@ -108,14 +127,43 @@ class WhitelistEntrySerializer(serializers.ModelSerializer):
         return domain
 
 
+class BlockEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlockEntry
+        fields = ["id", "domain", "note", "created_at"]
+        read_only_fields = ["id", "created_at"]
+
+    def validate_domain(self, value):
+        domain = clean_domain(value)
+        family = self.context["family"]
+        qs = family.blocklist.filter(domain=domain)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("Bu alan adı zaten engel listenizde.")
+        if family.whitelist.filter(domain=domain).exists():
+            raise serializers.ValidationError("Bu alan adı beyaz listenizde. Önce beyaz listeden çıkarın.")
+        return domain
+
+
+class ConsentSerializer(serializers.ModelSerializer):
+    kind_label = serializers.CharField(source="get_kind_display", read_only=True)
+
+    class Meta:
+        model = ConsentRecord
+        fields = ["id", "kind", "kind_label", "version", "accepted_at", "withdrawn_at"]
+        read_only_fields = fields
+
+
 class BlockEventSerializer(serializers.ModelSerializer):
     device_name = serializers.CharField(source="device.name", read_only=True, default=None)
     category_label = serializers.CharField(source="get_category_display", read_only=True)
+    action_label = serializers.CharField(source="get_action_display", read_only=True)
 
     class Meta:
         model = BlockEvent
         fields = [
-            "id", "domain", "category", "category_label", "score", "reasons",
+            "id", "domain", "category", "category_label", "action", "action_label", "score", "reasons",
             "enforcement_mode", "device", "device_name", "created_at",
         ]
         read_only_fields = fields

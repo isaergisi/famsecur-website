@@ -3,7 +3,10 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from shield.models import Family
+from shield.models import ConsentRecord, Family
+
+# Sözleşme ve aydınlatma metinlerinin sürümü. Metinler değiştiğinde güncellenir; her onay bu sürümle saklanır.
+LEGAL_VERSION = "2026-11-20"
 
 from .models import User
 
@@ -21,10 +24,33 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, style={"input_type": "password"})
     family_name = serializers.CharField(max_length=80, required=False, allow_blank=True)
     plan = serializers.ChoiceField(choices=Family.Plan.choices, required=False, default=Family.Plan.FULL)
+    billing_period = serializers.ChoiceField(
+        choices=Family.BillingPeriod.choices, required=False, default=Family.BillingPeriod.MONTHLY
+    )
+    # Onaylar: hiçbiri önceden işaretli gelmez; zorunlu olanlar işaretlenmeden hesap açılmaz.
+    accept_contract = serializers.BooleanField(required=False, default=False)
+    accept_privacy_notice = serializers.BooleanField(required=False, default=False)
+    accept_trial_to_paid = serializers.BooleanField(required=False, default=False)
+    household_ack = serializers.BooleanField(required=False, default=False)
+    plus_consent = serializers.BooleanField(required=False, default=False)
+    marketing_consent = serializers.BooleanField(required=False, default=False)
+
+    CONSENT_FIELDS = {
+        "accept_contract": ConsentRecord.Kind.CONTRACT,
+        "accept_privacy_notice": ConsentRecord.Kind.PRIVACY_NOTICE,
+        "accept_trial_to_paid": ConsentRecord.Kind.TRIAL_TO_PAID,
+        "household_ack": ConsentRecord.Kind.HOUSEHOLD,
+        "plus_consent": ConsentRecord.Kind.PLUS_SUMMARY,
+        "marketing_consent": ConsentRecord.Kind.MARKETING,
+    }
 
     class Meta:
         model = User
-        fields = ["email", "password", "first_name", "last_name", "family_name", "plan"]
+        fields = [
+            "email", "password", "first_name", "last_name", "family_name", "plan", "billing_period",
+            "accept_contract", "accept_privacy_notice", "accept_trial_to_paid", "household_ack",
+            "plus_consent", "marketing_consent",
+        ]
         extra_kwargs = {"first_name": {"required": True, "allow_blank": False}}
 
     def validate_email(self, value):
@@ -36,15 +62,36 @@ class RegisterSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         candidate = User(email=attrs["email"], first_name=attrs.get("first_name", ""))
         password_validation.validate_password(attrs["password"], candidate)
+        errors = {}
+        if not attrs.get("accept_contract"):
+            errors["accept_contract"] = "Ön bilgilendirme formunu ve mesafeli satış sözleşmesini onaylamanız gerekir."
+        if not attrs.get("accept_privacy_notice"):
+            errors["accept_privacy_notice"] = "KVKK aydınlatma metnini okuduğunuzu onaylamanız gerekir."
+        if not attrs.get("accept_trial_to_paid"):
+            errors["accept_trial_to_paid"] = "Deneme sonunda ücretli aboneliğin başlamasını onaylamanız gerekir."
+        plan = attrs.get("plan", Family.Plan.FULL)
+        if plan != Family.Plan.MONITOR and not attrs.get("household_ack"):
+            errors["household_ack"] = "Bu pakette cihaz bazında kayıt tutulduğu için hane bireylerini bilgilendirdiğinizi onaylamanız gerekir."
+        if plan == Family.Plan.PLUS and not attrs.get("plus_consent"):
+            errors["plus_consent"] = "Aile Plus günlük özeti için açık rızanız gerekir. Rıza vermek istemezseniz Ebeveyn paketini seçebilirsiniz."
+        if errors:
+            raise serializers.ValidationError(errors)
         return attrs
 
     @transaction.atomic
     def create(self, validated_data):
         family_name = validated_data.pop("family_name", "") or f"{validated_data['first_name']} Ailesi"
         plan = validated_data.pop("plan", Family.Plan.FULL)
+        billing_period = validated_data.pop("billing_period", Family.BillingPeriod.MONTHLY)
+        given = {field: validated_data.pop(field, False) for field in self.CONSENT_FIELDS}
         user = User.objects.create_user(**validated_data)
         # Her ebeveyn kendi ailesiyle, seçtiği paketle ve varsayılan koruma politikasıyla başlar.
-        Family.create_with_defaults(owner=user, name=family_name, plan=plan)
+        Family.create_with_defaults(owner=user, name=family_name, plan=plan, billing_period=billing_period)
+        ConsentRecord.objects.bulk_create([
+            ConsentRecord(user=user, kind=kind, version=LEGAL_VERSION)
+            for field, kind in self.CONSENT_FIELDS.items()
+            if given[field] and (kind != ConsentRecord.Kind.PLUS_SUMMARY or plan == Family.Plan.PLUS)
+        ])
         return user
 
 

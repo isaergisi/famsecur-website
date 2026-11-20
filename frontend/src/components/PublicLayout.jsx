@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth";
-import { SUPPORT } from "../site";
+import { SELLER, SUPPORT, sellerField } from "../site";
 import Logo from "./Logo";
 
 export default function PublicLayout() {
@@ -65,9 +65,14 @@ export default function PublicLayout() {
             <h4>Yasal</h4>
             <Link to="/gizlilik">Gizlilik Politikası</Link>
             <Link to="/kullanim-kosullari">Kullanım Koşulları</Link>
+            <Link to="/mesafeli-satis">Mesafeli Satış Sözleşmesi</Link>
+            <Link to="/acik-riza">Aile Plus Açık Rıza Metni</Link>
           </div>
         </div>
-        <div className="container footer-bottom muted">© {new Date().getFullYear()} FamSecur</div>
+        <div className="container footer-bottom muted">
+          © {new Date().getFullYear()} FamSecur · {sellerField(SELLER.title)} · {sellerField(SELLER.address)} ·{" "}
+          MERSİS {sellerField(SELLER.mersis)} · {SELLER.email}
+        </div>
       </footer>
     </>
   );

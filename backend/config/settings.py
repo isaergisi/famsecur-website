@@ -128,6 +128,10 @@ SPECTACULAR_SETTINGS = {
         "Tüm hatalar `{\"detail\": \"...\", \"errors\": {alan: [mesaj]}}` biçiminde Türkçe döner."
     ),
     "VERSION": "1.0.0",
+    "ENUM_NAME_OVERRIDES": {
+        "EventActionEnum": "shield.models.BlockEvent.Action",
+        "DecisionActionEnum": ["allow", "block"],
+    },
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
     "SWAGGER_UI_DIST": "SIDECAR",

@@ -7,6 +7,7 @@ export const CATEGORY_COLORS = {
   drugs: "#c99a2e",
   phishing: "var(--blue-light)",
   malware: "var(--lime)",
+  manual: "#9b8cff",
 };
 
 // Silme gibi geri alınamaz işlemlerden önce onay ister.
@@ -20,3 +21,6 @@ export const CATEGORY_LABELS = {
   phishing: "Oltalama / dolandırıcılık",
   malware: "Zararlı yazılım",
 };
+
+// Olaylarda ek olarak görünen kategori: ailenin kendi engel listesi.
+export const EVENT_CATEGORY_LABELS = { ...CATEGORY_LABELS, manual: "Engel listeniz" };

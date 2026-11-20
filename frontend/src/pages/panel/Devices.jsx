@@ -10,9 +10,9 @@ import useFetch from "../../components/useFetch";
 import { confirmAction } from "../../utils";
 
 const TYPES = { phone: "Telefon", tablet: "Tablet", computer: "Bilgisayar", console: "Oyun konsolu", tv: "Akıllı TV", other: "Diğer" };
-const EMPTY = { name: "", device_type: "phone", member_name: "", mac_address: "", is_protected: true };
+const EMPTY = { name: "", device_type: "phone", member_name: "", mac_address: "", is_protected: true, in_daily_summary: true };
 
-function DeviceForm({ initial, onClose, onSaved }) {
+function DeviceForm({ initial, onClose, onSaved, plus }) {
   const [form, setForm] = useState(initial || EMPTY);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
@@ -53,6 +53,15 @@ function DeviceForm({ initial, onClose, onSaved }) {
           <input type="checkbox" checked={form.is_protected} onChange={set("is_protected")} />
           <span>Bu cihazda koruma açık</span>
         </label>
+        {plus && (
+          <label className="switch">
+            <input type="checkbox" checked={form.in_daily_summary} onChange={set("in_daily_summary")} />
+            <span>
+              Günlük özete dahil et
+              <em className="muted small"> 18 yaşından büyük biri kullanıyorsa, bilgisi ve onayı olmadan açmayın.</em>
+            </span>
+          </label>
+        )}
         <div className="modal-actions">
           <button type="button" className="btn btn-ghost" onClick={onClose}>Vazgeç</button>
           <button className="btn btn-primary">Kaydet</button>
@@ -65,6 +74,8 @@ function DeviceForm({ initial, onClose, onSaved }) {
 export default function Devices() {
   const notify = useToast();
   const { data, error, loading, reload } = useFetch("/devices/");
+  const family = useFetch("/family/");
+  const plus = family.data?.plan === "plus";
   const [editing, setEditing] = useState(null); // null: kapalı, {}: yeni, cihaz: düzenle
 
   async function remove(device) {
@@ -78,10 +89,12 @@ export default function Devices() {
     }
   }
 
-  async function toggle(device) {
+  async function toggle(device, field = "is_protected") {
+    const on = !device[field];
     try {
-      await api.patch(`/devices/${device.id}/`, { is_protected: !device.is_protected });
-      notify(device.is_protected ? "Koruma kapatıldı." : "Koruma açıldı.");
+      await api.patch(`/devices/${device.id}/`, { [field]: on });
+      if (field === "is_protected") notify(on ? "Koruma açıldı." : "Koruma kapatıldı.");
+      else notify(on ? "Cihaz günlük özete dahil edildi." : "Cihaz günlük özetten çıkarıldı; bu cihaz için yeni sayı tutulmaz.");
       reload();
     } catch (err) {
       notify(err.message, "error");
@@ -101,7 +114,7 @@ export default function Devices() {
         <div className="card table-wrap">
           <table>
             <thead>
-              <tr><th>Cihaz</th><th>Tür</th><th>Kullanan</th><th>Engel</th><th>Koruma</th><th /></tr>
+              <tr><th>Cihaz</th><th>Tür</th><th>Kullanan</th><th>Olay</th><th>Koruma</th>{plus && <th>Günlük özet</th>}<th /></tr>
             </thead>
             <tbody>
               {devices.map((d) => (
@@ -115,6 +128,13 @@ export default function Devices() {
                       {d.is_protected ? "Açık" : "Kapalı"}
                     </button>
                   </td>
+                  {plus && (
+                    <td>
+                      <button className={`pill ${d.in_daily_summary ? "pill-on" : "pill-off"}`} onClick={() => toggle(d, "in_daily_summary")}>
+                        {d.in_daily_summary ? "Dahil" : "Hariç"}
+                      </button>
+                    </td>
+                  )}
                   <td className="row-actions">
                     <button className="btn btn-ghost btn-sm" onClick={() => setEditing(d)}>Düzenle</button>
                     <button className="btn btn-danger btn-sm" onClick={() => remove(d)}>Sil</button>
@@ -128,6 +148,7 @@ export default function Devices() {
       {editing && (
         <DeviceForm
           initial={editing.id ? editing : null}
+          plus={plus}
           onClose={() => setEditing(null)}
           onSaved={(_, updated) => {
             notify(updated ? "Cihaz güncellendi." : "Cihaz eklendi.");
