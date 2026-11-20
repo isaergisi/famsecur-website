@@ -513,7 +513,7 @@ export default function Home() {
             saldırıları, yasa dışı bahis siteleri ve sürekli değişen zararlı bağlantılara karşı geliştiriliyor.
           </p>
           <blockquote className="maker-quote">
-            Amacım basit: Çocuğunuza, farkına bile varmadan ihtiyaç duyduğu dijital güvenliği sağlamak.
+            Amacım, Türk gençlerine aileleri tarafından, kendileri farkına bile varmadan ihtiyaç duydukları dijital güvenliği sağlamaktır.
           </blockquote>
           <p className="maker-sign">
             <b>İsa Ergişi</b>, FamSecur geliştiricisi
