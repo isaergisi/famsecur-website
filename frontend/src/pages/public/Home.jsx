@@ -503,16 +503,19 @@ export default function Home() {
 
       <section className="section" id="gelistirici">
         <div className="container maker">
-          <SectionHead title="Türkiye'deki aileler için geliştirildi" />
+          <SectionHead eyebrow="Geliştirici" title="FamSecur'un arkasındaki isim" />
           <p className="lead">
-            FamSecur, yazılım mühendisi <b>İsa Ergişi</b> tarafından geliştirildi.
+            FamSecur, bilgisayar mühendisi ve siber güvenlik alanında çalışmalar yürüten <b>İsa Ergişi</b> tarafından
+            geliştirildi.
           </p>
           <p className="muted">
-            Yapay zekâ modeli Türkiye'de sık ziyaret edilen sitelerle eğitildi; oltalama verisi T.C. Siber Güvenlik
-            Başkanlığı'nın USOM listesinden alınıyor. Sık sık adres değiştiren yasa dışı bahis sitelerine karşı, bu sorunu
-            yakından bilen biri tarafından geliştirildi.
+            Yapay zekâ destekli tehdit tespit sistemi; Türkiye'deki ve uluslararası alandaki güvenilir kaynaklardan, resmî
+            tehdit istihbaratı verilerinden ve internet ekosistemine yönelik analizlerden yararlanıyor. Özellikle oltalama
+            saldırıları, yasa dışı bahis siteleri ve sürekli değişen zararlı bağlantılara karşı geliştiriliyor.
           </p>
-          <blockquote className="maker-quote">Amacım basit: çocuğunuzu gözetlemeden korumak.</blockquote>
+          <blockquote className="maker-quote">
+            Amacım basit: Çocuğunuza, farkına bile varmadan ihtiyaç duyduğu dijital güvenliği sağlamak.
+          </blockquote>
           <p className="maker-sign">
             <b>İsa Ergişi</b>, FamSecur'un geliştiricisi
           </p>
